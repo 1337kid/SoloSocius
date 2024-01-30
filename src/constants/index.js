@@ -1,1 +1,1 @@
-export const HOST = process.env.HOST
+export const INSTANCE = process.env.INSTANCE

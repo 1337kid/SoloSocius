@@ -1,5 +1,5 @@
 import connectToDB from '@/utils/connectToDB'
-import { HOST } from '@/constants'
+import { HOST, PORT } from '@/constants'
 import User from '@/models/user'
 import { NextResponse } from 'next/server'
 
@@ -14,31 +14,32 @@ export const GET = async(request) => {
             webfinger = {
                 subject: `acct:${account[0]}@${HOST}`,
                 aliases: [
-                    `${user.profileURL}`,
-                    `${user.self}`
+                    `http://${HOST}:${PORT}${user.profileURL}`,
+                    `http://${HOST}:${PORT}${user.self}`
                 ],
                 links: [
                     {
                         rel: "http://webfinger.net/rel/profile-page",
                         type: "text/html",
-                        href: `${user.profileURL}`
+                        href: `http://${HOST}:${PORT}${user.profileURL}`
                     },
                     {
                         rel: "self",
                         type: "application/activity+json",
-                        href: `${user.self}`
+                        href: `http://${HOST}:${PORT}${user.self}`
                     },
                     {
                         rel: "http://webfinger.net/rel/avatar",
                         type: "image/png",
-                        href: `${user.profilePhoto}`
+                        href: `http://${HOST}:${PORT}${user.profilePhoto}`
                     }
                 ]
             }
         })
         return NextResponse.json(webfinger, { status: 200 })
     }
-  } catch {
+  } catch (e){
+    console.log(e)
     return new NextResponse('', { status: 404 })
   }
 }
