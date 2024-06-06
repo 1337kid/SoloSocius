@@ -1,12 +1,14 @@
 import connectToDB from '@/utils/connectToDB'
 import User from '@/models/user'
 import { NextResponse } from 'next/server'
+import {INSTANCE} from '@/constants'
 
 export const GET = async(request) => {
   try {
     const searchParams = request.nextUrl.searchParams
     const resource = searchParams.get('resource')
     const account = resource.slice(5).split('@')
+    if (INSTANCE != account[1]) return new NextResponse('Not Found', { status: 404 });
     await connectToDB()
     let webfinger = {}
     await User.findOne({username: account[0]}).then(user => {
@@ -35,9 +37,14 @@ export const GET = async(request) => {
             ]
         }
     })
-    return NextResponse.json(webfinger, { status: 200 })
+    return NextResponse.json(webfinger,{
+        status:201,
+        headers : {
+            contentType: "application/activity+json"
+        }
+    });
 } catch (e){
     console.log(e)
-    return new NextResponse('', { status: 404 })
+    return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

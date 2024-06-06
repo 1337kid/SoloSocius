@@ -28,8 +28,16 @@ export const GET = async (req,{params}) => {
                 "icon": [
                     `${user.profilePhoto}`
                 ]
-            }})
-        return NextResponse.json(actor, {status:201})
+            }
+        })
+
+        return NextResponse.json(actor, {
+            status:201,
+            headers : {
+                contentType: "application/activity+json"
+            }
+        })
+        
     } catch (error) {
         console.log(error)
         return NextResponse.json({error:'Internal Server Error'},{status:500})
