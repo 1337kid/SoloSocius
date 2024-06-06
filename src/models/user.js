@@ -26,6 +26,10 @@ const userSchema = new Schema({
         type: String,
         default: ''
     },
+    createdOn: {
+        type: Date,
+        default: Date.now()
+    },
     fediverse: {
         self: {
             type: String,
