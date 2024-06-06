@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { DATABASE } from "@/constants"
 
 let isConnected = false
 
@@ -10,7 +11,7 @@ const connectToDB = async () => {
 
   try {
     await mongoose.connect(`${process.env.MONGO_URI}`,{
-        dbName:'solosocius'
+        dbName: DATABASE
     })
     isConnected = true
     console.log('Connected to DB')
