@@ -8,7 +8,7 @@ export const GET = async(request) => {
     const searchParams = request.nextUrl.searchParams
     const resource = searchParams.get('resource')
     const account = resource.slice(5).split('@')
-    if (INSTANCE != account[1]) return new NextResponse('Not Found', { status: 404 });
+    if (INSTANCE != account[1]) return new NextResponse.json({error:'Not Found'}, { status: 404 });
     await connectToDB()
     let webfinger = {}
     await User.findOne({username: account[0]}).then(user => {
@@ -45,6 +45,6 @@ export const GET = async(request) => {
     });
 } catch (e){
     console.log(e)
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse.json({error:'Internal Server Error'}, { status: 500 });
   }
 }

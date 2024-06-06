@@ -1,1 +1,1 @@
-export const INSTANCE = process.env.INSTANCE
+export const INSTANCE = process.env.DOMAIN

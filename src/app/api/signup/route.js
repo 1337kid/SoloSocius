@@ -14,11 +14,11 @@ export const POST = async (req) => {
             username: data.username,
             password: bcrypt.hashSync(data.password, 12),
             name: data.name,
-            profileURL: `${INSTANCE}/u/${data.username}`,
+            profileURL: `https://${INSTANCE}/u/${data.username}`,
             fediverse: {
-                self: `${INSTANCE}/user/${data.username}`,
-                inbox: `${INSTANCE}/user/${data.username}/inbox`,
-                outbox: `${INSTANCE}/user/${data.username}/oubox`,
+                self: `https://${INSTANCE}/user/${data.username}`,
+                inbox: `https://${INSTANCE}/user/${data.username}/inbox`,
+                outbox: `https://${INSTANCE}/user/${data.username}/oubox`,
                 publicKey: keyPair.publicKey,
                 privateKey: keyPair.privateKey
             }
