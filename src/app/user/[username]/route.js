@@ -9,7 +9,7 @@ export const GET = async (req,{params}) => {
         let actor = {}
         await User.findOne({username:username}).then(user => {
             actor = {
-                "@context": ["https://www.w3.org/ns/activitystreams",],
+                "@context": ["https://www.w3.org/ns/activitystreams","https://w3id.org/security/v1"],
                 "type": "Person",
                 "id": `${user.fediverse.self}`,
                 "following": `${user.fediverse.self}/following`,

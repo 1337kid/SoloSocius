@@ -11,7 +11,7 @@ const returnKeyPair = () => {
             type: 'pkcs1',
             format: 'pem'
         }
-    })
+    });
     return {
         publicKey: key.publicKey,
         privateKey: key.privateKey
