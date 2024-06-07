@@ -3,6 +3,23 @@ import { INSTANCE } from "@/constants";
 import https from "https";
 import axios from "axios";
 
+const webfingerLookup = async (user,domain) => {
+    const url = `https://${domain}/.well-known/webfinger?resource=acct:${user}@${domain}`
+    const agent = new https.Agent({  
+        rejectUnauthorized: false // temp, will be removed
+    });
+    const result = await axios.get(url, { httpsAgent: agent })
+    return result.data  
+}
+
+const getActor = async (actorUrl) => {
+    const agent = new https.Agent({  
+        rejectUnauthorized: false // temp, will be removed
+    });
+    const result = await axios.get(actorUrl, { httpsAgent: agent })
+    return result.data  
+}
+
 const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
     const currentDate = new Date().toGMTString();
     const parsedUrl = new URL(url);
@@ -57,4 +74,4 @@ const verifySignature = async (headers, url) => {
     }
 }
 
-export { genSignature, verifySignature }
+export { webfingerLookup, getActor, genSignature, verifySignature }

@@ -1,7 +1,7 @@
 import connectToDB from '@/utils/connectToDB'
 import User from '@/models/user'
 import { NextResponse } from 'next/server'
-import {INSTANCE} from '@/constants'
+import { INSTANCE } from '@/constants'
 
 export const GET = async(request) => {
     const searchParams = request.nextUrl.searchParams

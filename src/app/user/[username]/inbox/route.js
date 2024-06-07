@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { headers } from "next/headers";
 import connectToDB from '@/utils/connectToDB'
 import User from '@/models/user'
-import { genSignature, verifySignature } from '@/utils/fediverse'
+import { genSignature, verifySignature } from '@/utils/activitypub'
 
 export const POST = async(req,res) => {
     const headerList = headers();
