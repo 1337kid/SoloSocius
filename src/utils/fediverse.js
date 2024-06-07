@@ -21,13 +21,23 @@ const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
 const verifySignature = async (headers, url) => {
     try {
         const parsedUrl = new URL(url);
-        const signatureHeader = headers.get('signature');
-        const digestHash = headers.get('digest');
-        const currentDate = headers.get('date') || headers.get('x-date');
-        const data = signatureHeader.split(',')
+        const data = headers.get('signature').split(',');
+        const signatureElements = {host: INSTANCE, path: parsedUrl.pathname};
+        signatureElements.date = headers.get('date') || headers.get('x-date');
+        if (headers.get('digest')) {
+            signatureElements.digest = headers.get('digest')
+        }
         const keyID = data[0].split('=')[1].replaceAll('"','');
+        const signatureHeader = data[1].split('=')[1].replaceAll('"','').split(" ");
         const signature = data[2].split('=')[1].replaceAll('"','');
-
+        let signatureText="";
+        signatureHeader.map((item) => {
+            if (item === "(request-target)") signatureText += `(request-target): post ${signatureElements.path}\n`;
+            else if (item === "host") signatureText += `host: ${signatureElements.host}\n`;
+            else if (item === "date") signatureText += `date: ${signatureElements.date}\n`;
+            else if (item === "digest") signatureText += `digest: ${signatureElements.digest}\n`;
+        })
+        signatureText = signatureText.slice(0,-1);
         const agent = new https.Agent({  
             rejectUnauthorized: false // temp, will be removed
         });
@@ -37,7 +47,6 @@ const verifySignature = async (headers, url) => {
         if (!data) return false
         const publicKey = reqdata.publicKey.publicKeyPem;
         const verify = createVerify('SHA256');
-        const signatureText = `(request-target): post ${parsedUrl.pathname}\nhost: ${INSTANCE}\ndate: ${currentDate}\ndigest: ${digestHash}`;
         verify.update(signatureText);
         verify.end();
         const isVerfied = verify.verify(publicKey, signature, 'base64');
