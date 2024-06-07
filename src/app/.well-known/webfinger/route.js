@@ -38,9 +38,9 @@ export const GET = async(request) => {
         }
     })
     return NextResponse.json(webfinger,{
-        status:201,
+        status:200,
         headers : {
-            contentType: "application/activity+json"
+            contentType: "application/jrd+json"
         }
     });
 } catch (e){
