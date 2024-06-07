@@ -13,7 +13,7 @@ export const GET = async(request) => {
     let webfinger = {}
     await User.findOne({username: account[0]}).then(user => {
         webfinger = {
-            subject: `acct:${resource}`,
+            subject: `${resource}`,
             aliases: [
                 `${user.profileURL}`,
                 `${user.fediverse.self}`
