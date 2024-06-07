@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server'
 import {INSTANCE} from '@/constants'
 
 export const GET = async(request) => {
-  try {
     const searchParams = request.nextUrl.searchParams
+    try {
     const resource = searchParams.get('resource')
     const account = resource.slice(5).split('@')
     if (INSTANCE != account[1]) return new NextResponse.json({error:'Not Found'}, { status: 404 });
