@@ -34,7 +34,7 @@ export const GET = async (req,{params}) => {
         return NextResponse.json(actor, {
             status:201,
             headers : {
-                contentType: "application/activity+json"
+                "Content-Type": "application/activity+json"
             }
         })
         

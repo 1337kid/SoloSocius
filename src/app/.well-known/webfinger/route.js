@@ -40,7 +40,7 @@ export const GET = async(request) => {
     return NextResponse.json(webfinger,{
         status:200,
         headers : {
-            contentType: "application/jrd+json"
+            "Content-Type": "application/jrd+json"
         }
     });
 } catch (e){
