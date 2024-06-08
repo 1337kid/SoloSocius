@@ -1,4 +1,3 @@
-const INSTANCE = process.env.DOMAIN;
-const DATABASE = process.env.DATABASE;
-
-export { INSTANCE, DATABASE }
+export const INSTANCE = process.env.DOMAIN;
+export const DATABASE = process.env.DATABASE;
+export const VERSION = "0.0.1";
