@@ -8,7 +8,14 @@ const webfingerLookup = async (user,domain) => {
     return result.data  
 }
 
-const getActor = async (actorUrl) => {
+const getActor = async (user,domain) => {
+    const webfingerResult = await webfingerLookup(user,domain);
+    let actorUrl = ''
+    webfingerResult.links.map((link) => {
+        if (link.rel === "self") {
+            actorUrl = link.href
+        }
+    })
     const result = await axios.get(actorUrl)
     return result.data  
 }
