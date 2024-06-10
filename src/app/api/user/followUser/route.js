@@ -1,9 +1,8 @@
 import User from "@/models/user";
-import genFollowActivity from "@/utils/activitypub/activity/genFollowActivity";
+import genFollowAcceptActivity from "@/utils/activitypub/activity/genFollowAcceptActivity";
 import connectToDB from "@/utils/connectToDB";
 import { NextResponse } from "next/server";
-import { getActor, genSignature, sendSignedRequest } from "@/utils/activitypub";
-import axios from "axios";
+import { getActor, sendSignedRequest } from "@/utils/activitypub";
 
 export const POST = async(req) => {
     const data = await req.json();
@@ -14,9 +13,9 @@ export const POST = async(req) => {
         // get actor's (the user in this server) privateKey, inbox & main-key
         const actor = await User.findOne({username: data.username}, {"fediverse":1,_id:0});
         // get recipient's inbox
-        const recipientObject = await getActor(recipient[0],recipient[1]);
+        const recipientObject = await getActor(recipient[0],recipient[1].split(':')[0]);
          // genrate request body for follow activity
-        const body = genFollowActivity(actor.fediverse.self, recipientObject.id, "Follow");
+        const body = genFollowAcceptActivity(actor.fediverse.self, recipientObject.id, "Follow");
         // send a signed request to the recipient's inbox
         const requestStatus = await sendSignedRequest(
             actor.fediverse.privateKey,

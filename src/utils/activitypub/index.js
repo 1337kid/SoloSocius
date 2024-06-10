@@ -27,13 +27,11 @@ const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
     const digestHash = createHash("sha256").update(JSON.stringify(activityJSON)).digest('base64');
     const signatureText = `(request-target): post ${parsedUrl.pathname}\nhost: ${parsedUrl.hostname}\ndate: ${currentDate}\ndigest: SHA-256=${digestHash}`;
     const sign = createSign("sha256");
-    console.log(signatureText   )
     sign.update(signatureText);
     sign.end();
     const signature = sign.sign(privateKey, 'base64');
     const signatureHeader = `keyID="${senderPubKey}",headers="(request-target) host date digest",signature="${signature}"`
     const digestHeader = `SHA-256=${digestHash}`
-    console.log(signatureHeader)
     return { currentDate, signatureHeader, digestHeader };
 }
 
@@ -77,12 +75,11 @@ const verifySignature = async (headers, url) => {
             else if (item === "digest") signatureText += `digest: ${signatureElements.digest}\n`;
         })
         signatureText = signatureText.slice(0,-1);
-        console.log(signatureText)
         const result = await axios.get(keyID)
         const reqdata = result.data;
         if (!data) return false
         const publicKey = reqdata.publicKey.publicKeyPem;
-        const verify = createVerify('SHA256');
+        const verify = createVerify(signatureElements.digest.split("=")[0]);
         verify.update(signatureText);
         verify.end();
         const isVerfied = verify.verify(publicKey, signature, 'base64');
