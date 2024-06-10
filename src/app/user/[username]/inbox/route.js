@@ -13,25 +13,29 @@ export const POST = async(req) => {
         if (isAuthentic) {
             await connectToDB()
             const object = await req.json();
+            if (object?.type === "Accept") {
+                console.log(object)
+            }
             // if a "Follow" activity, send an "Accept" activity back to the origin
-            if (object?.type === "Follow") {
+            else if (object?.type === "Follow") {
                 const actor = await User.findOne({"fediverse.self": object.object}, {"fediverse":1,_id:0});
                 const recipient = new URL(object.actor); // recipient's actor url
-                const recipientObject = getActor(recipient.host, recipient.pathname.split('/').reverse()[0])
+                const recipientObject = await getActor(recipient.pathname.split('/').reverse()[0], recipient.host)
                 // generate "Accept" activity
                 const body = genFollowAcceptActivity(actor.fediverse.self, object, "Accept")
-                console.log(body)
+                // send signed request to recipient's inbox
                 const requestStatus = await sendSignedRequest(
                     actor.fediverse.privateKey,
                     recipientObject.inbox,
                     body,
                     `${actor.fediverse.self}#main-key`,
                 )
-                if (requestStatus) return new NextResponse.json({},{status:200})
-                else return new NextResponse.json({error:"error"}, {status:500})
+                if (requestStatus) return NextResponse.json({},{status:200})
+                else return NextResponse.json({error:"error"}, {status:500})
             }
         }
     } catch (error) {
+        console.log(error)
         return NextResponse.json({error:"Internal Server Error"}, {status:500});
     }
     return new NextResponse("lmap")
