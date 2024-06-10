@@ -1,6 +1,7 @@
 import { createSign, createHash, createVerify } from "crypto";
 import { INSTANCE } from "@/constants";
 import axios from "axios";
+import { genUserAgent } from "@/utils";
 
 const webfingerLookup = async (user,domain) => {
     const url = `https://${domain}/.well-known/webfinger?resource=acct:${user}@${domain}`
@@ -34,6 +35,26 @@ const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
     const digestHeader = `SHA-256=${digestHash}`
     console.log(signatureHeader)
     return { currentDate, signatureHeader, digestHeader };
+}
+
+const sendSignedRequest = async (privateKey, url, activityJSON, senderPubKey) => {
+    const {currentDate, signatureHeader, digestHeader} = genSignature(
+        privateKey,
+        url,
+        activityJSON,
+        senderPubKey
+    );
+    const result = await axios.post(url, activityJSON , {
+        headers: {
+            "Date": currentDate,
+            "Signature": signatureHeader,
+            "Digest": digestHeader,
+            "User-Agent": genUserAgent(),
+            "Content-Type": "application/activity+json"
+        }
+    })
+    if (result.status === 200) return true;
+    else return false;
 }
 
 const verifySignature = async (headers, url) => {
@@ -72,4 +93,4 @@ const verifySignature = async (headers, url) => {
     }
 }
 
-export { webfingerLookup, getActor, genSignature, verifySignature }
+export { webfingerLookup, getActor, genSignature, verifySignature, sendSignedRequest }
