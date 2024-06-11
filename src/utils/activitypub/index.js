@@ -61,6 +61,13 @@ const verifySignature = async (headers, url) => {
         const data = headers.get('signature').split(',');
         const signatureElements = {host: INSTANCE, path: parsedUrl.pathname};
         signatureElements.date = headers.get('date') || headers.get('x-date');
+        const result = await axios.get(keyID, {
+            headers: {
+                "Accept": "application/ld+json"
+            }
+        })
+        if (result.status != 200) return false;
+        const reqdata = result.data;
         if (headers.get('digest')) {
             signatureElements.digest = headers.get('digest')
         }
@@ -75,8 +82,6 @@ const verifySignature = async (headers, url) => {
             else if (item === "digest") signatureText += `digest: ${signatureElements.digest}\n`;
         })
         signatureText = signatureText.slice(0,-1);
-        const result = await axios.get(keyID)
-        const reqdata = result.data;
         if (!data) return false
         const publicKey = reqdata.publicKey.publicKeyPem;
         const verify = createVerify(signatureElements.digest.split("=")[0]);
