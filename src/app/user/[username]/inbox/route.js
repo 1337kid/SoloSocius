@@ -19,8 +19,7 @@ export const POST = async(req) => {
             // if a "Follow" activity, send an "Accept" activity back to the origin
             else if (object?.type === "Follow") {
                 const actor = await User.findOne({"fediverse.self": object.object}, {"fediverse":1,_id:0});
-                const recipient = new URL(object.actor); // recipient's actor url
-                const recipientObject = await getActor(recipient.pathname.split('/').reverse()[0], recipient.host)
+                const recipientObject = await getActor(object.actor);
                 // generate "Accept" activity
                 const body = genFollowAcceptActivity(actor.fediverse.self, object, "Accept")
                 // send signed request to recipient's inbox
@@ -33,10 +32,15 @@ export const POST = async(req) => {
                 if (requestStatus) return NextResponse.json({},{status:200})
                 else return NextResponse.json({error:"error"}, {status:500})
             }
+            else {
+                return NextResponse.json(object,{status:200})
+            }
+        } else {
+            return NextResponse.json({error:'Malformed signature'}, {status:200})
         }
     } catch (error) {
         console.log(error)
-        return NextResponse.json({error:"Internal Server Error"}, {status:500});
+        return NextResponse.json({error:"Internal Server Error"}, {status:200});
     }
     return new NextResponse("lmap")
 }
