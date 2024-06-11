@@ -1,22 +1,14 @@
-import User from "@/models/user";
-import genFollowAcceptActivity from "@/utils/activitypub/activity/genFollowAcceptActivity";
-import connectToDB from "@/utils/connectToDB";
+import genFollowAcceptActivity from "@/utils/activities/genFollowAcceptActivity";
 import { NextResponse } from "next/server";
-import { getActorFromWebfinger, sendSignedRequest } from "@/utils/activitypub";
+import { getActor, sendSignedRequest } from "@/utils/activities";
+import { getActorFromDB } from "@/utils/db/actor";
 
 export const POST = async(req) => {
     const data = await req.json();
     try {
-        await connectToDB();
-        // split recipient into user & domain
-        const recipient = data.recipient.split('@')
-        // get actor's (the user in this server) privateKey, inbox & main-key
-        const actor = await User.findOne({username: data.username}, {"fediverse":1,_id:0});
-        // get recipient's inbox
-        const recipientObject = await getActorFromWebfinger(recipient[0],recipient[1].split(':')[0]);
-         // genrate request body for follow activity
+        const actor = await getActorFromDB("username",data.username);
+        const recipientObject = await getActor(data.recipient);
         const body = genFollowAcceptActivity(actor.fediverse.self, recipientObject.id, "Follow");
-        // send a signed request to the recipient's inbox
         const requestStatus = await sendSignedRequest(
             actor.fediverse.privateKey,
             recipientObject.inbox,

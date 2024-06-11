@@ -2,6 +2,7 @@ import { createSign, createHash, createVerify } from "crypto";
 import { INSTANCE } from "@/constants";
 import axios from "axios";
 import { genUserAgent } from "@/utils";
+import { request } from "http";
 
 const webfingerLookup = async (user,domain) => {
     const url = `https://${domain}/.well-known/webfinger?resource=acct:${user}@${domain}`
@@ -61,7 +62,7 @@ const sendSignedRequest = async (privateKey, url, activityJSON, senderPubKey) =>
             "Algorithm": "rsa-sha256"
         }
     })
-    if (result.status === 200) return true;
+    if (result.status === 202) return true;
     else return false;
 }
 
