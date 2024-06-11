@@ -61,6 +61,7 @@ const verifySignature = async (headers, url) => {
         const data = headers.get('signature').split(',');
         const signatureElements = {host: INSTANCE, path: parsedUrl.pathname};
         signatureElements.date = headers.get('date') || headers.get('x-date');
+        const keyID = data[0].split('=')[1].replaceAll('"','');
         const result = await axios.get(keyID, {
             headers: {
                 "Accept": "application/ld+json"
@@ -71,7 +72,6 @@ const verifySignature = async (headers, url) => {
         if (headers.get('digest')) {
             signatureElements.digest = headers.get('digest')
         }
-        const keyID = data[0].split('=')[1].replaceAll('"','');
         const signatureHeader = data[1].split('=')[1].replaceAll('"','').split(" ");
         const signature = data[2].split('=')[1].replaceAll('"','');
         let signatureText="";
