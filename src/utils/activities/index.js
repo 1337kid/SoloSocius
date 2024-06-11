@@ -62,7 +62,7 @@ const sendSignedRequest = async (privateKey, url, activityJSON, senderPubKey) =>
             "Algorithm": "rsa-sha256"
         }
     })
-    if (result.status === 202) return true;
+    if (result.status >= 200 && result.status <= 300) return true;
     else return false;
 }
 
