@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { headers } from "next/headers";
 import { getActor, sendSignedRequest, verifySignature } from '@/utils/activities';
 import genFollowAcceptActivity from '@/utils/activities/genFollowAcceptActivity';
-import { addActorToFollowers, getActorFromDB } from '@/utils/db/actor';
+import { addActorToContacts, getActorFromDB } from '@/utils/db/actor';
 
 export const POST = async(req) => {
     const headerList = headers();
@@ -10,7 +10,6 @@ export const POST = async(req) => {
     try {
         if (isAuthentic) {
             const object = await req.json();
-            console.log(object)
             if (object?.type === "Follow") {
                 const actor = await getActorFromDB("fediverse.self", object.object);
                 const recipientObject = await getActor(object.actor);
@@ -23,12 +22,13 @@ export const POST = async(req) => {
                 )
                 console.log(requestStatus)
                 if (requestStatus) {
-                    await addActorToFollowers(recipientObject);
+                    await addActorToContacts(recipientObject, "followers");
                     return NextResponse.json({},{status:200})
                 }
-                else return NextResponse.json({error:"error"}, {status:500})
             }
-            else return NextResponse.json({},{status:200})
+            else if (object.type === "Accept") {
+                
+            }
         } else {
             return NextResponse.json({error:'Invalid signature'}, {status:403})
         }

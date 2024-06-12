@@ -70,6 +70,7 @@ const verifySignature = async (headers, url) => {
     try {
         const parsedUrl = new URL(url);
         const data = headers.get('signature').split(',');
+        if (!data) return false
         const signatureElements = {
             host: INSTANCE,
             path: parsedUrl.pathname,
@@ -100,7 +101,6 @@ const verifySignature = async (headers, url) => {
             else if (item === "content-type") signatureText += `content-type: ${signatureElements.contentType}\n`;
         })
         signatureText = signatureText.slice(0,-1);
-        if (!data) return false
         const publicKey = reqdata.publicKey.publicKeyPem;
         const verify = createVerify(signatureElements.algorithm || "rsa-sha256");
         verify.update(signatureText);
