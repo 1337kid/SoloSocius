@@ -10,6 +10,7 @@ export const POST = async(req) => {
     try {
         if (isAuthentic) {
             const object = await req.json();
+            console.log(object)
             if (object?.type === "Follow") {
                 const actor = await getActorFromDB("fediverse.self", object.object);
                 const recipientObject = await getActor(object.actor);
@@ -22,13 +23,14 @@ export const POST = async(req) => {
                 )
                 console.log(requestStatus)
                 if (requestStatus) {
-                    await addActorToContacts(recipientObject, "followers");
+                    await addActorToContacts(recipientObject, "followers", object.id);
                     return NextResponse.json({},{status:200})
                 }
             }
-            else if (object.type === "Accept") {
+            // else if (object.type === "Accept") {
                 
-            }
+            // }
+            return NextResponse.json({error:'Invalid signature'}, {status:200})
         } else {
             return NextResponse.json({error:'Invalid signature'}, {status:403})
         }

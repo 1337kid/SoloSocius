@@ -14,7 +14,7 @@ const getActorFromDB = async(field,value) => {
     }
 }
 
-const addActorToContacts = async(actor, type) => {
+const addActorToContacts = async(actor, type, activityId) => {
     await connectToDB()
     try {
         const newActor = {
@@ -29,20 +29,29 @@ const addActorToContacts = async(actor, type) => {
                 recipientId = result._id;
             } else recipientId = data._id 
             
-            const updateObject = {
-                $inc: { count: 1 },
-                $push: { [type] : recipientId },
+            const insertObject = {
+                actorId: recipientId,
+                activityId: activityId
             }
 
             if (type === "followers") {
-                await Followers.findOneAndUpdate({count: {$gte: 0}}, updateObject);
+                await new Followers(insertObject).save();
                 return
             }
-            await Following.findOneAndUpdate({count: {$gte: 0}}, updateObject);
+            await new Following(insertObject).save();
         })
     } catch (error) {
         console.log(error)
     }
 }
 
-export { getActorFromDB, addActorToContacts }
+const getContacts = async (type,page) => {
+    await connectToDB();
+    try {
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export { getActorFromDB, addActorToContacts, getContacts }

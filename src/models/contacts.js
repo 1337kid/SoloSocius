@@ -1,29 +1,20 @@
 import { Schema, model, models } from "mongoose";
 
-const followersSchema = new Schema({
-    count: {
-        type: Number,
-        default: 0
-    },
-    followers: [{
+const contactSchema = new Schema({
+    actorId: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'Actor'
-    }]
-})
-
-const followingSchema = new Schema({
-    count: {
-        type: Number,
-        default: 0
+        ref: 'Actors'
     },
-    following: [{
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: 'Actor'
-    }]
+    activityId: {
+        type: String
+    },
+    isContact: {
+        type: Boolean,
+        default: true
+    }
 })
 
-const Followers = models.Followers || model('Followers', followersSchema)
-const Following = models.Following || model('Following', followingSchema)
+const Followers = models.Followers || model('Followers', contactSchema)
+const Following = models.Following || model('Following', contactSchema)
 export { Followers, Following }
