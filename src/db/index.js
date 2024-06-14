@@ -3,7 +3,7 @@ import { DATABASE } from "@/constants"
 
 let isConnected = false
 
-const connectToDB = async () => {
+export const connectToDB = async () => {
   if (isConnected) {
     console.log('DB already connected')
     return
@@ -20,5 +20,3 @@ const connectToDB = async () => {
     console.log(error)   
   }
 }
-
-export default connectToDB

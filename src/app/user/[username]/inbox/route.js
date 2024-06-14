@@ -1,40 +1,75 @@
 import { NextResponse } from 'next/server';
 import { headers } from "next/headers";
-import { getActor, sendSignedRequest, verifySignature } from '@/utils/activities';
+import { getExternalActor, sendSignedRequest, verifySignature } from '@/utils/activities';
 import genFollowAcceptActivity from '@/utils/activities/genFollowAcceptActivity';
-import { addActorToContacts, getActorFromDB } from '@/utils/db/actor';
+import { 
+    addExternalUserActorToFollowers,
+    addExternalUserActorToFollowing,
+    getUserActorFromDB,
+    getExternalUserActorFromDB,
+    addExternalUserActorToDB,
+    removeExternalUserActorFromFollowers
+} from '@/db/actor';
+import { connectToDB } from '@/db';
+
+const getMongoIdOfExternalActor = async (actorObject) => {
+    let mongoID = await getExternalUserActorFromDB(actorObject.id);
+    if(!mongoID) mongoID = await addExternalUserActorToDB(actorObject);
+    return mongoID;
+}
+
+const handleFollowAction = async (reqBody) => {
+    const actor = await getUserActorFromDB("fediverse.self", reqBody.object);
+    const externalActor = await getExternalActor(reqBody.actor);
+    const body = genFollowAcceptActivity(actor.fediverse.self, reqBody, "Accept")
+    const requestStatus = await sendSignedRequest(
+        actor.fediverse.privateKey,
+        externalActor.inbox,
+        body,
+        `${actor.fediverse.self}#main-key`,
+    )
+    if (requestStatus) {
+        let externalActorMongoId = await getMongoIdOfExternalActor(externalActor)
+        await addExternalUserActorToFollowers(externalActor.id, externalActorMongoId, reqBody.id);
+        return NextResponse.json({},{status:200})
+    }
+    return NextResponse.json({}, {status:403})
+}
+
+const handleUndoActivity = async(reqBody) => {
+    const activityIdToUndo = reqBody.object.id;
+    const activityType = reqBody.object.type;
+    if (activityType === "Follow") {
+        await removeExternalUserActorFromFollowers("activityId", activityIdToUndo);
+        return NextResponse.json({},{status:200})
+    }
+}
+
+const handleAcceptActivity = async(reqBody) => {
+    const externalActor = await getExternalActor(reqBody.actor);
+    let externalActorMongoId = await getMongoIdOfExternalActor(externalActor);
+    console.log(externalActor, externalActorMongoId)
+    await addExternalUserActorToFollowing(externalActor.id, externalActorMongoId, reqBody.object.id || reqBody.object);
+    return NextResponse.json({})
+}
 
 export const POST = async(req) => {
+    await connectToDB();
     const headerList = headers();
-    const isAuthentic = await verifySignature(headerList, req.url);
     try {
+        const isAuthentic = await verifySignature(headerList, req.url);
         if (isAuthentic) {
-            const object = await req.json();
-            console.log(object)
-            if (object?.type === "Follow") {
-                const actor = await getActorFromDB("fediverse.self", object.object);
-                const recipientObject = await getActor(object.actor);
-                const body = genFollowAcceptActivity(actor.fediverse.self, object, "Accept")
-                const requestStatus = await sendSignedRequest(
-                    actor.fediverse.privateKey,
-                    recipientObject.inbox,
-                    body,
-                    `${actor.fediverse.self}#main-key`,
-                )
-                if (requestStatus) {
-                    await addActorToContacts(recipientObject, "followers", object.id);
-                    return NextResponse.json({},{status:200})
-                }
-            }
-            // else if (object.type === "Accept") {
-                
-            // }
-            return NextResponse.json({error:'Invalid signature'}, {status:200})
+            const reqBody = await req.json();
+            console.log(reqBody)
+            if (reqBody.type === "Follow") await handleFollowAction(reqBody);
+            else if (reqBody.type === "Undo") await handleUndoActivity(reqBody);
+            else if (reqBody.type === "Accept") await handleAcceptActivity(reqBody);
+            return NextResponse.json({error:'test'}, {status:200})
         } else {
             return NextResponse.json({error:'Invalid signature'}, {status:403})
         }
     } catch (error) {
         console.log(error)
-        return NextResponse.json({error:"Internal Server Error"}, {status:200});
+        return NextResponse.json({error:"Internal Server Error"}, {status:500});
     }
 }

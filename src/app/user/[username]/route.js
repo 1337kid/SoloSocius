@@ -1,45 +1,22 @@
-import {NextResponse} from 'next/server'
-import connectToDB from '@/utils/connectToDB'
-import User from '@/models/user'
+import { NextResponse } from 'next/server'
+import { connectToDB } from '@/db'
+import { genActorEndpointBody } from '@/utils/activities/public';
+import { getUserActorFromDB } from '@/db/actor';
 
 export const GET = async (req,{params}) => {
     try {
-        const username = params.username
-        await connectToDB()
-        let actor = {}
-        await User.findOne({username:username}).then(user => {
-            actor = {
-                "@context": ["https://www.w3.org/ns/activitystreams","https://w3id.org/security/v1"],
-                "type": "Person",
-                "id": `${user.fediverse.self}`,
-                "following": `${user.fediverse.self}/following`,
-                "followers": `${user.fediverse.self}/followers`,
-                "inbox": `${user.fediverse.inbox}`,
-                "outbox": `${user.fediverse.outbox}`,
-                "preferredUsername": `${user.username}`,
-                "name": `${user.name}`,
-                "summary": `${user.summary}`,
-                "url": `${user.profileURL}`,
-                "publicKey": {
-                    id: `${user.fediverse.self}#main-key`,
-                    owner: `${user.fediverse.self}`,
-                    publicKeyPem: `${user.fediverse.publicKey}`
-                },
-                "icon": [
-                    `${user.profilePhoto}`
-                ]
-            }
-        })
-
-        return NextResponse.json(actor, {
+        const username = params.username;
+        await connectToDB();
+        const user = await getUserActorFromDB("username",username,{});
+        if (!user) return NextResponse.json({error: 'Actor not found'}, {status:404});
+        return NextResponse.json(genActorEndpointBody(user) ,{
             status: 200,
             headers : {
                 "Content-Type": "application/activity+json"
             }
-        })
-        
+        });
     } catch (error) {
-        console.log(error)
-        return NextResponse.json({error:'Internal Server Error'},{status:500})
+        console.log(error);
+        return NextResponse.json({error:'Internal Server Error'},{status:500});
     }
 }

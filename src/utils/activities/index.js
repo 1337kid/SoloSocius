@@ -3,14 +3,14 @@ import { INSTANCE } from "@/constants";
 import axios from "axios";
 import { genUserAgent } from "@/utils";
 
-const webfingerLookup = async (user,domain) => {
+export const webfingerLookup = async (user,domain) => {
     const url = `https://${domain}/.well-known/webfinger?resource=acct:${user}@${domain}`
     const result = await axios.get(url)
     console.log(result.status)
     return result.data  
 }
 
-const getActor = async(actorUrl) => {
+export const getExternalActor = async(actorUrl) => {
     const result = await axios.get(actorUrl, {
         headers: {
             "Accept": "application/activity+json"
@@ -19,7 +19,7 @@ const getActor = async(actorUrl) => {
     return result.data 
 }
 
-const getActorFromWebfinger = async (user,domain) => {
+export const getActorFromWebfinger = async (user,domain) => {
     const webfingerResult = await webfingerLookup(user,domain);
     let actorUrl = ''
     webfingerResult.links.map((link) => {
@@ -27,10 +27,10 @@ const getActorFromWebfinger = async (user,domain) => {
             actorUrl = link.href
         }
     })
-    return await getActor(actorUrl);
+    return await getExternalActor(actorUrl);
 }
 
-const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
+export const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
     const currentDate = new Date().toGMTString();
     const parsedUrl = new URL(url);
     const digestHash = createHash("sha256").update(JSON.stringify(activityJSON)).digest('base64');
@@ -44,7 +44,7 @@ const genSignature = (privateKey, url, activityJSON, senderPubKey) => {
     return { currentDate, signatureHeader, digestHeader };
 }
 
-const sendSignedRequest = async (privateKey, url, activityJSON, senderPubKey) => {
+export const sendSignedRequest = async (privateKey, url, activityJSON, senderPubKey) => {
     const {currentDate, signatureHeader, digestHeader} = genSignature(
         privateKey,
         url,
@@ -65,7 +65,7 @@ const sendSignedRequest = async (privateKey, url, activityJSON, senderPubKey) =>
     else return false;
 }
 
-const verifySignature = async (headers, url) => {
+export const verifySignature = async (headers, url) => {
     try {
         const parsedUrl = new URL(url);
         const data = headers.get('signature').split(',');
@@ -111,5 +111,3 @@ const verifySignature = async (headers, url) => {
         return false
     }
 }
-
-export { webfingerLookup, getActor, genSignature, verifySignature, sendSignedRequest, getActorFromWebfinger }

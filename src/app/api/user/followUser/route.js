@@ -1,13 +1,15 @@
 import genFollowAcceptActivity from "@/utils/activities/genFollowAcceptActivity";
 import { NextResponse } from "next/server";
-import { getActor, sendSignedRequest } from "@/utils/activities";
-import { getActorFromDB } from "@/utils/db/actor";
+import { getExternalActor, sendSignedRequest } from "@/utils/activities";
+import { getUserActorFromDB } from "@/db/actor";
+import { connectToDB } from "@/db";
 
 export const POST = async(req) => {
+    await connectToDB();
     const data = await req.json();
     try {
-        const actor = await getActorFromDB("username",data.username);
-        const recipientObject = await getActor(data.recipient);
+        const actor = await getUserActorFromDB("username",data.username);
+        const recipientObject = await getExternalActor(data.recipient);
         const body = genFollowAcceptActivity(actor.fediverse.self, recipientObject.id, "Follow");
         const requestStatus = await sendSignedRequest(
             actor.fediverse.privateKey,
