@@ -4,6 +4,15 @@ import { Followers, Following } from "@/models/contacts";
 import { getContactsAggregateOptions } from "@/db/aggregateOptions";
 
 //=================== User & Database
+export const createUser = async(object) => {
+    await new User(object).save();
+}
+
+export const getUser = async() => {
+    const user = await User.findOne({}).select("-password");
+    console.log(user)
+    return user;
+}
 
 export const getUserActorFromDB = async(field, value, select={"fediverse":1, _id:0 }) => {
     const user = await User.findOne({[field]: value}, select);

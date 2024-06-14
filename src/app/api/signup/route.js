@@ -1,6 +1,5 @@
 import {NextResponse} from 'next/server'
-import connectToDB from '@/utils/connectToDB'
-import User from '@/models/user'
+import { connectToDB } from '@/db';
 import bcrypt from 'bcrypt'
 import { INSTANCE } from '@/constants'
 import returnKeyPair from '@/utils/keyPair'
@@ -10,7 +9,7 @@ export const POST = async (req) => {
     try {
         await connectToDB()
         const keyPair = returnKeyPair();
-        const user = new User({
+        await createUser({
             username: data.username,
             password: bcrypt.hashSync(data.password, 12),
             name: data.name,
@@ -23,8 +22,7 @@ export const POST = async (req) => {
                 privateKey: keyPair.privateKey
             }
         })
-        await user.save()
-        return NextResponse.json(user,{status:200})
+        return NextResponse.json({message: 'Account created'},{status:200})
     } catch (error){
         console.log(error)
         return NextResponse.json({error:'Internal Server Error'},{status:500})

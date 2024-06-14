@@ -1,42 +1,41 @@
-import connectToDB from '@/utils/connectToDB'
-import User from '@/models/user'
-import { NextResponse } from 'next/server'
-import { INSTANCE } from '@/constants'
+import { connectToDB } from '@/db';
+import { NextResponse } from 'next/server';
+import { INSTANCE } from '@/constants';
+import { getUser } from '@/db/actor';
 
 export const GET = async(request) => {
     const searchParams = request.nextUrl.searchParams
     try {
     const resource = searchParams.get('resource')
     const account = resource.slice(5).split('@')
-    if (INSTANCE != account[1]) return new NextResponse.json({error:'Not Found'}, { status: 404 });
+    if (INSTANCE != account[1]) return NextResponse.json({error:'Not Found'}, { status: 404 });
     await connectToDB()
-    let webfinger = {}
-    await User.findOne({username: account[0]}).then(user => {
-        webfinger = {
-            subject: `${resource}`,
-            aliases: [
-                `${user.profileURL}`,
-                `${user.fediverse.self}`
-            ],
-            links: [
-                {
-                    rel: "http://webfinger.net/rel/profile-page",
-                    type: "text/html",
-                    href: `${user.profileURL}`
-                },
-                {
-                    rel: "self",
-                    type: "application/activity+json",
-                    href: `${user.fediverse.self}`
-                },
-                {
-                    rel: "http://webfinger.net/rel/avatar",
-                    type: "image/png",
-                    href: `${user.profilePhoto}`
-                }
-            ]
-        }
-    })
+    const user = await getUser();
+    if (user.username != account[0]) return NextResponse.json({error:'Not Found'}, {status:404})
+    const webfinger = {
+        subject: `${resource}`,
+        aliases: [
+            `${user.profileURL}`,
+            `${user.fediverse.self}`
+        ],
+        links: [
+            {
+                rel: "http://webfinger.net/rel/profile-page",
+                type: "text/html",
+                href: `${user.profileURL}`
+            },
+            {
+                rel: "self",
+                type: "application/activity+json",
+                href: `${user.fediverse.self}`
+            },
+            {
+                rel: "http://webfinger.net/rel/avatar",
+                type: "image/png",
+                href: `${user.profilePhoto}`
+            }
+        ]
+    }
     return NextResponse.json(webfinger,{
         status:200,
         headers : {
