@@ -30,8 +30,9 @@ const addActorToContacts = async(actor, type, activityId) => {
             } else recipientId = data._id 
             
             const insertObject = {
-                actorId: recipientId,
-                activityId: activityId
+                actorId: actor.id,
+                actorObject: data._id,
+                activityId: activityId,
             }
 
             if (type === "followers") {
@@ -45,13 +46,29 @@ const addActorToContacts = async(actor, type, activityId) => {
     }
 }
 
-const getContacts = async (type,page) => {
-    await connectToDB();
-    try {
-        
-    } catch (error) {
-        console.log(error)
-    }
+const genContactsAggregateOptions = (page,limit) => {
+    limit = page === 0 ? limit = 1 : limit;
+    page = page >= 1 ? page-1 : page;
+    return [
+        {$match: {}},
+        {$sort: {_id: -1}},
+        {$limit: page*limit + limit},
+        {$skip: page*limit},
+        {$group: {_id: null, actors: {$push: "$actorId"}}},
+        {$project: {actors: true, _id: false}}
+    ]
 }
 
-export { getActorFromDB, addActorToContacts, getContacts }
+const getActorFollowers = async (page=1,limit=10) => {
+    const totalCount = await Followers.find({}).countDocuments();
+    const data = await Followers.aggregate(genContactsAggregateOptions(page, limit));
+    return [totalCount, data[0]?.actors]
+}
+
+const getActorFollowing = async (page=1,limit=10) => {
+    const totalCount = await Following.find({}).countDocuments();
+    const data = await Following.aggregate(genContactsAggregateOptions(page, limit));
+    return [totalCount, data[0]?.actors]
+}
+
+export { getActorFromDB, addActorToContacts, getActorFollowers, getActorFollowing}

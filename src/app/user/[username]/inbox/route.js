@@ -21,7 +21,6 @@ export const POST = async(req) => {
                     body,
                     `${actor.fediverse.self}#main-key`,
                 )
-                console.log(requestStatus)
                 if (requestStatus) {
                     await addActorToContacts(recipientObject, "followers", object.id);
                     return NextResponse.json({},{status:200})

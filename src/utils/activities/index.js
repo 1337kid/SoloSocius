@@ -2,7 +2,6 @@ import { createSign, createHash, createVerify } from "crypto";
 import { INSTANCE } from "@/constants";
 import axios from "axios";
 import { genUserAgent } from "@/utils";
-import { request } from "http";
 
 const webfingerLookup = async (user,domain) => {
     const url = `https://${domain}/.well-known/webfinger?resource=acct:${user}@${domain}`

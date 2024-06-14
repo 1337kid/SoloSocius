@@ -4,7 +4,6 @@ import User from '@/models/user'
 import bcrypt from 'bcrypt'
 import { INSTANCE } from '@/constants'
 import returnKeyPair from '@/utils/keyPair'
-import { Followers,Following } from '@/models/contacts'
 
 export const POST = async (req) => {
     const data = await req.json();
@@ -25,10 +24,6 @@ export const POST = async (req) => {
             }
         })
         await user.save()
-        const followersCollection = new Followers({followers: []})
-        const followingCollection = new Following({following: []})
-        await followersCollection.save()
-        await followingCollection.save()
         return NextResponse.json(user,{status:200})
     } catch (error){
         console.log(error)

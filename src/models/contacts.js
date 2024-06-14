@@ -2,6 +2,9 @@ import { Schema, model, models } from "mongoose";
 
 const contactSchema = new Schema({
     actorId: {
+        type: String
+    },
+    actorObject: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'Actors'
