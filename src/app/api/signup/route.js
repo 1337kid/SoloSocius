@@ -3,6 +3,7 @@ import { connectToDB } from '@/db';
 import bcrypt from 'bcrypt'
 import { INSTANCE } from '@/constants'
 import returnKeyPair from '@/utils/keyPair'
+import { createUser } from '@/db/actor';
 
 export const POST = async (req) => {
     const data = await req.json();
@@ -13,11 +14,11 @@ export const POST = async (req) => {
             username: data.username,
             password: bcrypt.hashSync(data.password, 12),
             name: data.name,
-            profileURL: `https://${INSTANCE}/u/${data.username}`,
+            profileURL: `https://${INSTANCE}/`,
             fediverse: {
-                self: `https://${INSTANCE}/user/${data.username}`,
-                inbox: `https://${INSTANCE}/user/${data.username}/inbox`,
-                outbox: `https://${INSTANCE}/user/${data.username}/oubox`,
+                self: `https://${INSTANCE}/actor`,
+                inbox: `https://${INSTANCE}/inbox`,
+                outbox: `https://${INSTANCE}/oubox`,
                 publicKey: keyPair.publicKey,
                 privateKey: keyPair.privateKey
             }

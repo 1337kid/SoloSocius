@@ -2,6 +2,7 @@ import { createSign, createHash, createVerify } from "crypto";
 import { INSTANCE } from "@/constants";
 import axios from "axios";
 import { genUserAgent } from "@/utils";
+import { getExternalUserActorFromDB } from "@/db/actor";
 
 export const webfingerLookup = async (user,domain) => {
     const url = `https://${domain}/.well-known/webfinger?resource=acct:${user}@${domain}`
@@ -10,8 +11,10 @@ export const webfingerLookup = async (user,domain) => {
     return result.data  
 }
 
-export const getExternalActor = async(actorUrl) => {
-    const result = await axios.get(actorUrl, {
+export const getExternalActor = async(actorId) => {
+    const actor = await getExternalUserActorFromDB(actorId,{});
+    if (actor) return actor.actor;
+    const result = await axios.get(actorId, {
         headers: {
             "Accept": "application/activity+json"
         }
@@ -21,13 +24,13 @@ export const getExternalActor = async(actorUrl) => {
 
 export const getActorFromWebfinger = async (user,domain) => {
     const webfingerResult = await webfingerLookup(user,domain);
-    let actorUrl = ''
+    let actorId = ''
     webfingerResult.links.map((link) => {
         if (link.rel === "self") {
-            actorUrl = link.href
+            actorId = link.href
         }
     })
-    return await getExternalActor(actorUrl);
+    return await getExternalActor(actorId);
 }
 
 export const genSignature = (privateKey, url, activityJSON, senderPubKey) => {

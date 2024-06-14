@@ -8,7 +8,7 @@ export const POST = async(req) => {
     await connectToDB();
     const data = await req.json();
     try {
-        const actor = await getUserActorFromDB("username",data.username);
+        const actor = await getUserActorFromDB();
         const recipientObject = await getExternalActor(data.recipient);
         const body = genFollowAcceptActivity(actor.fediverse.self, recipientObject.id, "Follow");
         const requestStatus = await sendSignedRequest(

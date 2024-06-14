@@ -1,7 +1,7 @@
 import { connectToDB } from '@/db';
 import { NextResponse } from 'next/server';
 import { INSTANCE } from '@/constants';
-import { getUser } from '@/db/actor';
+import { getUserActorFromDB } from '@/db/actor';
 
 export const GET = async(request) => {
     const searchParams = request.nextUrl.searchParams
@@ -9,9 +9,10 @@ export const GET = async(request) => {
     const resource = searchParams.get('resource')
     const account = resource.slice(5).split('@')
     if (INSTANCE != account[1]) return NextResponse.json({error:'Not Found'}, { status: 404 });
-    await connectToDB()
-    const user = await getUser();
-    if (user.username != account[0]) return NextResponse.json({error:'Not Found'}, {status:404})
+    await connectToDB();
+    const user = await getUserActorFromDB("-password");
+    console.log(user.username)
+    if (user && user.username != account[0]) return NextResponse.json({error:'Not Found'}, {status:404})
     const webfinger = {
         subject: `${resource}`,
         aliases: [

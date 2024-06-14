@@ -8,14 +8,8 @@ export const createUser = async(object) => {
     await new User(object).save();
 }
 
-export const getUser = async() => {
-    const user = await User.findOne({}).select("-password");
-    console.log(user)
-    return user;
-}
-
-export const getUserActorFromDB = async(field, value, select={"fediverse":1, _id:0 }) => {
-    const user = await User.findOne({[field]: value}, select);
+export const getUserActorFromDB = async(select={"fediverse":1, _id:0 }) => {
+    const user = await User.findOne({}, select);
     return user
 }
 
@@ -23,6 +17,7 @@ export const getUserActorFromDB = async(field, value, select={"fediverse":1, _id
 
 export const addExternalUserActorToDB = async(actorObject) => {
     const actor = await new Actors({actorId: actorObject.id, actor: actorObject});
+    actor.save()
     return actor._id;
 }
 

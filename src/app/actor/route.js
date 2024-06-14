@@ -5,9 +5,8 @@ import { getUserActorFromDB } from '@/db/actor';
 
 export const GET = async (req,{params}) => {
     try {
-        const username = params.username;
         await connectToDB();
-        const user = await getUserActorFromDB("username",username,{});
+        const user = await getUserActorFromDB("-password");
         if (!user) return NextResponse.json({error: 'Actor not found'}, {status:404});
         return NextResponse.json(genActorEndpointBody(user) ,{
             status: 200,

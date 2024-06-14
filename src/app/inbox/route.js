@@ -19,7 +19,7 @@ const getMongoIdOfExternalActor = async (actorObject) => {
 }
 
 const handleFollowAction = async (reqBody) => {
-    const actor = await getUserActorFromDB("fediverse.self", reqBody.object);
+    const actor = await getUserActorFromDB();
     const externalActor = await getExternalActor(reqBody.actor);
     const body = genFollowAcceptActivity(actor.fediverse.self, reqBody, "Accept")
     const requestStatus = await sendSignedRequest(
@@ -48,7 +48,6 @@ const handleUndoActivity = async(reqBody) => {
 const handleAcceptActivity = async(reqBody) => {
     const externalActor = await getExternalActor(reqBody.actor);
     let externalActorMongoId = await getMongoIdOfExternalActor(externalActor);
-    console.log(externalActor, externalActorMongoId)
     await addExternalUserActorToFollowing(externalActor.id, externalActorMongoId, reqBody.object.id || reqBody.object);
     return NextResponse.json({})
 }
