@@ -85,13 +85,8 @@ export const verifySignature = async (headers, url) => {
             const keyVal = item.split('=');
             signatureElements[[keyVal[0]]]=keyVal[1].replaceAll('"','')
         })
-        const result = await axios.get(signatureElements.keyId, {
-            headers: {
-                "Accept": "application/activity+json"
-            }
-        })
-        if (result.status != 200) return false;
-        const reqdata = result.data;
+        const reqdata = await getExternalActor(signatureElements.keyId);
+        if (!reqdata) return false;
         const signatureHeader = signatureElements.headers.split(" ");
         let signatureText="";
         signatureHeader.map((item) => {

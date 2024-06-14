@@ -31,9 +31,9 @@ const handleFollowAction = async (reqBody) => {
     if (requestStatus) {
         let externalActorMongoId = await getMongoIdOfExternalActor(externalActor)
         await addExternalUserActorToFollowers(externalActor.id, externalActorMongoId, reqBody.id);
-        return NextResponse.json({},{status:200})
+        return NextResponse.json({},{status:200});
     }
-    return NextResponse.json({}, {status:403})
+    return NextResponse.json({}, {status:403});
 }
 
 const handleUndoActivity = async(reqBody) => {
@@ -41,7 +41,7 @@ const handleUndoActivity = async(reqBody) => {
     const activityType = reqBody.object.type;
     if (activityType === "Follow") {
         await removeExternalUserActorFromFollowers("activityId", activityIdToUndo);
-        return NextResponse.json({},{status:200})
+        return NextResponse.json({},{status:200});
     }
 }
 
@@ -49,7 +49,7 @@ const handleAcceptActivity = async(reqBody) => {
     const externalActor = await getExternalActor(reqBody.actor);
     let externalActorMongoId = await getMongoIdOfExternalActor(externalActor);
     await addExternalUserActorToFollowing(externalActor.id, externalActorMongoId, reqBody.object.id || reqBody.object);
-    return NextResponse.json({})
+    return NextResponse.json({}, {status:200});
 }
 
 export const POST = async(req) => {
