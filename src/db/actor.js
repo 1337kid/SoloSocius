@@ -8,8 +8,8 @@ export const createUser = async(object) => {
     await new User(object).save();
 }
 
-export const getUserActorFromDB = async(select={"fediverse":1, _id:0 }) => {
-    const user = await User.findOne({}, select);
+export const getUserActorFromDB = async(select={"fediverse":1, _id:0 }, filter={}) => {
+    const user = await User.findOne(filter, select);
     return user
 }
 
