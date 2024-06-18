@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function Form() {
   const [data, setData] = useState({
@@ -14,7 +14,6 @@ export default function Form() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const response = await signIn('credentials', data);
-    console.log({ response });
     if (response.error) {
       setError('Login failed. check user & pass again')
     }
@@ -23,15 +22,16 @@ export default function Form() {
       router.refresh();
     }
   };
+
   return (
     <form
       onSubmit={handleSubmit}
       className='flex flex-col gap-2'
     >
       {error && (
-              <span className='bg-red-300 text-black'>
-                {error}
-              </span>
+        <span className='bg-red-300 text-black'>
+          {error}
+        </span>
       )}
       <input
         name="username"

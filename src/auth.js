@@ -1,10 +1,11 @@
-import NextAuth, { CallbackRouteError } from "next-auth"
+import NextAuth from "next-auth"
 import { createUser, getUserActorFromDB } from "./db/actor";
 import Credentials from "next-auth/providers/credentials"
 import returnKeyPair from "@/utils/keyPair";
 import { connectToDB } from "@/db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { INSTANCE } from "./constants";
+import { genJWT } from "./utils";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -47,7 +48,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({user,account,credentials}) {
         if (user?.error) throw new Error('Invalid Username / password')
+        const token = genJWT(user);
+        user.token = token;
+        console.log(user)
         return user
     }
+  },
+  pages: {
+    signIn: '/auth'
   }
 })

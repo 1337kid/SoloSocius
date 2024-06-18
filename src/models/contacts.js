@@ -18,6 +18,6 @@ const contactSchema = new Schema({
     }
 })
 
-const Followers = models.Followers || model('Followers', contactSchema)
-const Following = models.Following || model('Following', contactSchema)
+const Followers = models?.Followers || model('Followers', contactSchema)
+const Following = models?.Following || model('Following', contactSchema)
 export { Followers, Following }
