@@ -11,5 +11,5 @@ const actorsSchema = new Schema({
     }
 })
 
-const Actors = models.Actors || model('Actors',actorsSchema)
+const Actors = models?.Actors || model('Actors',actorsSchema)
 export default Actors
