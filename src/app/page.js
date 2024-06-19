@@ -1,19 +1,27 @@
 "use client"
-import {signOut} from 'next-auth/react'
 import { useRouter } from 'next/navigation';
-export default function Home() {
-  const router = useRouter();
-  return (
-    <>    <form className=""
-    action={() => {
-      signOut()
-    }}
-  >
-    <button>out</button>
-  </form>
-  
-  <button onClick={() => router.push('/test')}>LMO</button>
-  </>
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { API_PUBLIC } from '@/constants/api';
 
-  );
+const ActorProfile = () => {
+  const router = useRouter();
+  const [data, setData] = useState({userActor: {}, connections: {}})
+  useEffect(() => {
+    const getUserActor = async () => {
+      const data = await axios.get(`${API_PUBLIC}/getActor`)
+      if (data.status == 404) router.push('/auth');
+      setData(data?.data);
+    }
+    getUserActor();
+  }, [])
+  return (
+    <div className='flex container w-full bg-slate-300 m-auto'>
+      <div className='flex w-full'>
+        <h3>{data?.userActor?.name}</h3>
+      </div>
+    </div>
+  )
 }
+
+export default ActorProfile

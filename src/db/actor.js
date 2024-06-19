@@ -13,6 +13,12 @@ export const getUserActorFromDB = async(select={"fediverse":1, _id:0 }, filter={
     return user
 }
 
+export const getUserActorConnectionsCount = async() => {
+    const followers = await Followers.find({}).countDocuments();
+    const following = await Following.find({}).countDocuments();
+    return {followers, following}
+}
+
 //=================== External Actors & Database
 
 export const addExternalUserActorToDB = async(actorObject) => {
