@@ -5,19 +5,29 @@ import { useEffect, useState } from 'react';
 import { API_PUBLIC } from '@/constants/api';
 import Image from 'next/image';
 import DOMPurify from 'dompurify';
+import ReactLoading from 'react-loading';
 
 const ActorProfile = () => {
   const router = useRouter();
-  const [data, setData] = useState({userActor: {}, stats: []})
+  const [data, setData] = useState({userActor: {}, stats: []});
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
+    setLoading(true);
     const getUserActor = async () => {
       const data = await axios.get(`${API_PUBLIC}/getActor`)
       if (data.status == 404) router.push('/auth');
       setData(data?.data);
     }
     getUserActor();
+    setLoading(false);
   }, [])
-  return (
+  if (loading) {
+    return (
+      <div className='w-full h-dvh'>
+              <ReactLoading type="bars" color="white" width={100} className='m-auto'/>
+      </div>
+    )
+  } else return (
     <div className='flex container w-full m-auto p-2 text-white'>
       <div className='flex w-full gap-2'>
         <div className='flex w-3/12 flex-col bg-zinc-900 p-2 rounded-md pt-4'>
