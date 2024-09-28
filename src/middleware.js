@@ -22,4 +22,8 @@ export const config = {
       '/api/private/:path*',
       '/home/:path*'
     ],
+    unstable_allowDynamic: [
+      "/src/db/lib/dbConnect.js",
+      "/node_modules/mongoose/dist/**",
+    ]
 }
