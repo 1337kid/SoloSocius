@@ -1,6 +1,6 @@
 import { followers } from "../schema.js";
 import { eq } from "drizzle-orm";
-import { createFollowerInupt } from "../../types/activitypub.js";
+import { createFollowerInupt } from "../../types/index.js";
 import { db } from "../index.js";
 
 export const createFollowerEntry = async (data: createFollowerInupt) => {

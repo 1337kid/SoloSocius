@@ -1,6 +1,6 @@
 import { posts } from "../schema.js";
 import { eq } from "drizzle-orm";
-import { RemotePostInput } from "../../types/activitypub.js";
+import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {

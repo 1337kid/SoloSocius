@@ -3,7 +3,7 @@ import { db } from "../db/index.js";
 import { posts, followers } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { storeRemotePost } from "../db/queries/posts.js";
-import { remoteFetch } from "../utils/index.js";
+import { remoteFetch } from "../utils/activitypub.js";
 import {
   createFollowerEntry,
   removeFollowerEntry,

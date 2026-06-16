@@ -1,4 +1,4 @@
-import { ActorObject } from "../types/activitypub.js";
+import { ActorObject } from "../types/index.js";
 
 export const generateActorObject = ({
   domain,

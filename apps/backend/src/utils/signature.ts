@@ -1,4 +1,4 @@
-import { generateKeyPairSync, cryptoSign, createVerify } from "crypto";
+import { generateKeyPairSync, sign, createVerify } from "crypto";
 
 export const generateRSAKeyPair = () => {
   const { privateKey, publicKey } = generateKeyPairSync("rsa", {
@@ -40,4 +40,16 @@ export const splitSignatureHeader = (header: string) => {
     },
     {} as Record<string, string>,
   );
+};
+
+export const createSignature = (
+  comparisonString: string,
+  privateKeyPem: string,
+) => {
+  const signatureBytes = sign(
+    "sha256",
+    Buffer.from(comparisonString),
+    privateKeyPem,
+  );
+  return signatureBytes.toString("base64");
 };

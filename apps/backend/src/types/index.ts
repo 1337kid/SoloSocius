@@ -20,3 +20,10 @@ export interface createFollowerInupt {
   inboxUrl: string;
   sharedInboxUrl: string;
 }
+
+export interface DeliverParams {
+  inboxUrl: string;
+  activity: any;
+  privateKeyPem: string;
+  keyId: string;
+}
