@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { db } from "../db/index.js";
 import { posts, followers } from "../db/schema.js";
 import { eq } from "drizzle-orm";
-import { storeRemotePost } from "../db/queries/posts.js";
+import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
 import { deliverActivity, remoteFetch } from "../utils/activitypub.js";
 import {
   createFollowerEntry,
@@ -10,6 +10,8 @@ import {
 } from "../db/queries/followers.js";
 import { createActivity } from "../activitypub/activities.js";
 import { markFollowingAsAccepted } from "../db/queries/following.js";
+import { createNotificationEntry } from "../db/queries/notifications.js";
+import { DOMAIN } from "../config/env.js";
 
 export const handleIncomingInbox = async (
   request: FastifyRequest,
@@ -30,6 +32,8 @@ export const handleIncomingInbox = async (
       case "Create": {
         const nestedObject = activity.object;
 
+        const actorUri = `https://${DOMAIN}/actor`;
+
         if (nestedObject && nestedObject.type === "Note") {
           await storeRemotePost({
             actorUri: activity.actor,
@@ -39,6 +43,33 @@ export const handleIncomingInbox = async (
             url: nestedObject.url || null,
             published: nestedObject.published,
           });
+
+          if (nestedObject.inReplyTo) {
+            const localParentPost = await getPostFromDB(nestedObject.inReplyTo);
+
+            if (localParentPost && localParentPost.isLocal) {
+              await createNotificationEntry({
+                type: "mention",
+                actorId: activity.actor,
+                targetPostUri: localParentPost.idUri,
+                linkedNotificationUri: nestedObject.id,
+              });
+            }
+          }
+
+          if (Array.isArray(nestedObject.tag)) {
+            const isMentioned = nestedObject.tag.some(
+              (t: any) => t.type === "Mention" && t.href === actorUri,
+            );
+
+            if (isMentioned)
+              await createNotificationEntry({
+                type: "mention",
+                actorId: activity.actor,
+                targetPostUri: nestedObject.inReplyTo || null,
+                linkedNotificationUri: nestedObject.id,
+              });
+          }
         }
         break;
       }

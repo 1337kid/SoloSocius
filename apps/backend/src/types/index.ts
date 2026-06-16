@@ -25,3 +25,10 @@ export interface DeliverParams {
   inboxUrl: string;
   activity: any;
 }
+
+export interface NotificationType {
+  type: string;
+  actorId: string;
+  targetPostUri: string;
+  linkedNotificationUri: string;
+}

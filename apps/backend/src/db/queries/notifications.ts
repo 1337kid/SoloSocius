@@ -1,0 +1,7 @@
+import { NotificationType } from "../../types/index.js";
+import { db } from "../index.js";
+import { notifications } from "../schema.js";
+
+export const createNotificationEntry = async (data: NotificationType) => {
+  await db.insert(notifications).values(data);
+};

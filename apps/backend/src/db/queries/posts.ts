@@ -23,3 +23,12 @@ export const storeRemotePost = async (data: RemotePostInput) => {
       },
     });
 };
+
+export const getPostFromDB = async (idUri: string) => {
+  const post = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.idUri, idUri))
+    .limit(1);
+  return post[0];
+};
