@@ -3,11 +3,12 @@ import { db } from "../db/index.js";
 import { posts, followers } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { storeRemotePost } from "../db/queries/posts.js";
-import { remoteFetch } from "../utils/activitypub.js";
+import { deliverActivity, remoteFetch } from "../utils/activitypub.js";
 import {
   createFollowerEntry,
   removeFollowerEntry,
 } from "../db/queries/followers.js";
+import { createActivity } from "../activitypub/activities.js";
 
 export const handleIncomingInbox = async (
   request: FastifyRequest,
@@ -46,13 +47,21 @@ export const handleIncomingInbox = async (
 
         if (actorLookup.ok) {
           const remoteActorProfile = (await actorLookup.json()) as any;
+          const remoteInbox = remoteActorProfile.inbox;
 
           await createFollowerEntry({
             followerActorUri: activity.actor,
-            inboxUrl: remoteActorProfile.inbox,
+            inboxUrl: remoteInbox,
             sharedInboxUrl:
               remoteActorProfile.endpoints?.sharedInboxUrl ||
               remoteActorProfile.inbox,
+          });
+
+          const acceptActivity = createActivity("Accept", activity);
+          
+          await deliverActivity({
+            inboxUrl: remoteInbox,
+            activity: acceptActivity,
           });
         }
 

@@ -24,6 +24,4 @@ export interface createFollowerInupt {
 export interface DeliverParams {
   inboxUrl: string;
   activity: any;
-  privateKeyPem: string;
-  keyId: string;
 }

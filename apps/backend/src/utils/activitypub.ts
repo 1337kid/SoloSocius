@@ -3,6 +3,8 @@ import { DeliverParams } from "../types/index.js";
 import { createSignature } from "./signature.js";
 import axios from "axios";
 import axiosRetry from "axios-retry";
+import { DOMAIN } from "../config/env.js";
+import { getUserPrivateKey } from "../db/queries/users.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -31,7 +33,10 @@ export const remoteFetch = async (destination: string) => {
 };
 
 export const deliverActivity = async (params: DeliverParams) => {
-  const { inboxUrl, activity, privateKeyPem, keyId } = params;
+  const { inboxUrl, activity } = params;
+  const privateKeyPem = await getUserPrivateKey();
+
+  const keyId = `https://${DOMAIN}/actor#main-key`;
 
   const urlObj = new URL(inboxUrl);
   const targetPath = urlObj.pathname + urlObj.search;
