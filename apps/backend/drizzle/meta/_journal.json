@@ -8,6 +8,13 @@
       "when": 1781518257846,
       "tag": "0000_sticky_dragon_lord",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781595934895,
+      "tag": "0001_nostalgic_mariko_yashida",
+      "breakpoints": true
     }
   ]
 }

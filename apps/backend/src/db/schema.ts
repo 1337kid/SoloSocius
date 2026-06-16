@@ -22,7 +22,7 @@ export const posts = pgTable("posts", {
   id: uuid().defaultRandom().primaryKey(),
   actorId: text("actor_id").notNull(), // URI pointing to the author profile
   idUri: text("id_uri").notNull().unique(), // ActivityPub global URI identifying this post
-  content: text("id_uri").notNull(),
+  content: text("content").notNull(),
   isLocal: boolean("is_local").default(false).notNull(),
   inReplyTo: text("in_reply_to"), // URI of the post this is replying to (if applicable)
   url: text("url"), // Public browser link to view the post
