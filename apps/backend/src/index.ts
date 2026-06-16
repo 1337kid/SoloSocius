@@ -1,0 +1,42 @@
+import Fastify from "fastify";
+import cors from "@fastify/cors";
+import dotenv from "dotenv";
+import { activityPubRoutes } from "./routes/activitypub.router.js";
+import { PORT } from "./config/env.js";
+
+dotenv.config();
+
+const fastify = Fastify({
+  logger: true,
+});
+
+await fastify.register(cors, { origin: true });
+
+fastify.addContentTypeParser(
+  "application/activity+json",
+  { parseAs: "string" },
+  (req, body, done) => {
+    try {
+      const json = JSON.parse(body as string);
+      done(null, json);
+    } catch (err: any) {
+      err.statusCode = 400;
+      done(err, undefined);
+    }
+  },
+);
+
+await fastify.register(activityPubRoutes);
+
+const start = async () => {
+  try {
+    const port = PORT;
+    await fastify.listen({ port, host: "0.0.0.0" });
+    console.log(`SoloSocius Server spinning on port ${port}`);
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();
