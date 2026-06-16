@@ -5,3 +5,18 @@ export interface ActorObject {
   bio: string;
   publicKey: string;
 }
+
+export interface RemotePostInput {
+  actorUri: string;
+  idUri: string;
+  content: string;
+  inReplyTo?: string | null;
+  url?: string | null;
+  published?: string | Date | null;
+}
+
+export interface createFollowerInupt {
+  followerActorUri: string;
+  inboxUrl: string;
+  sharedInboxUrl: string;
+}
