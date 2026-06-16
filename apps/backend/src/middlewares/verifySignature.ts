@@ -29,7 +29,7 @@ export const verifyIncomingSignature = async (
     const comparisonLines: string[] = [];
 
     for (const key of headerKeys) {
-      if (key == "(request-target") {
+      if (key == "(request-target)") {
         comparisonLines.push(
           `(request-target): ${request.method.toLowerCase()} ${request.url}`,
         );

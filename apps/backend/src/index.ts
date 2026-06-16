@@ -9,7 +9,15 @@ import { handleWebFinger } from "./controllers/webfinger.controller.js";
 dotenv.config();
 
 const fastify = Fastify({
-  logger: true,
+  logger: {
+    transport: {
+      target: "pino-pretty",
+      options: {
+        colorize: true,
+        translateTime: "SYS:standard",
+      },
+    },
+  },
 });
 
 await fastify.register(cors, { origin: true });
