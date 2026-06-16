@@ -15,6 +15,13 @@
       "when": 1781595934895,
       "tag": "0001_nostalgic_mariko_yashida",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781625468289,
+      "tag": "0002_lethal_vulture",
+      "breakpoints": true
     }
   ]
 }

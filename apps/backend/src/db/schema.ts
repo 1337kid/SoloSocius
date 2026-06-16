@@ -52,3 +52,13 @@ export const following = pgTable(
   },
   (table) => [uniqueIndex("following_uri_idx").on(table.followingActorUri)],
 );
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  type: text("type").notNull(), // 'mention', 'like', 'repost', 'follow'
+  actorId: text("actor_id").notNull(),
+  targetPostUri: text("target_post_uri"),
+  linkedNotificationUri: text("linked_uri"),
+  isRead: boolean("is_read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

@@ -3,7 +3,7 @@ import cors from "@fastify/cors";
 import dotenv from "dotenv";
 import { activityPubRoutes } from "./routes/activitypub.router.js";
 import { APIRoutes } from "./routes/api.router.js";
-import { PORT } from "./config/env.js";
+import { PORT, NODE_ENV } from "./config/env.js";
 import { handleWebFinger } from "./controllers/webfinger.controller.js";
 
 dotenv.config();
@@ -19,6 +19,17 @@ const fastify = Fastify({
     },
   },
 });
+
+if (NODE_ENV !== "production") {
+  fastify.addHook("preHandler", async (request) => {
+    request.log.info(
+      {
+        body: request.body,
+      },
+      "Request body",
+    );
+  });
+}
 
 await fastify.register(cors, { origin: true });
 
