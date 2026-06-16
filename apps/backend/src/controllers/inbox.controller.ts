@@ -9,6 +9,7 @@ import {
   removeFollowerEntry,
 } from "../db/queries/followers.js";
 import { createActivity } from "../activitypub/activities.js";
+import { markFollowingAsAccepted } from "../db/queries/following.js";
 
 export const handleIncomingInbox = async (
   request: FastifyRequest,
@@ -58,13 +59,18 @@ export const handleIncomingInbox = async (
           });
 
           const acceptActivity = createActivity("Accept", activity);
-          
+
           await deliverActivity({
             inboxUrl: remoteInbox,
             activity: acceptActivity,
           });
         }
 
+        break;
+      }
+
+      case "Accept": {
+        await markFollowingAsAccepted(activity.actor);
         break;
       }
 

@@ -4,12 +4,13 @@ import { users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { DOMAIN } from "../config/env.js";
 import { generateActorObject } from "../activitypub/actor.js";
+import { getUser } from "../db/queries/users.js";
 
 export const getActorProfile = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const [adminUser] = await db.select().from(users).limit(1);
+  const adminUser = await getUser();
 
   if (!adminUser) {
     return reply

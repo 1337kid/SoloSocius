@@ -2,7 +2,9 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import dotenv from "dotenv";
 import { activityPubRoutes } from "./routes/activitypub.router.js";
+import { APIRoutes } from "./routes/api.router.js";
 import { PORT } from "./config/env.js";
+import { handleWebFinger } from "./controllers/webfinger.controller.js";
 
 dotenv.config();
 
@@ -26,7 +28,9 @@ fastify.addContentTypeParser(
   },
 );
 
-await fastify.register(activityPubRoutes);
+fastify.get("/.well-known/webfinger", handleWebFinger);
+await fastify.register(activityPubRoutes, { prefix: "/actor" });
+await fastify.register(APIRoutes, { prefix: "/api" });
 
 const start = async () => {
   try {
