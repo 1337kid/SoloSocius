@@ -1,4 +1,5 @@
 import { ActorObject } from "../types/index.js";
+import { DOMAIN } from "../config/env.js";
 
 export const generateActorObject = ({
   domain,
@@ -31,4 +32,14 @@ export const generateActorObject = ({
       publicKeyPem: publicKey,
     },
   };
+};
+
+export const userEndpoints = {
+  home: `https://${DOMAIN}/`,
+  actorUri: `https://${DOMAIN}/actor`,
+  inbox: `https://${DOMAIN}/actor/inbox`,
+  outbox: `https://${DOMAIN}/actor/outbox`,
+  following: `https://${DOMAIN}/actor/following`,
+  followers: `https://${DOMAIN}/actor/followers`,
+  activities: `https://${DOMAIN}/activities/`,
 };

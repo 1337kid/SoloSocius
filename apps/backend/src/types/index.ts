@@ -15,7 +15,7 @@ export interface RemotePostInput {
   published?: string | Date | null;
 }
 
-export interface createFollowerInupt {
+export interface CreateFollowerInupt {
   followerActorUri: string;
   inboxUrl: string;
   sharedInboxUrl: string;
@@ -31,4 +31,19 @@ export interface NotificationType {
   actorId: string;
   targetPostUri: string;
   linkedNotificationUri: string;
+}
+
+export interface OrderedCollection {
+  totalItems: number;
+  first: string;
+  last: string;
+}
+
+export interface OutboxActivity {
+  id: string;
+  idUri: string;
+  createdAt: Date;
+  inReplyTo: string | null;
+  content: string;
+  url: string | null;
 }
