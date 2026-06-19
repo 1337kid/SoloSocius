@@ -78,3 +78,28 @@ export const createNotePayload = ({
     content: content,
   };
 };
+
+export const createNoteUpdatePayload = ({
+  idUri,
+  createdAt,
+  content,
+}: {
+  idUri: string;
+  createdAt: Date;
+  content: string;
+}) => {
+  const { "@context": _context, ...notePayload } = createNotePayload({
+    idUri,
+    createdAt,
+    content,
+  });
+
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: `${idUri}/activity/update-${Date.now()}`,
+    type: "Update",
+    actor: userEndpoints.actorUri,
+    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    object: notePayload,
+  };
+};

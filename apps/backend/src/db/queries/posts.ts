@@ -91,3 +91,13 @@ export const updateUserPostUri = async (postId: string) => {
 
   return postUri;
 };
+
+export const updatePostContent = async (id: string, content: string) => {
+  const [updatedPost] = await db
+    .update(posts)
+    .set({ content })
+    .where(eq(posts.id, id))
+    .returning();
+
+  return updatedPost;
+};

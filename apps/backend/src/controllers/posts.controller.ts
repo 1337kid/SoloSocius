@@ -1,15 +1,16 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivity } from "../utils/activitypub.js";
+import { deliverActivityToFollowers } from "../utils/activitypub.js";
 import {
   createUserPost,
   getPostById,
+  updatePostContent,
   updateUserPostUri,
 } from "../db/queries/posts.js";
 import {
   createNoteActivity,
   createNotePayload,
+  createNoteUpdatePayload,
 } from "../activitypub/activities.js";
-import { getAllFollowers } from "../db/queries/followers.js";
 
 export const createPost = async (
   request: FastifyRequest,
@@ -41,32 +42,9 @@ export const createPost = async (
       url: postUri,
     });
 
-    const userFollowers = await getAllFollowers();
+    await deliverActivityToFollowers(activityPayload);
 
-    if (userFollowers.length > 0) {
-      const uniqueDeliveryInboxes = new Set<string>();
-      for (const follower of userFollowers) {
-        uniqueDeliveryInboxes.add(follower.sharedInboxUrl || follower.inboxUrl);
-      }
-
-      Promise.allSettled(
-        Array.from(uniqueDeliveryInboxes).map((inboxUrl) => {
-          deliverActivity({
-            inboxUrl,
-            activity: activityPayload,
-          });
-        }),
-      ).then((results) => {
-        const deliveredCount = results.filter(
-          (r) => r.status === "fulfilled",
-        ).length;
-        console.log("Status", deliveredCount);
-      });
-
-      return reply
-        .status(201)
-        .send({ ...newPost, idUri: postUri, url: postUri });
-    }
+    return reply.status(201).send({ ...newPost, idUri: postUri, url: postUri });
   } catch (error) {
     console.error("Error in post creation:", error);
     return reply.status(500).send({ error: "Internal Server Error" });
@@ -97,5 +75,39 @@ export const getPostActivity = async (
   } catch (error) {
     console.log("Error fetching post: ", error);
     return reply.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+export const updatePost = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { id } = request.params as { id: string };
+  const { content } = request.body as { content: string };
+
+  if (!content || content.trim() === "") {
+    return reply.status(400).send({ error: "Post content cannot be empty." });
+  }
+
+  try {
+    const existingPost = await getPostById(id);
+    if (!existingPost || !existingPost.isLocal) {
+      return reply.status(404).send({ error: "Local post not found." });
+    }
+
+    const updatedPost = await updatePostContent(id, content);
+
+    const noteUpdateActivity = createNoteUpdatePayload({
+      idUri: updatedPost.idUri,
+      createdAt: updatedPost.createdAt,
+      content: updatedPost.content,
+    });
+
+    await deliverActivityToFollowers(noteUpdateActivity);
+
+    return reply.status(200).send(updatedPost);
+  } catch (error) {
+    console.log("Error while updating post: ", error);
+    return reply.status(500).send({ error: "Internal Sever Error" });
   }
 };
