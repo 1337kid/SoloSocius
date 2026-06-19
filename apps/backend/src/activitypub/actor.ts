@@ -8,7 +8,7 @@ export const generateActorObject = ({
   bio,
   publicKey,
 }: ActorObject) => {
-  const actorUri = `https://${domain}/actor`;
+  const actorUri = userEndpoints.actorUri;
 
   return {
     "@context": [
@@ -35,7 +35,7 @@ export const generateActorObject = ({
 };
 
 export const userEndpoints = {
-  actorUri: `https://${DOMAIN}/`,
+  actorUri: `https://${DOMAIN}`,
   inbox: `https://${DOMAIN}/inbox`,
   outbox: `https://${DOMAIN}/outbox`,
   following: `https://${DOMAIN}/following`,
