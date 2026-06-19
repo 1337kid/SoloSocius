@@ -103,3 +103,16 @@ export const createNoteUpdatePayload = ({
     object: notePayload,
   };
 };
+
+export const createDeleteActivity = (idUri: string) => {
+  return { "@context": "https://www.w3.org/ns/activitystreams" ,
+    id: `${idUri}/activity/delete`,
+    type: 'Delete',
+    actor: userEndpoints.actorUri,
+    to: ['https://www.w3.org/ns/activitystreams#Public'],
+    object: {
+      id: idUri,
+      type: 'Tombstone'
+    }
+  };
+};

@@ -2,11 +2,13 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { deliverActivityToFollowers } from "../utils/activitypub.js";
 import {
   createUserPost,
+  deletePostFromDB,
   getPostById,
   updatePostContent,
   updateUserPostUri,
 } from "../db/queries/posts.js";
 import {
+  createDeleteActivity,
   createNoteActivity,
   createNotePayload,
   createNoteUpdatePayload,
@@ -108,6 +110,31 @@ export const updatePost = async (
     return reply.status(200).send(updatedPost);
   } catch (error) {
     console.log("Error while updating post: ", error);
+    return reply.status(500).send({ error: "Internal Sever Error" });
+  }
+};
+
+export const deletePost = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { id } = request.params as { id: string };
+
+  try {
+    const existingPost = await getPostById(id);
+    if (!existingPost || !existingPost.isLocal) {
+      return reply.status(404).send({ error: "Local post not found." });
+    }
+
+    const deleteActivity = createDeleteActivity(existingPost.idUri);
+
+    await deletePostFromDB(id);
+
+    await deliverActivityToFollowers(deleteActivity);
+
+    return reply.status(200).send({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.log("Error while deleting post: ", error);
     return reply.status(500).send({ error: "Internal Sever Error" });
   }
 };
