@@ -1,6 +1,6 @@
 import { following } from "../schema.js";
 import { db } from "../index.js";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export const createFollowingUserEntry = async (
   followingActorUri: string,
@@ -21,4 +21,18 @@ export const markFollowingAsAccepted = async (actorUri: string) => {
     .update(following)
     .set({ status: "accepted" })
     .where(eq(following.followingActorUri, actorUri));
+};
+
+export const isFollowRequestPending = async (actorUri: string) => {
+  const [res] = await db
+    .select()
+    .from(following)
+    .where(
+      and(
+        eq(following.followingActorUri, actorUri),
+        eq(following.status, "pending"),
+      ),
+    )
+    .limit(1);
+  return res;
 };

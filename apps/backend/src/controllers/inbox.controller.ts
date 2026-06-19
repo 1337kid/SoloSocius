@@ -9,7 +9,10 @@ import {
   removeFollowerEntry,
 } from "../db/queries/followers.js";
 import { createActivity } from "../activitypub/activities.js";
-import { markFollowingAsAccepted } from "../db/queries/following.js";
+import {
+  isFollowRequestPending,
+  markFollowingAsAccepted,
+} from "../db/queries/following.js";
 import { createNotificationEntry } from "../db/queries/notifications.js";
 import { DOMAIN } from "../config/env.js";
 import { userEndpoints } from "../activitypub/actor.js";
@@ -102,7 +105,15 @@ export const handleIncomingInbox = async (
       }
 
       case "Accept": {
-        await markFollowingAsAccepted(activity.actor);
+        if (!activity.object) {
+          console.log("Got accept activity without object body");
+          return reply.status(200).send();
+        }
+
+        if (await isFollowRequestPending(activity.actor)) {
+          await markFollowingAsAccepted(activity.actor);
+        }
+
         break;
       }
 
@@ -123,7 +134,7 @@ export const handleIncomingInbox = async (
         break;
     }
 
-    return reply.status(202).send({ status: "ok" });
+    return reply.status(200).send({ status: "ok" });
   } catch (error) {
     console.log(`Error processing incoming activity: ${error}`);
     return reply.status(500).send({ error: "Internal Server Error." });
