@@ -4,6 +4,7 @@ import { handleWebFinger } from "../controllers/webfinger.controller.js";
 import { verifyIncomingSignature } from "../middlewares/verifySignature.js";
 import { handleIncomingInbox } from "../controllers/inbox.controller.js";
 import { handleOutboxRequest } from "../controllers/outbox.controller.js";
+import { getPostActivity } from "../controllers/posts.controller.js";
 
 export async function activityPubRoutes(fastify: FastifyInstance) {
   fastify.get("/", getActorProfile);
@@ -13,4 +14,5 @@ export async function activityPubRoutes(fastify: FastifyInstance) {
     handleIncomingInbox,
   );
   fastify.get("/outbox", handleOutboxRequest);
+  fastify.post("/posts/:id", getPostActivity);
 }

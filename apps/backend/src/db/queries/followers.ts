@@ -10,3 +10,7 @@ export const createFollowerEntry = async (data: CreateFollowerInupt) => {
 export const removeFollowerEntry = async (actorId: string) => {
   await db.delete(followers).where(eq(followers.followerActorUri, actorId));
 };
+
+export const getAllFollowers = async () => {
+  return await db.select().from(followers);
+};

@@ -2,6 +2,7 @@ import { posts } from "../schema.js";
 import { eq, desc, count } from "drizzle-orm";
 import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
+import { userEndpoints } from "../../activitypub/actor.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
   await db
@@ -33,6 +34,11 @@ export const getPostFromDB = async (idUri: string) => {
   return post[0];
 };
 
+export const getPostById = async (id: string) => {
+  const post = await db.select().from(posts).where(eq(posts.id, id)).limit(1);
+  return post[0];
+};
+
 export const getUserPostsCount = async () => {
   const [totalResult] = await db
     .select({ value: count() })
@@ -50,4 +56,38 @@ export const getUserPosts = async (offset: number, limit: number) => {
     .orderBy(desc(posts.createdAt))
     .limit(limit)
     .offset(offset);
+};
+
+export const createUserPost = async ({
+  content,
+  inReplyTo,
+}: {
+  content: string;
+  inReplyTo?: string;
+}) => {
+  const [newPost] = await db
+    .insert(posts)
+    .values({
+      actorId: userEndpoints.actorUri,
+      content: content,
+      isLocal: true,
+      idUri: "",
+      inReplyTo: inReplyTo || null,
+    })
+    .returning();
+  return newPost;
+};
+
+export const updateUserPostUri = async (postId: string) => {
+  const postUri = `${userEndpoints.home}posts/${postId}`;
+
+  await db
+    .update(posts)
+    .set({
+      idUri: postUri,
+      url: postUri,
+    })
+    .where(eq(posts.id, postId));
+
+  return postUri;
 };

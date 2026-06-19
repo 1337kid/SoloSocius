@@ -12,6 +12,29 @@ export const createActivity = (type: string, object: any) => {
   };
 };
 
+export const createNoteActivity = (params: OutboxActivity) => {
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: `${params.idUri}/activity`,
+    type: "Create",
+    actor: userEndpoints.actorUri,
+    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    cc: [userEndpoints.followers],
+    object: {
+      id: params.idUri,
+      type: "Note",
+      summary: null,
+      inReplyTo: params.inReplyTo,
+      published: params.createdAt.toISOString(),
+      url: params.url,
+      actor: userEndpoints.actorUri,
+      to: ["https://www.w3.org/ns/activitystreams#Public"],
+      cc: [userEndpoints.followers],
+      content: params.content,
+    },
+  };
+};
+
 export const createOutboxActivity = (params: OutboxActivity) => {
   return {
     id: `${params.idUri}/activity`,
@@ -31,5 +54,27 @@ export const createOutboxActivity = (params: OutboxActivity) => {
       cc: [userEndpoints.followers],
       content: params.content,
     },
+  };
+};
+
+export const createNotePayload = ({
+  idUri,
+  createdAt,
+  content,
+}: {
+  idUri: string;
+  createdAt: Date;
+  content: string;
+}) => {
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: idUri,
+    type: "Note",
+    published: createdAt.toISOString(),
+    url: idUri,
+    actor: userEndpoints.actorUri,
+    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    cc: [userEndpoints.followers],
+    content: content,
   };
 };
