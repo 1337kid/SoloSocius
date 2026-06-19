@@ -1,5 +1,9 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivity, remoteFetch } from "../utils/activitypub.js";
+import {
+  deliverActivity,
+  remoteFetch,
+  webfingerLookup,
+} from "../utils/activitypub.js";
 import { createFollowingUserEntry } from "../db/queries/following.js";
 import { createActivity } from "../activitypub/activities.js";
 
@@ -7,15 +11,38 @@ export const handleFollowRemoteUser = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { remoteProfileUri } = request.body as { remoteProfileUri: string };
+  const { handle } = request.body as { handle: string };
 
-  if (!remoteProfileUri) {
-    return reply
-      .status(400)
-      .send({ error: "Missing target remoteProfileUri parameter." });
+  if (!handle || !handle.includes("@")) {
+    return reply.status(400).send({
+      error: "Valid federated handle target required (user@domain.com).",
+    });
   }
 
+  const cleanHandle = handle.startsWith("@") ? handle.slice(1) : handle;
+  const [, remoteDomain] = cleanHandle.split("@");
+
   try {
+    const webfingerResponse = await webfingerLookup(remoteDomain, cleanHandle);
+
+    if (!webfingerResponse.ok) {
+      return reply
+        .status(500)
+        .send({ error: "Error fetching webfinger of user" });
+    }
+
+    const webfingerData = await webfingerResponse.json();
+
+    const selfLink = webfingerData.links?.find((l: any) => l.rel === "self");
+
+    if (!selfLink || !selfLink.href) {
+      return reply
+        .status(404)
+        .send({ error: "ActivityPub profile target URI lookup failed." });
+    }
+
+    const remoteProfileUri = selfLink.href;
+
     const profileLookup = await remoteFetch(remoteProfileUri);
     if (!profileLookup.ok) {
       return reply

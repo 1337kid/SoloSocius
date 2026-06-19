@@ -11,7 +11,7 @@ import { userEndpoints } from "../activitypub/actor.js";
 const axiosClient = axios.create({ timeout: 10000 });
 
 axiosRetry(axiosClient, {
-  retries: 3,
+  retries: 5,
   retryCondition: (error) => {
     return (
       axiosRetry.isNetworkOrIdempotentRequestError(error) ||
@@ -32,6 +32,12 @@ export const remoteFetch = async (destination: string) => {
   return await fetch(destination, {
     headers: { Accept: "application/activity+json" },
   });
+};
+
+export const webfingerLookup = async (domain: string, handle: string) => {
+  return await remoteFetch(
+    `https://${domain}/.well-known/webfinger?resource=acct:${handle}`,
+  );
 };
 
 export const deliverActivity = async (params: DeliverParams) => {
