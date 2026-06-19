@@ -6,6 +6,7 @@ import axiosRetry from "axios-retry";
 import { DOMAIN } from "../config/env.js";
 import { getUserPrivateKey } from "../db/queries/users.js";
 import { getAllFollowers } from "../db/queries/followers.js";
+import { userEndpoints } from "../activitypub/actor.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -37,7 +38,7 @@ export const deliverActivity = async (params: DeliverParams) => {
   const { inboxUrl, activity } = params;
   const privateKeyPem = await getUserPrivateKey();
 
-  const keyId = `https://${DOMAIN}/actor#main-key`;
+  const keyId = `${userEndpoints.actorUri}#main-key`;
 
   const urlObj = new URL(inboxUrl);
   const targetPath = urlObj.pathname + urlObj.search;

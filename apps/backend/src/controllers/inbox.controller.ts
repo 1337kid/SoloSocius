@@ -12,6 +12,7 @@ import { createActivity } from "../activitypub/activities.js";
 import { markFollowingAsAccepted } from "../db/queries/following.js";
 import { createNotificationEntry } from "../db/queries/notifications.js";
 import { DOMAIN } from "../config/env.js";
+import { userEndpoints } from "../activitypub/actor.js";
 
 export const handleIncomingInbox = async (
   request: FastifyRequest,
@@ -32,7 +33,7 @@ export const handleIncomingInbox = async (
       case "Create": {
         const nestedObject = activity.object;
 
-        const actorUri = `https://${DOMAIN}/actor`;
+        const actorUri = userEndpoints.actorUri;
 
         if (nestedObject && nestedObject.type === "Note") {
           await storeRemotePost({

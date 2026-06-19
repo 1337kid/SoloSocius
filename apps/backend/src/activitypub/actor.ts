@@ -35,11 +35,10 @@ export const generateActorObject = ({
 };
 
 export const userEndpoints = {
-  home: `https://${DOMAIN}/`,
-  actorUri: `https://${DOMAIN}/actor`,
-  inbox: `https://${DOMAIN}/actor/inbox`,
-  outbox: `https://${DOMAIN}/actor/outbox`,
-  following: `https://${DOMAIN}/actor/following`,
-  followers: `https://${DOMAIN}/actor/followers`,
+  actorUri: `https://${DOMAIN}/`,
+  inbox: `https://${DOMAIN}/inbox`,
+  outbox: `https://${DOMAIN}/outbox`,
+  following: `https://${DOMAIN}/following`,
+  followers: `https://${DOMAIN}/followers`,
   activities: `https://${DOMAIN}/activities/`,
 };

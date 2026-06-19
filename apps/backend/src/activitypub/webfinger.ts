@@ -1,17 +1,19 @@
+import { userEndpoints } from "./actor.js";
+
 export const webfingerResponse = (username: string, domain: string) => {
   return {
     subject: `acct:${username}@${domain}`,
-    aliases: [`https://${domain}/`, `https://${domain}/actor`],
+    aliases: [userEndpoints.actorUri],
     links: [
       {
         rel: "http://webfinger.net/rel/profile-page",
         type: "text/html",
-        href: `https://${domain}/`,
+        href: userEndpoints.actorUri,
       },
       {
         rel: "self",
         type: "application/activity+json",
-        href: `https://${domain}/actor`,
+        href: userEndpoints.actorUri,
       },
     ],
   };

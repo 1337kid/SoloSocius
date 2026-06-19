@@ -48,7 +48,7 @@ fastify.addContentTypeParser(
 );
 
 fastify.get("/.well-known/webfinger", handleWebFinger);
-await fastify.register(activityPubRoutes, { prefix: "/actor" });
+await fastify.register(activityPubRoutes);
 await fastify.register(APIRoutes, { prefix: "/api" });
 
 const start = async () => {
