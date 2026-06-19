@@ -5,6 +5,7 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import { DOMAIN } from "../config/env.js";
 import { getUserPrivateKey } from "../db/queries/users.js";
+import { getAllFollowers } from "../db/queries/followers.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -75,5 +76,30 @@ export const deliverActivity = async (params: DeliverParams) => {
   } catch (error) {
     console.log("Error in sending activity: ", error);
     return false;
+  }
+};
+
+export const deliverActivityToFollowers = async (activityPayload: any) => {
+  const userFollowers = await getAllFollowers();
+
+  if (userFollowers.length > 0) {
+    const uniqueDeliveryInboxes = new Set<string>();
+    for (const follower of userFollowers) {
+      uniqueDeliveryInboxes.add(follower.sharedInboxUrl || follower.inboxUrl);
+    }
+
+    Promise.allSettled(
+      Array.from(uniqueDeliveryInboxes).map((inboxUrl) => {
+        deliverActivity({
+          inboxUrl,
+          activity: activityPayload,
+        });
+      }),
+    ).then((results) => {
+      const deliveredCount = results.filter(
+        (r) => r.status === "fulfilled",
+      ).length;
+      console.log("Status", deliveredCount);
+    });
   }
 };
