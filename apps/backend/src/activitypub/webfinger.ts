@@ -8,7 +8,7 @@ export const webfingerResponse = (username: string, domain: string) => {
       {
         rel: "http://webfinger.net/rel/profile-page",
         type: "text/html",
-        href: userEndpoints.actorUri,
+        href: userEndpoints.home,
       },
       {
         rel: "self",

@@ -7,7 +7,7 @@ import { handleOutboxRequest } from "../controllers/outbox.controller.js";
 import { getPostActivity } from "../controllers/posts.controller.js";
 
 export async function activityPubRoutes(fastify: FastifyInstance) {
-  fastify.get("/", getActorProfile);
+  fastify.get("/actor", getActorProfile);
   fastify.post(
     "/inbox",
     { preHandler: [verifyIncomingSignature] },

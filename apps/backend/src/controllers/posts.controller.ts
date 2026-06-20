@@ -4,6 +4,7 @@ import {
   createUserPost,
   deletePostFromDB,
   getPostById,
+  getPostsByActorUris,
   updatePostContent,
   updateUserPostUri,
 } from "../db/queries/posts.js";
@@ -13,6 +14,8 @@ import {
   createNotePayload,
   createNoteUpdatePayload,
 } from "../activitypub/activities.js";
+import { getAllAcceptedFollowingActorUri } from "../db/queries/following.js";
+import { userEndpoints } from "../activitypub/actor.js";
 
 export const createPost = async (
   request: FastifyRequest,
@@ -136,5 +139,43 @@ export const deletePost = async (
   } catch (error) {
     console.log("Error while deleting post: ", error);
     return reply.status(500).send({ error: "Internal Sever Error" });
+  }
+};
+
+export const getHomeTimeline = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const TIMELINE_LIMIT = 20;
+  const { page } = request.query as { page?: string };
+  const pageNumber = parseInt(page || "1", 10);
+
+  if (isNaN(pageNumber) || pageNumber < 1) {
+    return reply.status(400).send({ error: "Invalid timeline page." });
+  }
+
+  const offsetValue = (pageNumber - 1) * TIMELINE_LIMIT;
+
+  try {
+    const followedAccounts = await getAllAcceptedFollowingActorUri();
+
+    const actorsToShow = [...followedAccounts, userEndpoints.actorUri];
+
+    const feedItems = await getPostsByActorUris(
+      actorsToShow,
+      TIMELINE_LIMIT,
+      offsetValue,
+    );
+
+    return reply.send({
+      page: pageNumber,
+      limit: TIMELINE_LIMIT,
+      count: feedItems.length,
+      nextPage: feedItems.length === TIMELINE_LIMIT ? pageNumber + 1 : null,
+      items: feedItems,
+    });
+  } catch (error) {
+    console.error("Failed assembling timeline:", error);
+    return reply.status(500).send({ error: "Internal Server Error" });
   }
 };

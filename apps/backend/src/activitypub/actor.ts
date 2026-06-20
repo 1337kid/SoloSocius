@@ -8,34 +8,33 @@ export const generateActorObject = ({
   bio,
   publicKey,
 }: ActorObject) => {
-  const actorUri = userEndpoints.actorUri;
-
   return {
     "@context": [
       "https://www.w3.org/ns/activitystreams",
       "https://w3id.org/security/v1",
     ],
-    id: actorUri,
+    id: userEndpoints.actorUri,
     type: "Person",
-    following: `${actorUri}/following`,
-    followers: `${actorUri}/followers`,
-    inbox: `${actorUri}/inbox`,
-    outbox: `${actorUri}/outbox`,
+    following: userEndpoints.following,
+    followers: userEndpoints.followers,
+    inbox: userEndpoints.inbox,
+    outbox: userEndpoints.outbox,
     preferredUsername: username,
     name: displayName,
     summary: bio,
-    url: actorUri,
+    url: userEndpoints.actorUri,
 
     publicKey: {
-      id: `${actorUri}#main-key`,
-      owner: actorUri,
+      id: `${userEndpoints.actorUri}#main-key`,
+      owner: userEndpoints.actorUri,
       publicKeyPem: publicKey,
     },
   };
 };
 
 export const userEndpoints = {
-  actorUri: `https://${DOMAIN}`,
+  home: `https://${DOMAIN}/`,
+  actorUri: `https://${DOMAIN}/actor`,
   inbox: `https://${DOMAIN}/inbox`,
   outbox: `https://${DOMAIN}/outbox`,
   following: `https://${DOMAIN}/following`,

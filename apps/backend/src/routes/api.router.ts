@@ -3,6 +3,7 @@ import { handleFollowRemoteUser } from "../controllers/following.controller.js";
 import {
   createPost,
   deletePost,
+  getHomeTimeline,
   updatePost,
 } from "../controllers/posts.controller.js";
 
@@ -13,4 +14,7 @@ export async function APIRoutes(fastify: FastifyInstance) {
   fastify.post("/posts", createPost);
   fastify.put("/posts/:id", updatePost);
   fastify.delete("/posts/:id", deletePost);
+
+  // timeline
+  fastify.get("/timeline", getHomeTimeline);
 }

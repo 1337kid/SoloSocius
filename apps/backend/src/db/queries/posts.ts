@@ -1,5 +1,5 @@
 import { posts } from "../schema.js";
-import { eq, desc, count } from "drizzle-orm";
+import { eq, desc, count, inArray } from "drizzle-orm";
 import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
@@ -104,4 +104,18 @@ export const updatePostContent = async (id: string, content: string) => {
 
 export const deletePostFromDB = async (id: string) => {
   await db.delete(posts).where(eq(posts.id, id));
+};
+
+export const getPostsByActorUris = async (
+  actorUris: string[],
+  limit: number,
+  offset: number,
+) => {
+  return await db
+    .select()
+    .from(posts)
+    .where(inArray(posts.actorId, actorUris))
+    .orderBy(desc(posts.createdAt))
+    .limit(limit)
+    .offset(offset);
 };

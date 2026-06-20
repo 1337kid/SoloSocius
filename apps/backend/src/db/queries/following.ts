@@ -36,3 +36,12 @@ export const isFollowRequestPending = async (actorUri: string) => {
     .limit(1);
   return res;
 };
+
+export const getAllAcceptedFollowingActorUri = async () => {
+  const followedAccounts = await db
+    .select({ uri: following.followingActorUri })
+    .from(following)
+    .where(eq(following.status, "accepted"));
+
+  return followedAccounts.map((account) => account.uri);
+};
