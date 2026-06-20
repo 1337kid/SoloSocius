@@ -4,6 +4,7 @@ import {
   createPost,
   deletePost,
   getHomeTimeline,
+  handleOutboundPostInteraction,
   updatePost,
 } from "../controllers/posts.controller.js";
 
@@ -15,6 +16,7 @@ export async function APIRoutes(fastify: FastifyInstance) {
   fastify.put("/posts/:id", updatePost);
   fastify.delete("/posts/:id", deletePost);
 
-  // timeline
+  // social
   fastify.get("/timeline", getHomeTimeline);
+  fastify.post("/interact", handleOutboundPostInteraction);
 }

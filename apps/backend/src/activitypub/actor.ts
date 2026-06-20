@@ -39,5 +39,5 @@ export const userEndpoints = {
   outbox: `https://${DOMAIN}/outbox`,
   following: `https://${DOMAIN}/following`,
   followers: `https://${DOMAIN}/followers`,
-  activities: `https://${DOMAIN}/activities/`,
+  activities: `https://${DOMAIN}/activities`,
 };

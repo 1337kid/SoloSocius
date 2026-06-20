@@ -1,15 +1,21 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivityToFollowers } from "../utils/activitypub.js";
+import {
+  deliverActivity,
+  deliverActivityToFollowers,
+  remoteFetch,
+} from "../utils/activitypub.js";
 import {
   createUserPost,
   deletePostFromDB,
   getPostById,
+  getPostFromDB,
   getPostsByActorUris,
   updatePostContent,
   updateUserPostUri,
 } from "../db/queries/posts.js";
 import {
   createDeleteActivity,
+  createInteractionActivity,
   createNoteActivity,
   createNotePayload,
   createNoteUpdatePayload,
@@ -176,6 +182,66 @@ export const getHomeTimeline = async (
     });
   } catch (error) {
     console.error("Failed assembling timeline:", error);
+    return reply.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+export const handleOutboundPostInteraction = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { action, targetPostUri } = request.body as {
+    action: "like" | "boost";
+    targetPostUri: string;
+  };
+
+  if (!targetPostUri || !["like", "boost"].includes(action)) {
+    return reply.status(400).send({
+      error: "Valid action (like/boost) and targetPostUri are required.",
+    });
+  }
+
+  try {
+    const targetPost = await getPostFromDB(targetPostUri);
+
+    if (!targetPost)
+      return reply.status(404).send({ error: "Target post not found" });
+
+    const actorLookup = await remoteFetch(targetPost.actorId);
+
+    if (!actorLookup.ok) {
+      return reply
+        .status(400)
+        .send({ error: "Failed discovering remote actor inbox path." });
+    }
+
+    const remoteActorProfile = (await actorLookup.json()) as any;
+    const remoteInbox = remoteActorProfile.inbox;
+
+    const activityType = action === "like" ? "Like" : "Announce";
+
+    const interactionActivity = createInteractionActivity(
+      activityType,
+      targetPostUri,
+    );
+
+    const success = await deliverActivity({
+      inboxUrl: remoteInbox,
+      activity: interactionActivity,
+    });
+
+    if (!success) {
+      return reply.status(502).send({
+        error: "Remote instance rejected or timed out on interaction payload.",
+      });
+    }
+
+    return reply.status(200).send({
+      message: `Sent ${action} Activity`,
+      status: "success",
+    });
+  } catch (error) {
+    console.log("Error in sending post interaction: ", error);
     return reply.status(500).send({ error: "Internal Server Error" });
   }
 };

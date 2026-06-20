@@ -5,7 +5,7 @@ import { OutboxActivity } from "../types/index.js";
 export const createActivity = (type: string, object: any) => {
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${userEndpoints.activities}${uuidv7()}`,
+    id: `${userEndpoints.activities}/${uuidv7()}`,
     type: type,
     actor: userEndpoints.actorUri,
     object: object,
@@ -105,14 +105,29 @@ export const createNoteUpdatePayload = ({
 };
 
 export const createDeleteActivity = (idUri: string) => {
-  return { "@context": "https://www.w3.org/ns/activitystreams" ,
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
     id: `${idUri}/activity/delete`,
-    type: 'Delete',
+    type: "Delete",
     actor: userEndpoints.actorUri,
-    to: ['https://www.w3.org/ns/activitystreams#Public'],
+    to: ["https://www.w3.org/ns/activitystreams#Public"],
     object: {
       id: idUri,
-      type: 'Tombstone'
-    }
+      type: "Tombstone",
+    },
+  };
+};
+
+export const createInteractionActivity = (
+  activityType: string,
+  targetPostUri: string,
+) => {
+  const interactionId = crypto.randomUUID();
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: `${userEndpoints.activities}/${activityType}-${interactionId}`,
+    type: activityType,
+    actor: userEndpoints.actorUri,
+    object: targetPostUri,
   };
 };
