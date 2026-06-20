@@ -5,7 +5,7 @@ import {
   timestamp,
   boolean,
   uniqueIndex,
-  integer
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -66,14 +66,16 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const likedPosts = pgTable('liked_posts', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  postUri: text('post_uri').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+export const likedPosts = pgTable("liked_posts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  activityUri: text("activity_uri").notNull().unique(),
+  postUri: text("post_uri").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const boostedPosts = pgTable('boosted_posts', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  postUri: text('post_uri').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+export const boostedPosts = pgTable("boosted_posts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  activityUri: text("activity_uri").notNull().unique(),
+  postUri: text("post_uri").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
