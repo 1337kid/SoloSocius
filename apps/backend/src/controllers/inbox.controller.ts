@@ -42,7 +42,7 @@ export const handleIncomingInbox = async (
           await storeRemotePost({
             actorUri: activity.actor,
             idUri: nestedObject.id,
-            content: nestedObject.id || "",
+            content: nestedObject.content || "",
             inReplyTo: nestedObject.inReplyTo || null,
             url: nestedObject.url || null,
             published: nestedObject.published,
