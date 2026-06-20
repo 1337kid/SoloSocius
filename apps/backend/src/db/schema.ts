@@ -5,6 +5,7 @@ import {
   timestamp,
   boolean,
   uniqueIndex,
+  integer
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -26,6 +27,8 @@ export const posts = pgTable("posts", {
   isLocal: boolean("is_local").default(false).notNull(),
   inReplyTo: text("in_reply_to"), // URI of the post this is replying to (if applicable)
   url: text("url"), // Public browser link to view the post
+  likeCount: integer("like_count").default(0).notNull(),
+  boostCount: integer("boost_count").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -61,4 +64,16 @@ export const notifications = pgTable("notifications", {
   linkedNotificationUri: text("linked_uri"),
   isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const likedPosts = pgTable('liked_posts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  postUri: text('post_uri').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const boostedPosts = pgTable('boosted_posts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  postUri: text('post_uri').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
