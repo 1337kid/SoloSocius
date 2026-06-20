@@ -33,7 +33,7 @@ export const generateActorObject = ({
 };
 
 export const userEndpoints = {
-  home: `https://${DOMAIN}/`,
+  home: `https://${DOMAIN}`,
   actorUri: `https://${DOMAIN}/actor`,
   inbox: `https://${DOMAIN}/inbox`,
   outbox: `https://${DOMAIN}/outbox`,

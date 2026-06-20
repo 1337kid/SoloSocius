@@ -49,7 +49,7 @@ export const createOutboxActivity = (params: OutboxActivity) => {
       summary: null,
       inReplyTo: params.inReplyTo,
       published: params.createdAt.toISOString(),
-      url: params.url || `${userEndpoints.actorUri}/posts/${params.id}`,
+      url: params.url || `${userEndpoints.home}/posts/${params.id}`,
       to: ["https://www.w3.org/ns/activitystreams#Public"],
       cc: [userEndpoints.followers],
       content: params.content,

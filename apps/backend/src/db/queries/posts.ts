@@ -79,7 +79,7 @@ export const createUserPost = async ({
 };
 
 export const updateUserPostUri = async (postId: string) => {
-  const postUri = `${userEndpoints.actorUri}posts/${postId}`;
+  const postUri = `${userEndpoints.home}/posts/${postId}`;
 
   await db
     .update(posts)
