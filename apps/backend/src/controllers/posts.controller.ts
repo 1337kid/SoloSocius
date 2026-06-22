@@ -207,7 +207,7 @@ export const handleOutboundPostInteraction = async (
     if (!targetPost)
       return reply.status(404).send({ error: "Target post not found" });
 
-    const actorLookup = await remoteFetch(targetPost.actorId);
+    const actorLookup = await remoteFetch(targetPost.actorUri);
 
     if (!actorLookup.ok) {
       return reply

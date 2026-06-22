@@ -8,7 +8,7 @@ export const storeRemotePost = async (data: RemotePostInput) => {
   await db
     .insert(posts)
     .values({
-      actorId: data.actorUri,
+      actorUri: data.actorUri,
       idUri: data.idUri,
       content: data.content,
       isLocal: false,
@@ -68,7 +68,7 @@ export const createUserPost = async ({
   const [newPost] = await db
     .insert(posts)
     .values({
-      actorId: userEndpoints.actorUri,
+      actorUri: userEndpoints.actorUri,
       content: content,
       isLocal: true,
       idUri: "",
@@ -114,7 +114,7 @@ export const getPostsByActorUris = async (
   return await db
     .select()
     .from(posts)
-    .where(inArray(posts.actorId, actorUris))
+    .where(inArray(posts.actorUri, actorUris))
     .orderBy(desc(posts.createdAt))
     .limit(limit)
     .offset(offset);
