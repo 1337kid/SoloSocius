@@ -1,6 +1,7 @@
 import { createActivity } from "../../activitypub/activities.js";
 import { createFollowerEntry } from "../../db/queries/followers.js";
 import { ActivityObject } from "../../types/index.js";
+import { generateAcceptActivityId } from "../../utils/activityId.js";
 import { deliverActivity, remoteActorLookup } from "../../utils/activitypub.js";
 
 interface FollowActivty {
@@ -11,8 +12,7 @@ interface FollowActivty {
 }
 
 export const handleFollowActivity = async (activity: FollowActivty) => {
-  const actorToFollow =
-    typeof activity.object === "string" ? activity.object : activity.object.id;
+  const actorToFollow = activity.actor;
 
   const actorLookup = await remoteActorLookup(actorToFollow);
 
@@ -21,7 +21,8 @@ export const handleFollowActivity = async (activity: FollowActivty) => {
     incomingFollowActivityId: activity.id,
   });
 
-  const acceptActivity = createActivity("Accept", activity);
+  const activityId = generateAcceptActivityId();
+  const acceptActivity = createActivity(activityId, "Accept", activity);
 
   await deliverActivity({
     inboxUrl: actorLookup.inboxUrl,

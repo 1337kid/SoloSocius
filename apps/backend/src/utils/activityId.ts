@@ -4,3 +4,7 @@ import { uuidv7 } from "uuidv7";
 export const generateFollowActivityId = () => {
   return `${userEndpoints.actorUri}/follow/${uuidv7()}`;
 };
+
+export const generateAcceptActivityId = () => {
+  return `${userEndpoints.actorUri}/accept/${uuidv7()}`;
+};
