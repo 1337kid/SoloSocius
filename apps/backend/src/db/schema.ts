@@ -13,7 +13,7 @@ export const actors = pgTable("actors", {
   username: text("username").notNull(),
   domain: text("domain").notNull(),
   displayName: text("display_name"),
-  bio: text("bio"),
+  summary: text("summary"),
   avatarUrl: text("avatar_url"),
   publicKey: text("public_key").notNull(),
   inboxUrl: text("inbox_url").notNull(),
@@ -57,6 +57,7 @@ export const followers = pgTable(
     followerActorUri: text("follower_actor_uri")
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
+    incomingFollowActivityId: text().default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [uniqueIndex("follower_uri_idx").on(table.followerActorUri)],
@@ -70,6 +71,7 @@ export const following = pgTable(
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
     status: text("status").notNull().default("pending"),
+    followActivityId: text().default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [uniqueIndex("followed_uri_idx").on(table.followedActorUri)],
