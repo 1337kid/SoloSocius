@@ -5,8 +5,12 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import { DOMAIN } from "../config/env.js";
 import { getUserPrivateKey } from "../db/queries/users.js";
-import { getAllFollowers } from "../db/queries/followers.js";
+import {
+  getAllFollowers,
+  getAllFollowersInbox,
+} from "../db/queries/followers.js";
 import { userEndpoints } from "../activitypub/actor.js";
+import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -38,6 +42,31 @@ export const webfingerLookup = async (domain: string, handle: string) => {
   return await remoteFetch(
     `https://${domain}/.well-known/webfinger?resource=acct:${handle}`,
   );
+};
+
+export const remoteActorLookup = async (actorUri: string) => {
+  const actor = await getActorFromDB(actorUri);
+  if (actor) return actor;
+
+  const remoteActor = await remoteFetch(actorUri);
+  if (!remoteActor.ok)
+    throw new Error("Could not discover target remote profile path.");
+
+  const data = await remoteActor.json();
+  const newActor = await addActorToDB({
+    actorUri: actorUri,
+    username: data.preferredUsername,
+    domain: new URL(actorUri).hostname,
+    displayName: data.name,
+    summary: data.summary || data.bio,
+    avatarUrl: data.icon?.url ?? "",
+    publicKeyId: data.publicKey?.id,
+    publicKey: data.publicKey?.publicKeyPem,
+    inboxUrl: data.inbox,
+    sharedInboxUrl: data.endpoints?.sharedInbox || data.inbox,
+  });
+
+  return newActor;
 };
 
 export const deliverActivity = async (params: DeliverParams) => {
@@ -87,12 +116,14 @@ export const deliverActivity = async (params: DeliverParams) => {
 };
 
 export const deliverActivityToFollowers = async (activityPayload: any) => {
-  const userFollowers = await getAllFollowers();
+  const userFollowers = await getAllFollowersInbox();
 
   if (userFollowers.length > 0) {
     const uniqueDeliveryInboxes = new Set<string>();
     for (const follower of userFollowers) {
-      uniqueDeliveryInboxes.add(follower.sharedInboxUrl || follower.inboxUrl);
+      uniqueDeliveryInboxes.add(
+        follower.actor.sharedInboxUrl || follower.actor.inboxUrl,
+      );
     }
 
     Promise.allSettled(

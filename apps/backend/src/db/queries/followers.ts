@@ -1,4 +1,4 @@
-import { followers } from "../schema.js";
+import { actors, followers } from "../schema.js";
 import { eq } from "drizzle-orm";
 import { CreateFollowerInupt } from "../../types/index.js";
 import { db } from "../index.js";
@@ -13,4 +13,17 @@ export const removeFollowerEntry = async (actorId: string) => {
 
 export const getAllFollowers = async () => {
   return await db.select().from(followers);
+};
+
+export const getAllFollowersInbox = async () => {
+  return await db.query.followers.findMany({
+    with: {
+      actor: {
+        columns: {
+          inboxUrl: true,
+          sharedInboxUrl: true,
+        },
+      },
+    },
+  });
 };

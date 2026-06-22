@@ -29,6 +29,7 @@ export interface RemotePostInput {
 
 export interface CreateFollowerInupt {
   followerActorUri: string;
+  incomingFollowActivityId: string;
   inboxUrl: string;
   sharedInboxUrl: string;
 }
