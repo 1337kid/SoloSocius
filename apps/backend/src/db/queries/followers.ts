@@ -27,3 +27,13 @@ export const getAllFollowersInbox = async () => {
     },
   });
 };
+
+export const getFollowerByActivityId = async (activityId: string) => {
+  return (
+    await db
+      .select({ actorUri: followers.followerActorUri })
+      .from(followers)
+      .where(eq(followers.followerActorUri, activityId))
+      .limit(1)
+  )[0];
+};

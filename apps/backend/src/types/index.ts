@@ -30,8 +30,6 @@ export interface RemotePostInput {
 export interface CreateFollowerInupt {
   followerActorUri: string;
   incomingFollowActivityId: string;
-  inboxUrl: string;
-  sharedInboxUrl: string;
 }
 
 export interface DeliverParams {
@@ -60,3 +58,11 @@ export interface OutboxActivity {
   content: string;
   url: string | null;
 }
+
+export type ActivityObject =
+  | string
+  | {
+      id: string;
+      type?: string;
+      [key: string]: any;
+    };

@@ -9,8 +9,7 @@ export const createFollowingUserEntry = async (
   await db
     .insert(following)
     .values({
-      followingActorUri,
-      inboxUri,
+      followedActorUri,
       status: "pending",
     })
     .onConflictDoNothing();
@@ -20,26 +19,22 @@ export const markFollowingAsAccepted = async (actorUri: string) => {
   await db
     .update(following)
     .set({ status: "accepted" })
-    .where(eq(following.followingActorUri, actorUri));
+    .where(eq(following.followedActorUri, actorUri));
 };
 
-export const isFollowRequestPending = async (actorUri: string) => {
-  const [res] = await db
-    .select()
-    .from(following)
-    .where(
-      and(
-        eq(following.followingActorUri, actorUri),
-        eq(following.status, "pending"),
-      ),
-    )
-    .limit(1);
-  return res;
+export const getFollowingByActivityId = async (activityId: string) => {
+  return (
+    await db
+      .select({ followedActorUri: following.followedActorUri })
+      .from(following)
+      .where(eq(following.followActivityId, activityId))
+      .limit(1)
+  )[0];
 };
 
 export const getAllAcceptedFollowingActorUri = async () => {
   const followedAccounts = await db
-    .select({ uri: following.followingActorUri })
+    .select({ uri: following.followedActorUri })
     .from(following)
     .where(eq(following.status, "accepted"));
 
