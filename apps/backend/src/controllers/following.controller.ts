@@ -1,11 +1,12 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import {
   deliverActivity,
-  remoteFetch,
+  remoteActorLookup,
   webfingerLookup,
 } from "../utils/activitypub.js";
 import { createFollowingUserEntry } from "../db/queries/following.js";
 import { createActivity } from "../activitypub/activities.js";
+import { generateFollowActivityId } from "../utils/activityId.js";
 
 export const handleFollowRemoteUser = async (
   request: FastifyRequest,
@@ -43,15 +44,12 @@ export const handleFollowRemoteUser = async (
 
     const remoteProfileUri = selfLink.href;
 
-    const profileLookup = await remoteFetch(remoteProfileUri);
-    if (!profileLookup.ok) {
-      return reply
-        .status(400)
-        .send({ error: "Could not discover target remote profile path." });
-    }
+    console.log(remoteProfileUri);
 
-    const remoteActor = (await profileLookup.json()) as any;
-    const remoteInbox = remoteActor.inbox;
+    const remoteActor = await remoteActorLookup(remoteProfileUri);
+
+    console.log(remoteActor);
+    const remoteInbox = remoteActor.inboxUrl;
 
     if (!remoteInbox) {
       return reply.status(400).send({
@@ -59,9 +57,17 @@ export const handleFollowRemoteUser = async (
       });
     }
 
-    await createFollowingUserEntry(remoteProfileUri, remoteInbox);
+    const followActivityId = generateFollowActivityId();
 
-    const followActivity = createActivity("Follow", remoteProfileUri);
+    await createFollowingUserEntry(followActivityId, remoteProfileUri);
+
+    const followActivity = createActivity(
+      followActivityId,
+      "Follow",
+      remoteProfileUri,
+    );
+
+    console.log(followActivity);
 
     const success = await deliverActivity({
       inboxUrl: remoteInbox,

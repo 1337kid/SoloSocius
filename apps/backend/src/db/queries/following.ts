@@ -3,12 +3,13 @@ import { db } from "../index.js";
 import { and, eq } from "drizzle-orm";
 
 export const createFollowingUserEntry = async (
-  followingActorUri: string,
-  inboxUri: string,
+  activityId: string,
+  followedActorUri: string,
 ) => {
   await db
     .insert(following)
     .values({
+      followActivityId: activityId,
       followedActorUri,
       status: "pending",
     })

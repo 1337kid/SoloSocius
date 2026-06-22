@@ -3,12 +3,8 @@ import { DeliverParams } from "../types/index.js";
 import { createSignature } from "./signature.js";
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import { DOMAIN } from "../config/env.js";
 import { getUserPrivateKey } from "../db/queries/users.js";
-import {
-  getAllFollowers,
-  getAllFollowersInbox,
-} from "../db/queries/followers.js";
+import { getAllFollowersInbox } from "../db/queries/followers.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
 

@@ -2,10 +2,14 @@ import { uuidv7 } from "uuidv7";
 import { userEndpoints } from "../activitypub/actor.js";
 import { OutboxActivity } from "../types/index.js";
 
-export const createActivity = (type: string, object: any) => {
+export const createActivity = (
+  activityId: string,
+  type: string,
+  object: any,
+) => {
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${userEndpoints.activities}/${uuidv7()}`,
+    id: activityId,
     type: type,
     actor: userEndpoints.actorUri,
     object: object,

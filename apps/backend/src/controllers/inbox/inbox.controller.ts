@@ -23,7 +23,7 @@ export const handleIncomingInbox = async (
 
   const remoteActor = await remoteActorLookup(activity.actor);
 
-  if (!remoteActor) return reply.status(200).send();
+  if (!remoteActor) return reply.status(202).send();
 
   const activityType = activity.type;
 
