@@ -11,6 +11,7 @@ export interface ActorObject {
   domain: string;
   displayName: string;
   summary: string;
+  publicKeyId: string;
   avatarUrl: string;
   publicKey: string;
   inboxUrl: string;

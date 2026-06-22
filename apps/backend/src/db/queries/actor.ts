@@ -32,6 +32,7 @@ export const addActorToDB = async (params: ActorObject) => {
       displayName: params.displayName,
       summary: params.summary,
       avatarUrl: "",
+      publicKeyId: params.publicKeyId,
       publicKey: params.publicKey,
       inboxUrl: params.inboxUrl,
       sharedInboxUrl: params.sharedInboxUrl,

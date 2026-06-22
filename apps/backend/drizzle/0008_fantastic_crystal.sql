@@ -1,0 +1,1 @@
+ALTER TABLE "actors" ADD COLUMN "public_key_id" text NOT NULL;

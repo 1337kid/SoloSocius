@@ -15,6 +15,7 @@ export const actors = pgTable("actors", {
   displayName: text("display_name"),
   summary: text("summary"),
   avatarUrl: text("avatar_url"),
+  publicKeyId: text("public_key_id").notNull(),
   publicKey: text("public_key").notNull(),
   inboxUrl: text("inbox_url").notNull(),
   sharedInboxUrl: text("shared_inbox_url"),
