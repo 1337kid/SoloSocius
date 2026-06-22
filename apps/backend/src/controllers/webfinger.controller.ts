@@ -1,9 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { db } from "../db/index.js";
-import { users } from "../db/schema.js";
-import { DOMAIN } from "../config/env.js";
-import { eq } from "drizzle-orm";
 import { webfingerResponse } from "../activitypub/webfinger.js";
+import { checkActorOnThisInstance } from "../db/queries/actor.js";
+import { DOMAIN } from "../config/env.js";
 
 export const handleWebFinger = async (
   req: FastifyRequest,
@@ -25,18 +23,12 @@ export const handleWebFinger = async (
       .status(404)
       .send({ error: "Account handle not found on this server instance." });
 
-  const [adminUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username))
-    .limit(1);
-
-  if (!adminUser)
+  if (!(await checkActorOnThisInstance(username)))
     return reply
       .status(404)
       .send({ error: "Account handle not found on this server instance." });
 
-  const response = webfingerResponse(adminUser.username, DOMAIN);
+  const response = webfingerResponse(username);
 
   return reply.status(200).send(response);
 };

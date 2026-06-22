@@ -1,13 +1,12 @@
-import { ActorObject } from "../types/index.js";
+import { InstanceActorObject } from "../types/index.js";
 import { DOMAIN } from "../config/env.js";
 
 export const generateActorObject = ({
-  domain,
   username,
   displayName,
-  bio,
+  summary,
   publicKey,
-}: ActorObject) => {
+}: InstanceActorObject) => {
   return {
     "@context": [
       "https://www.w3.org/ns/activitystreams",
@@ -21,7 +20,7 @@ export const generateActorObject = ({
     outbox: userEndpoints.outbox,
     preferredUsername: username,
     name: displayName,
-    summary: bio,
+    summary: summary,
     url: userEndpoints.actorUri,
 
     publicKey: {

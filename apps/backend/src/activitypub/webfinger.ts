@@ -1,8 +1,9 @@
 import { userEndpoints } from "./actor.js";
+import { DOMAIN } from "../config/env.js";
 
-export const webfingerResponse = (username: string, domain: string) => {
+export const webfingerResponse = (username: string) => {
   return {
-    subject: `acct:${username}@${domain}`,
+    subject: `acct:${username}@${DOMAIN}`,
     aliases: [userEndpoints.actorUri],
     links: [
       {

@@ -1,9 +1,20 @@
-export interface ActorObject {
-  domain: string;
+export interface InstanceActorObject {
   username: string;
   displayName: string;
-  bio: string;
+  summary: string;
   publicKey: string;
+}
+
+export interface ActorObject {
+  actorUri: string;
+  username: string;
+  domain: string;
+  displayName: string;
+  summary: string;
+  avatarUrl: string;
+  publicKey: string;
+  inboxUrl: string;
+  sharedInboxUrl: string;
 }
 
 export interface RemotePostInput {

@@ -57,7 +57,7 @@ export const followers = pgTable(
     followerActorUri: text("follower_actor_uri")
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
-    incomingFollowActivityId: text().default(""),
+    incomingFollowActivityId: text().notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [uniqueIndex("follower_uri_idx").on(table.followerActorUri)],
@@ -71,7 +71,7 @@ export const following = pgTable(
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
     status: text("status").notNull().default("pending"),
-    followActivityId: text().default(""),
+    followActivityId: text().notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [uniqueIndex("followed_uri_idx").on(table.followedActorUri)],

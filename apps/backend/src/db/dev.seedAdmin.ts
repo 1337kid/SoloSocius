@@ -1,11 +1,10 @@
-import { config } from "dotenv";
 import { db } from "./index.js";
-import { users } from "./schema.js";
+import { users, actors } from "./schema.js";
 import { generateRSAKeyPair } from "../utils/signature.js";
-import { sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-
+import { userEndpoints } from "../activitypub/actor.js";
+import { DOMAIN } from "../config/env.js";
 
 const seedAdmin = async () => {
   console.log("Checking if a user exists...");
@@ -22,13 +21,28 @@ const seedAdmin = async () => {
   const password = crypto.randomBytes(10).toString("base64");
   const passwordHash = await bcrypt.hash(password, 20);
 
+  const [actor] = await db
+    .insert(actors)
+    .values({
+      actorUri: userEndpoints.actorUri,
+      username: "test",
+      domain: DOMAIN,
+      displayName: "Test Account",
+      summary: "SoloSocius dev account",
+      avatarUrl: "",
+      publicKey: publicKey,
+      inboxUrl: userEndpoints.inbox,
+      sharedInboxUrl: userEndpoints.inbox,
+      isLocal: true,
+      lastFetchedAt: new Date(),
+    })
+    .returning();
+
   await db.insert(users).values({
     username: "test",
-    displayName: "Test account",
-    bio: "SoloSocius dev account",
     passwordHash: passwordHash,
     privateKey: privateKey,
-    publicKey: publicKey,
+    actorUri: actor.actorUri,
   });
 
   console.log(`Dev account created with creds => test:${password}`);
