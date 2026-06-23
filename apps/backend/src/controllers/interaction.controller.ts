@@ -1,5 +1,9 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivity, remoteActorLookup } from "../utils/activitypub.js";
+import {
+  deliverActivity,
+  deliverActivityToFollowers,
+  remoteActorLookup,
+} from "../utils/activitypub.js";
 import { getPostFromDB } from "../db/queries/posts.js";
 import { createInteractionActivity } from "../activitypub/activities.js";
 import { generateInteractionActivityId } from "../utils/activityId.js";
@@ -58,6 +62,9 @@ export const handleOutboundPostInteraction = async (
       actorUri: userEndpoints.actorUri,
       postUri: targetPost.idUri,
     });
+
+    if (action === "boost")
+      await deliverActivityToFollowers(interactionActivity);
 
     return reply.status(200).send({
       message: `Sent ${action} Activity`,
