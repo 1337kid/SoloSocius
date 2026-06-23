@@ -39,9 +39,9 @@ export interface DeliverParams {
 
 export interface NotificationType {
   type: string;
-  actorId: string;
+  actorUri: string;
   targetPostUri: string;
-  linkedNotificationUri: string;
+  activityId: string;
 }
 
 export interface OrderedCollection {

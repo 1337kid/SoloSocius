@@ -1,4 +1,3 @@
-import { uuidv7 } from "uuidv7";
 import { userEndpoints } from "../activitypub/actor.js";
 import { OutboxActivity } from "../types/index.js";
 

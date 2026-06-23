@@ -1,4 +1,3 @@
-import { FastifyReply } from "fastify";
 import {
   getFollowingByActivityId,
   markFollowingAsAccepted,
@@ -13,8 +12,6 @@ interface AcceptActivity {
 }
 
 export const handleAcceptActivity = async (activity: AcceptActivity) => {
-  if (!activity.object) return;
-
   const acceptedActivityId =
     typeof activity.object === "string" ? activity.object : activity.object.id;
 

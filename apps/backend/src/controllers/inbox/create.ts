@@ -1,10 +1,7 @@
-import { createActivity } from "../../activitypub/activities.js";
 import { userEndpoints } from "../../activitypub/actor.js";
-import { createFollowerEntry } from "../../db/queries/followers.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
 import { getPostFromDB, storeRemotePost } from "../../db/queries/posts.js";
 import { ActivityObject } from "../../types/index.js";
-import { deliverActivity, remoteActorLookup } from "../../utils/activitypub.js";
 
 interface CreateActivity {
   id: string;
@@ -35,9 +32,9 @@ export const handleCreateActivity = async (activity: CreateActivity) => {
         if (localParentPost && localParentPost.isLocal) {
           await createNotificationEntry({
             type: "mention",
-            actorId: activity.actor,
+            actorUri: activity.actor,
             targetPostUri: localParentPost.idUri,
-            linkedNotificationUri: nestedObject.id,
+            activityId: nestedObject.id,
           });
         }
       }
@@ -50,9 +47,9 @@ export const handleCreateActivity = async (activity: CreateActivity) => {
         if (isMentioned)
           await createNotificationEntry({
             type: "mention",
-            actorId: activity.actor,
+            actorUri: activity.actor,
             targetPostUri: nestedObject.inReplyTo || null,
-            linkedNotificationUri: nestedObject.id,
+            activityId: nestedObject.id,
           });
       }
   }

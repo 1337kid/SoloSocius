@@ -64,6 +64,20 @@
       "when": 1782121225009,
       "tag": "0008_fantastic_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782207474849,
+      "tag": "0009_kind_mysterio",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782209753528,
+      "tag": "0010_lush_devos",
+      "breakpoints": true
     }
   ]
 }

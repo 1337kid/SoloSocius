@@ -85,7 +85,7 @@ export const notifications = pgTable("notifications", {
     .notNull()
     .references(() => actors.actorUri, { onDelete: "cascade" }),
   targetPostUri: text("target_post_uri"),
-  linkedNotificationUri: text("linked_uri"),
+  activityId: text("activity_id").unique(),
   isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -93,7 +93,7 @@ export const notifications = pgTable("notifications", {
 export const interactions = pgTable("interactions", {
   id: uuid("id").defaultRandom().primaryKey(),
   type: text("type").notNull(), // Discriminating value: 'like' or 'boost'
-  activityUri: text("activity_uri").notNull().unique(), // activityUri for undo operations
+  activityId: text("activity_id").notNull().unique(), // activityUri for undo operations
   actorUri: text("actor_uri")
     .notNull()
     .references(() => actors.actorUri, { onDelete: "cascade" }),

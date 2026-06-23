@@ -1,5 +1,5 @@
 import { posts } from "../schema.js";
-import { eq, desc, count, inArray } from "drizzle-orm";
+import { eq, desc, count, inArray, and, sql } from "drizzle-orm";
 import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
@@ -118,4 +118,32 @@ export const getPostsByActorUris = async (
     .orderBy(desc(posts.createdAt))
     .limit(limit)
     .offset(offset);
+};
+
+export const findLocalPostByUri = async (postUri: string) => {
+  return (
+    await db
+      .select()
+      .from(posts)
+      .where(and(eq(posts.isLocal, true), eq(posts.idUri, postUri)))
+      .limit(1)
+  )[0];
+};
+
+export const incrementPostLikeCount = async (postUri: string) => {
+  await db
+    .update(posts)
+    .set({
+      likeCount: sql`${posts.likeCount} + 1`,
+    })
+    .where(eq(posts.idUri, postUri));
+};
+
+export const decrementPostLikeCount = async (postUri: string) => {
+  await db
+    .update(posts)
+    .set({
+      likeCount: sql`${posts.likeCount} - 1`,
+    })
+    .where(eq(posts.idUri, postUri));
 };
