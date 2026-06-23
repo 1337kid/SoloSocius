@@ -3,5 +3,9 @@ import { db } from "../index.js";
 import { notifications } from "../schema.js";
 
 export const createNotificationEntry = async (data: NotificationType) => {
-  await db.insert(notifications).values(data);
+  try {
+    await db.insert(notifications).values(data);
+  } catch (error) {
+    console.log(error);
+  }
 };

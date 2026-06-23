@@ -29,13 +29,14 @@ export const handleCreateActivity = async (activity: CreateActivity) => {
       if (nestedObject.inReplyTo) {
         const localParentPost = await getPostFromDB(nestedObject.inReplyTo);
 
-        if (localParentPost && localParentPost.isLocal) {
+        if (localParentPost?.isLocal) {
           await createNotificationEntry({
-            type: "mention",
+            type: "reply",
             actorUri: activity.actor,
             targetPostUri: localParentPost.idUri,
             activityId: nestedObject.id,
           });
+          return;
         }
       }
 
