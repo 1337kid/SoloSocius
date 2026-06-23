@@ -1,4 +1,4 @@
-import { posts } from "../schema.js";
+import { interactions, posts } from "../schema.js";
 import { eq, desc, count, inArray, and, sql } from "drizzle-orm";
 import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
@@ -139,11 +139,18 @@ export const incrementPostLikeCount = async (postUri: string) => {
     .where(eq(posts.idUri, postUri));
 };
 
-export const decrementPostLikeCount = async (postUri: string) => {
-  await db
-    .update(posts)
-    .set({
-      likeCount: sql`${posts.likeCount} - 1`,
-    })
-    .where(eq(posts.idUri, postUri));
+export const removeInteractionAndDecrementLikeCount = async (
+  postUri: string,
+  interactionId: string,
+) => {
+  await db.transaction(async (tx) => {
+    await tx.delete(interactions).where(eq(interactions.id, interactionId));
+
+    await tx
+      .update(posts)
+      .set({
+        likeCount: sql`GREATEST(${posts.likeCount} - 1, 0)`,
+      })
+      .where(eq(posts.idUri, postUri));
+  });
 };
