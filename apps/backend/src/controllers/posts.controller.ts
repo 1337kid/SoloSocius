@@ -75,7 +75,7 @@ export const getPostActivity = async (
     }
 
     const notePayload = createNotePayload({
-      idUri: post.id,
+      idUri: post.idUri,
       createdAt: post.createdAt,
       content: post.content,
     });
