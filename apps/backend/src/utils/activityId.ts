@@ -8,3 +8,7 @@ export const generateFollowActivityId = () => {
 export const generateAcceptActivityId = () => {
   return `${userEndpoints.actorUri}/accept/${uuidv7()}`;
 };
+
+export const generateInteractionActivityId = (type: string) => {
+  return `${userEndpoints.activities}/${type}/${uuidv7}`;
+};

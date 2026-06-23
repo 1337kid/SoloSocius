@@ -4,9 +4,9 @@ import {
   createPost,
   deletePost,
   getHomeTimeline,
-  handleOutboundPostInteraction,
   updatePost,
 } from "../controllers/posts.controller.js";
+import { handleOutboundPostInteraction } from "../controllers/interaction.controller.js";
 
 export async function APIRoutes(fastify: FastifyInstance) {
   fastify.post("/follow", handleFollowRemoteUser);

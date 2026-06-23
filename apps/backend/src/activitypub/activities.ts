@@ -122,15 +122,24 @@ export const createDeleteActivity = (idUri: string) => {
 };
 
 export const createInteractionActivity = (
-  activityType: string,
+  activityId: string,
+  activityType: "Like" | "Announce",
   targetPostUri: string,
 ) => {
-  const interactionId = crypto.randomUUID();
-  return {
+  const activity = {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${userEndpoints.activities}/${activityType}-${interactionId}`,
+    id: activityId,
     type: activityType,
     actor: userEndpoints.actorUri,
     object: targetPostUri,
   };
+
+  if (activityType === "Announce") {
+    return {
+      ...activity,
+      to: ["https://www.w3.org/ns/activitystreams#Public"],
+    };
+  }
+
+  return activity;
 };
