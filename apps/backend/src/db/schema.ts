@@ -103,3 +103,15 @@ export const interactions = pgTable("interactions", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const timelineEvents = pgTable("timeline_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  type: text("text").notNull(),
+  actorUri: text("actor_uri")
+    .notNull()
+    .references(() => actors.actorUri, { onDelete: "cascade" }),
+  postUri: text("post_uri")
+    .notNull()
+    .references(() => posts.idUri, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

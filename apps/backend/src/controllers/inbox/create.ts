@@ -1,6 +1,7 @@
 import { userEndpoints } from "../../activitypub/actor.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
 import { getPostFromDB, storeRemotePost } from "../../db/queries/posts.js";
+import { createTimelineEntry } from "../../db/queries/timeline.js";
 import { ActivityObject } from "../../types/index.js";
 
 interface CreateActivity {
@@ -24,6 +25,12 @@ export const handleCreateActivity = async (activity: CreateActivity) => {
         inReplyTo: nestedObject.inReplyTo || null,
         url: nestedObject.url || null,
         published: nestedObject.published,
+      });
+
+      await createTimelineEntry({
+        actorUri: activity.actor,
+        postUri: nestedObject.id,
+        type: "post",
       });
 
       if (nestedObject.inReplyTo) {

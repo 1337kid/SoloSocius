@@ -7,6 +7,7 @@ import {
   following,
   notifications,
   interactions,
+  timelineEvents,
 } from "./schema.js";
 
 export const actorsRelations = relations(actors, ({ many, one }) => ({
@@ -69,6 +70,18 @@ export const interactionsRelations = relations(interactions, ({ one }) => ({
 
   post: one(posts, {
     fields: [interactions.postUri],
+    references: [posts.idUri],
+  }),
+}));
+
+export const timelineEventsRelations = relations(timelineEvents, ({ one }) => ({
+  actor: one(actors, {
+    fields: [timelineEvents.actorUri],
+    references: [actors.actorUri],
+  }),
+
+  post: one(posts, {
+    fields: [timelineEvents.postUri],
     references: [posts.idUri],
   }),
 }));
