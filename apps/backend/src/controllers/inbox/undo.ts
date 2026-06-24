@@ -5,10 +5,9 @@ import {
 } from "../../db/queries/followers.js";
 import { findInteractionByActivityId } from "../../db/queries/interactions.js";
 import {
+  removeBoostByActivityId,
   removeInteractionAndDecrementLikeCount,
-  removeInteractionAndDecrementBoostCount,
-} from "../../db/queries/posts.js";
-import { removeBoostByActivityId } from "../../db/queries/transactions.js";
+} from "../../db/queries/transactions.js";
 
 export const handleUndoActivity = async (activity: InboxActivity) => {
   if (typeof activity.object !== "string") {

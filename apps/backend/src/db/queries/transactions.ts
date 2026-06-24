@@ -1,6 +1,11 @@
 import { db } from "../index.js";
-import { interactions, timelineEvents, notifications } from "../schema.js";
-import { and, eq } from "drizzle-orm";
+import {
+  interactions,
+  timelineEvents,
+  notifications,
+  posts,
+} from "../schema.js";
+import { and, sql, eq } from "drizzle-orm";
 
 export const removeBoostByActivityId = async (activityId: string) => {
   await db.transaction(async (tx) => {
@@ -25,5 +30,21 @@ export const removeBoostByActivityId = async (activityId: string) => {
     await tx
       .delete(notifications)
       .where(eq(notifications.activityId, activityId));
+  });
+};
+
+export const removeInteractionAndDecrementLikeCount = async (
+  postUri: string,
+  interactionId: string,
+) => {
+  await db.transaction(async (tx) => {
+    await tx.delete(interactions).where(eq(interactions.id, interactionId));
+
+    await tx
+      .update(posts)
+      .set({
+        likeCount: sql`GREATEST(${posts.likeCount} - 1, 0)`,
+      })
+      .where(eq(posts.idUri, postUri));
   });
 };

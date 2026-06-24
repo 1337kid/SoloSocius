@@ -149,22 +149,6 @@ export const incrementPostLikeCount = async (postUri: string) => {
     .where(eq(posts.idUri, postUri));
 };
 
-export const removeInteractionAndDecrementLikeCount = async (
-  postUri: string,
-  interactionId: string,
-) => {
-  await db.transaction(async (tx) => {
-    await tx.delete(interactions).where(eq(interactions.id, interactionId));
-
-    await tx
-      .update(posts)
-      .set({
-        likeCount: sql`GREATEST(${posts.likeCount} - 1, 0)`,
-      })
-      .where(eq(posts.idUri, postUri));
-  });
-};
-
 export const incrementPostBoostCount = async (postUri: string) => {
   await db
     .update(posts)
@@ -172,20 +156,4 @@ export const incrementPostBoostCount = async (postUri: string) => {
       boostCount: sql`${posts.boostCount} + 1`,
     })
     .where(eq(posts.idUri, postUri));
-};
-
-export const removeInteractionAndDecrementBoostCount = async (
-  postUri: string,
-  interactionId: string,
-) => {
-  await db.transaction(async (tx) => {
-    await tx.delete(interactions).where(eq(interactions.id, interactionId));
-
-    await tx
-      .update(posts)
-      .set({
-        boostCount: sql`GREATEST(${posts.boostCount} - 1, 0)`,
-      })
-      .where(eq(posts.idUri, postUri));
-  });
 };
