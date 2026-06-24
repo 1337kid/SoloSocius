@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { deliverActivityToFollowers } from "../utils/activitypub.js";
 import {
   createUserPost,
-  deletePostFromDB,
+  deletePostById,
   getPostById,
   getPostsByActorUris,
   updatePostContent,
@@ -137,7 +137,7 @@ export const deletePost = async (
 
     const deleteActivity = createDeleteActivity(existingPost.idUri);
 
-    await deletePostFromDB(id);
+    await deletePostById(id);
 
     await deliverActivityToFollowers(deleteActivity);
 
