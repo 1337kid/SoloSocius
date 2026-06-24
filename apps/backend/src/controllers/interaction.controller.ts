@@ -9,6 +9,7 @@ import { createInteractionActivity } from "../activitypub/activities.js";
 import { generateInteractionActivityId } from "../utils/activityId.js";
 import { addInteractionEntry } from "../db/queries/interactions.js";
 import { userEndpoints } from "../activitypub/actor.js";
+import { createTimelineEntry } from "../db/queries/timeline.js";
 
 export const handleOutboundPostInteraction = async (
   request: FastifyRequest,
@@ -63,8 +64,15 @@ export const handleOutboundPostInteraction = async (
       postUri: targetPost.idUri,
     });
 
-    if (action === "boost")
+    if (action === "boost") {
       await deliverActivityToFollowers(interactionActivity);
+      
+      await createTimelineEntry({
+        type: "boost",
+        actorUri: userEndpoints.actorUri,
+        postUri: targetPost.idUri,
+      });
+    }
 
     return reply.status(200).send({
       message: `Sent ${action} Activity`,
