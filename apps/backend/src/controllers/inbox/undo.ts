@@ -8,6 +8,7 @@ import {
   removeInteractionAndDecrementLikeCount,
   removeInteractionAndDecrementBoostCount,
 } from "../../db/queries/posts.js";
+import { removeBoostByActivityId } from "../../db/queries/transactions.js";
 
 export const handleUndoActivity = async (activity: InboxActivity) => {
   if (typeof activity.object !== "string") {
@@ -31,16 +32,7 @@ export const handleUndoActivity = async (activity: InboxActivity) => {
         break;
 
       case "Announce":
-        const boostInteraction = await findInteractionByActivityId(
-          activity.object.id,
-        );
-
-        if (boostInteraction && boostInteraction.type === "boost") {
-          await removeInteractionAndDecrementBoostCount(
-            boostInteraction.postUri,
-            boostInteraction.id,
-          );
-        }
+        await removeBoostByActivityId(activity.object.id);
         break;
 
       default:
