@@ -1,19 +1,15 @@
-import { ActivityObject } from "../../types/index.js";
+import { InboxActivity } from "../../types/index.js";
 import {
   getFollowerByActivityId,
   removeFollowerEntry,
 } from "../../db/queries/followers.js";
 import { findInteractionByActivityId } from "../../db/queries/interactions.js";
-import { removeInteractionAndDecrementLikeCount } from "../../db/queries/posts.js";
+import {
+  removeInteractionAndDecrementLikeCount,
+  removeInteractionAndDecrementBoostCount,
+} from "../../db/queries/posts.js";
 
-interface UndoActivity {
-  id: string;
-  actor: string;
-  type: "Undo";
-  object: ActivityObject;
-}
-
-export const handleUndoActivity = async (activity: UndoActivity) => {
+export const handleUndoActivity = async (activity: InboxActivity) => {
   if (typeof activity.object !== "string") {
     switch (activity.object?.type) {
       case "Follow":
@@ -22,15 +18,30 @@ export const handleUndoActivity = async (activity: UndoActivity) => {
         break;
 
       case "Like":
-        const interaction = await findInteractionByActivityId(
+        const likeInteraction = await findInteractionByActivityId(
           activity.object.id,
         );
 
-        if (interaction)
-          removeInteractionAndDecrementLikeCount(
-            interaction.postUri,
-            interaction.id,
+        if (likeInteraction && likeInteraction.type === "like") {
+          await removeInteractionAndDecrementLikeCount(
+            likeInteraction.postUri,
+            likeInteraction.id,
           );
+        }
+        break;
+
+      case "Announce":
+        const boostInteraction = await findInteractionByActivityId(
+          activity.object.id,
+        );
+
+        if (boostInteraction && boostInteraction.type === "boost") {
+          await removeInteractionAndDecrementBoostCount(
+            boostInteraction.postUri,
+            boostInteraction.id,
+          );
+        }
+        break;
 
       default:
         return;

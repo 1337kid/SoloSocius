@@ -41,3 +41,18 @@ export const getAllAcceptedFollowingActorUri = async () => {
 
   return followedAccounts.map((account) => account.uri);
 };
+
+export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
+  const followingEntry = await db
+    .select()
+    .from(following)
+    .where(
+      and(
+        eq(following.followedActorUri, actorUri),
+        eq(following.status, "accepted"),
+      ),
+    )
+    .limit(1);
+
+  return followingEntry.length > 0;
+};

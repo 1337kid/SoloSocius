@@ -7,6 +7,7 @@ import { getUserPrivateKey } from "../db/queries/users.js";
 import { getAllFollowersInbox } from "../db/queries/followers.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
+import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -63,6 +64,30 @@ export const remoteActorLookup = async (actorUri: string) => {
   });
 
   return newActor;
+};
+
+export const remotePostLookup = async (postUri: string) => {
+  const post = await getPostFromDB(postUri);
+  if (post) return post;
+
+  const lookup = await remoteFetch(postUri);
+
+  if (!lookup.ok)
+    throw new Error("Could not discover target remote post path.");
+
+  const data = await lookup.json();
+
+  await remoteActorLookup(data.attributedTo);
+
+  const newPost = await storeRemotePost({
+    actorUri: data.attributedTo,
+    idUri: postUri,
+    content: data.content,
+    inReplyTo: data.inReplyTo,
+    url: data.url,
+    published: data.published,
+  });
+  return newPost;
 };
 
 export const deliverActivity = async (params: DeliverParams) => {

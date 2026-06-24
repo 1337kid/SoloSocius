@@ -28,6 +28,7 @@ export const findInteractionByActivityId = async (activityId: string) => {
     columns: {
       id: true,
       postUri: true,
+      type: true,
     },
     where: eq(interactions.activityId, activityId),
   });

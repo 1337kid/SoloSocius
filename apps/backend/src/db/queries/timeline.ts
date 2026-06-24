@@ -63,10 +63,24 @@ export const getFeedEvents = async (
 export const getProfileTimeline = async (limit: number, offset: number) => {
   return await db.query.timelineEvents.findMany({
     with: {
-      actor: true,
+      actor: {
+        columns: {
+          actorUri: true,
+          avatarUrl: true,
+          username: true,
+          domain: true,
+        },
+      },
       post: {
         with: {
-          actor: true,
+          actor: {
+            columns: {
+              actorUri: true,
+              avatarUrl: true,
+              username: true,
+              domain: true,
+            },
+          },
         },
       },
     },

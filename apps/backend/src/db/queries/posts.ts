@@ -22,7 +22,8 @@ export const storeRemotePost = async (data: RemotePostInput) => {
         content: data.content,
         inReplyTo: data.inReplyTo,
       },
-    });
+    })
+    .returning();
 };
 
 export const getPostFromDB = async (idUri: string) => {
@@ -159,6 +160,31 @@ export const removeInteractionAndDecrementLikeCount = async (
       .update(posts)
       .set({
         likeCount: sql`GREATEST(${posts.likeCount} - 1, 0)`,
+      })
+      .where(eq(posts.idUri, postUri));
+  });
+};
+
+export const incrementPostBoostCount = async (postUri: string) => {
+  await db
+    .update(posts)
+    .set({
+      boostCount: sql`${posts.boostCount} + 1`,
+    })
+    .where(eq(posts.idUri, postUri));
+};
+
+export const removeInteractionAndDecrementBoostCount = async (
+  postUri: string,
+  interactionId: string,
+) => {
+  await db.transaction(async (tx) => {
+    await tx.delete(interactions).where(eq(interactions.id, interactionId));
+
+    await tx
+      .update(posts)
+      .set({
+        boostCount: sql`GREATEST(${posts.boostCount} - 1, 0)`,
       })
       .where(eq(posts.idUri, postUri));
   });

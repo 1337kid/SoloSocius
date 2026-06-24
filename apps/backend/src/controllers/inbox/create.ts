@@ -2,16 +2,9 @@ import { userEndpoints } from "../../activitypub/actor.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
 import { getPostFromDB, storeRemotePost } from "../../db/queries/posts.js";
 import { createTimelineEntry } from "../../db/queries/timeline.js";
-import { ActivityObject } from "../../types/index.js";
+import { InboxActivity } from "../../types/index.js";
 
-interface CreateActivity {
-  id: string;
-  type: "Create";
-  actor: string;
-  object: ActivityObject;
-}
-
-export const handleCreateActivity = async (activity: CreateActivity) => {
+export const handleCreateActivity = async (activity: InboxActivity) => {
   if (typeof activity.object === "string") return;
 
   const nestedObject = activity.object;

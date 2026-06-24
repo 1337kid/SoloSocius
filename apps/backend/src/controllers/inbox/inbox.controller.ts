@@ -6,6 +6,7 @@ import { remoteActorLookup } from "../../utils/activitypub.js";
 import { handleCreateActivity } from "./create.js";
 import { handleLikeActivity } from "./like.js";
 import { handleDeleteActivity } from "./delete.js";
+import { handleAnnounceActivity } from "./announce.js";
 
 export const handleIncomingInbox = async (
   request: FastifyRequest,
@@ -58,6 +59,11 @@ export const handleIncomingInbox = async (
 
       case "Delete": {
         await handleDeleteActivity(activity);
+        break;
+      }
+
+      case "Announce": {
+        await handleAnnounceActivity(activity);
         break;
       }
 

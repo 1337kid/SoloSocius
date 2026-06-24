@@ -4,16 +4,9 @@ import {
   findLocalPostByUri,
   incrementPostLikeCount,
 } from "../../db/queries/posts.js";
-import { ActivityObject } from "../../types/index.js";
+import { InboxActivity } from "../../types/index.js";
 
-interface LikeActivity {
-  id: string;
-  actor: string;
-  type: "Like";
-  object: ActivityObject;
-}
-
-export const handleLikeActivity = async (activity: LikeActivity) => {
+export const handleLikeActivity = async (activity: InboxActivity) => {
   try {
     const likedActivityId =
       typeof activity.object === "string"

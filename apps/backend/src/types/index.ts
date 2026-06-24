@@ -66,3 +66,17 @@ export type ActivityObject =
       type?: string;
       [key: string]: any;
     };
+
+export interface InboxActivity {
+  id: string;
+  actor: string;
+  type:
+    | "Follow"
+    | "Accept"
+    | "Delete"
+    | "Create"
+    | "Like"
+    | "Undo"
+    | "Announce";
+  object: ActivityObject;
+}
