@@ -8,15 +8,18 @@ import { PORT, NODE_ENV } from "./config/env.js";
 dotenv.config();
 
 const fastify = Fastify({
-  logger: {
-    transport: {
-      target: "pino-pretty",
-      options: {
-        colorize: true,
-        translateTime: "SYS:standard",
-      },
-    },
-  },
+  logger:
+    NODE_ENV !== "production"
+      ? {
+          transport: {
+            target: "pino-pretty",
+            options: {
+              colorize: true,
+              translateTime: "SYS:standard",
+            },
+          },
+        }
+      : false,
 });
 
 if (NODE_ENV !== "production") {

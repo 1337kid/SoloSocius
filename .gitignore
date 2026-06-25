@@ -21,6 +21,8 @@ out/
 
 # Production
 build/
+dist
+Caddyfile
 
 # Dependency directories
 .pnp/
@@ -32,6 +34,9 @@ build/
 # Environment files
 .env
 .env.local
+.env.postgres
+.env.backend
+.env.frontend
 .env.development.local
 .env.test.local
 .env.production.local
@@ -65,3 +70,5 @@ node_modules/
 
 # Parcel cache
 .cache
+
+.pnpm-store
