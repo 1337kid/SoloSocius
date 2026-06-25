@@ -31,6 +31,7 @@ const seedAdmin = async () => {
       summary: "SoloSocius dev account",
       avatarUrl: "",
       publicKey: publicKey,
+      publicKeyId: `${userEndpoints.actorUri}#main-key`,
       inboxUrl: userEndpoints.inbox,
       sharedInboxUrl: userEndpoints.inbox,
       isLocal: true,
