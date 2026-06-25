@@ -5,12 +5,16 @@ import {
   deletePost,
   updatePost,
 } from "../controllers/posts.controller.js";
-import { handleOutboundPostInteraction } from "../controllers/interaction.controller.js";
+import {
+  handleOutboundPostInteraction,
+  handleUndoPostInteraction,
+} from "../controllers/interaction.controller.js";
 import {
   getHomeFeed,
   getPublicTimeline,
 } from "../controllers/timeline.controller.js";
 import { validatePagination } from "../middlewares/validatePagination.js";
+import { validateInteraction } from "../middlewares/validateInteraction.js";
 
 export async function APIRoutes(fastify: FastifyInstance) {
   fastify.post("/follow", handleFollowRemoteUser);
@@ -29,5 +33,14 @@ export async function APIRoutes(fastify: FastifyInstance) {
     getPublicTimeline,
   );
 
-  fastify.post("/interact", handleOutboundPostInteraction);
+  fastify.post(
+    "/interact",
+    { preHandler: [validateInteraction] },
+    handleOutboundPostInteraction,
+  );
+  fastify.delete(
+    "/interact",
+    { preHandler: [validateInteraction] },
+    handleUndoPostInteraction,
+  );
 }

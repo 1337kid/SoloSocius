@@ -1,4 +1,4 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "../index.js";
 import { timelineEvents } from "../schema.js";
 import { userEndpoints } from "../../activitypub/actor.js";
@@ -23,6 +23,21 @@ export const createTimelineEntry = async ({
 
 export const removeTimelineEntry = async (postUri: string) => {
   await db.delete(timelineEvents).where(eq(timelineEvents.postUri, postUri));
+};
+
+export const removeTimelineBoostEntry = async (
+  postUri: string,
+  actorUri: string,
+) => {
+  await db
+    .delete(timelineEvents)
+    .where(
+      and(
+        eq(timelineEvents.postUri, postUri),
+        eq(timelineEvents.actorUri, actorUri),
+        eq(timelineEvents.type, "boost"),
+      ),
+    );
 };
 
 export const getFeedEvents = async (
