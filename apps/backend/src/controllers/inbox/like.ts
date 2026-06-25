@@ -1,9 +1,6 @@
 import { addInteractionEntry } from "../../db/queries/interactions.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
-import {
-  findLocalPostByUri,
-  incrementPostLikeCount,
-} from "../../db/queries/posts.js";
+import { findLocalPostByUri } from "../../db/queries/posts.js";
 import { InboxActivity } from "../../types/index.js";
 
 export const handleLikeActivity = async (activity: InboxActivity) => {
@@ -23,8 +20,6 @@ export const handleLikeActivity = async (activity: InboxActivity) => {
       actorUri: activity.actor,
       postUri: post.idUri,
     });
-
-    await incrementPostLikeCount(post.idUri);
 
     await createNotificationEntry({
       type: "Like",

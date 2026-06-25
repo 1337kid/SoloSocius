@@ -33,3 +33,7 @@ export const findInteractionByActivityId = async (activityId: string) => {
     where: eq(interactions.activityId, activityId),
   });
 };
+
+export const removeInteractionById = async (interactionId: string) => {
+  await db.delete(interactions).where(eq(interactions.id, interactionId));
+};

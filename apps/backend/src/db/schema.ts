@@ -46,8 +46,6 @@ export const posts = pgTable("posts", {
   isLocal: boolean("is_local").default(false).notNull(),
   inReplyTo: text("in_reply_to"),
   url: text("url"),
-  likeCount: integer("like_count").default(0).notNull(),
-  boostCount: integer("boost_count").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

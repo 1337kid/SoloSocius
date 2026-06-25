@@ -32,19 +32,3 @@ export const removeBoostByActivityId = async (activityId: string) => {
       .where(eq(notifications.activityId, activityId));
   });
 };
-
-export const removeInteractionAndDecrementLikeCount = async (
-  postUri: string,
-  interactionId: string,
-) => {
-  await db.transaction(async (tx) => {
-    await tx.delete(interactions).where(eq(interactions.id, interactionId));
-
-    await tx
-      .update(posts)
-      .set({
-        likeCount: sql`GREATEST(${posts.likeCount} - 1, 0)`,
-      })
-      .where(eq(posts.idUri, postUri));
-  });
-};

@@ -139,21 +139,3 @@ export const findLocalPostByUri = async (postUri: string) => {
       .limit(1)
   )[0];
 };
-
-export const incrementPostLikeCount = async (postUri: string) => {
-  await db
-    .update(posts)
-    .set({
-      likeCount: sql`${posts.likeCount} + 1`,
-    })
-    .where(eq(posts.idUri, postUri));
-};
-
-export const incrementPostBoostCount = async (postUri: string) => {
-  await db
-    .update(posts)
-    .set({
-      boostCount: sql`${posts.boostCount} + 1`,
-    })
-    .where(eq(posts.idUri, postUri));
-};

@@ -3,11 +3,11 @@ import {
   getFollowerByActivityId,
   removeFollowerEntry,
 } from "../../db/queries/followers.js";
-import { findInteractionByActivityId } from "../../db/queries/interactions.js";
 import {
-  removeBoostByActivityId,
-  removeInteractionAndDecrementLikeCount,
-} from "../../db/queries/transactions.js";
+  findInteractionByActivityId,
+  removeInteractionById,
+} from "../../db/queries/interactions.js";
+import { removeBoostByActivityId } from "../../db/queries/transactions.js";
 
 export const handleUndoActivity = async (activity: InboxActivity) => {
   if (typeof activity.object !== "string") {
@@ -23,10 +23,7 @@ export const handleUndoActivity = async (activity: InboxActivity) => {
         );
 
         if (likeInteraction && likeInteraction.type === "like") {
-          await removeInteractionAndDecrementLikeCount(
-            likeInteraction.postUri,
-            likeInteraction.id,
-          );
+          await removeInteractionById(likeInteraction.id);
         }
         break;
 

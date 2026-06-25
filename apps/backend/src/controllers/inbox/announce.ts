@@ -3,7 +3,6 @@ import {
   addInteractionEntry,
   findInteractionByActivityId,
 } from "../../db/queries/interactions.js";
-import { incrementPostBoostCount } from "../../db/queries/posts.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
 import { createTimelineEntry } from "../../db/queries/timeline.js";
 import { remotePostLookup } from "../../utils/activitypub.js";
@@ -42,8 +41,6 @@ export const handleAnnounceActivity = async (activity: InboxActivity) => {
     });
 
     if (post.isLocal) {
-      await incrementPostBoostCount(post.idUri);
-
       await createNotificationEntry({
         type: "boost",
         actorUri: activity.actor,

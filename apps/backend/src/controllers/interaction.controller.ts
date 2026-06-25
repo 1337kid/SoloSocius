@@ -65,13 +65,13 @@ export const handleOutboundPostInteraction = async (
     });
 
     if (action === "boost") {
-      await deliverActivityToFollowers(interactionActivity);
-      
       await createTimelineEntry({
         type: "boost",
         actorUri: userEndpoints.actorUri,
         postUri: targetPost.idUri,
       });
+      
+      await deliverActivityToFollowers(interactionActivity);
     }
 
     return reply.status(200).send({
