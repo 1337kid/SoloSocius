@@ -56,7 +56,7 @@ fastify.addContentTypeParser(
 );
 
 await fastify.register(activityPubRoutes);
-await fastify.register(AuthRoutes, { prefix: "/auth" });
+await fastify.register(AuthRoutes, { prefix: "/api/auth" });
 await fastify.register(APIRoutes, { prefix: "/api" });
 
 const start = async () => {

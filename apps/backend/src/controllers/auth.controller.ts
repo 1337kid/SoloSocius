@@ -4,7 +4,10 @@ import bcrypt from "bcryptjs";
 import { NODE_ENV } from "../config/env.js";
 import { setupAdminUser } from "../utils/user.js";
 
-export const handleLogin = async (request: FastifyRequest, reply: FastifyReply) => {
+export const handleLogin = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const body = request.body as { username: string; password: string };
 
   if (!body.username || !body.password) {
@@ -45,7 +48,10 @@ export const handleLogin = async (request: FastifyRequest, reply: FastifyReply) 
     .send({ message: "Logged in." });
 };
 
-export const handleLogout = async (request: FastifyRequest, reply: FastifyReply) => {
+export const handleLogout = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   return reply
     .clearCookie("auth", {
       path: "/",
@@ -54,7 +60,10 @@ export const handleLogout = async (request: FastifyRequest, reply: FastifyReply)
     .send({ message: "Logged out." });
 };
 
-export const handleSetup = async (request: FastifyRequest, reply: FastifyReply) => {
+export const handleSetup = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const { username, password } = request.body as {
     username: string;
     password: string;
@@ -91,4 +100,21 @@ export const handleSetup = async (request: FastifyRequest, reply: FastifyReply) 
     .send({
       message: "Setup complete.",
     });
+};
+
+export const handleStatus = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const user = await getUserCredentials();
+
+  if (user) return reply.status(200).send({ configured: true });
+  return reply.status(200).send({ configured: false });
+};
+
+export const handleLookup = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  return;
 };
