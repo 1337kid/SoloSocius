@@ -1,7 +1,0 @@
-FROM node:24
-
-WORKDIR /app
-
-RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
-
-CMD ["bash"]
