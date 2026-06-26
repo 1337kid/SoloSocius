@@ -1,9 +1,13 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
+import jwt from "@fastify/jwt";
 import dotenv from "dotenv";
 import { activityPubRoutes } from "./routes/activitypub.router.js";
 import { APIRoutes } from "./routes/api.router.js";
-import { PORT, NODE_ENV } from "./config/env.js";
+import { PORT, NODE_ENV, JWT_SECRET } from "./config/env.js";
+import { AuthRoutes } from "./routes/auth.router.js";
+import authPlugin from "./plugins/authPlugin.js";
 
 dotenv.config();
 
@@ -33,6 +37,8 @@ if (NODE_ENV !== "production") {
   });
 }
 
+await fastify.register(authPlugin);
+
 await fastify.register(cors, { origin: true });
 
 fastify.addContentTypeParser(
@@ -50,6 +56,7 @@ fastify.addContentTypeParser(
 );
 
 await fastify.register(activityPubRoutes);
+await fastify.register(AuthRoutes, { prefix: "/auth" });
 await fastify.register(APIRoutes, { prefix: "/api" });
 
 const start = async () => {
