@@ -1,9 +1,13 @@
-import LoginForm from "@/components/auth/LoginForm";
+import LoginForm from "@/features/auth/components/LoginForm";
+import { AuthShell } from "@/features/auth/components/AuthShell";
 
-export default function page() {
+export default function LoginPage() {
   return (
-    <main className="mx-auto w-sm py-20">
+    <AuthShell
+      title="Welcome back"
+      description="Sign in to manage your ActivityPub timeline, followers, and federation settings."
+    >
       <LoginForm />
-    </main>
+    </AuthShell>
   );
 }

@@ -1,18 +1,20 @@
 "use client";
 
-import { LoginSchema, type LoginSchemaType } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { useLogin } from "@/hooks/auth/useLogin";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { routes } from "@/lib/routes";
+
+import { useLogin } from "../hooks/useLogin";
+import { LoginSchema, type LoginSchemaType } from "../schemas";
 
 const LoginForm = () => {
   const login = useLogin();
-
   const router = useRouter();
 
   const form = useForm({
@@ -29,7 +31,7 @@ const LoginForm = () => {
 
       toast.success("Logged in.");
 
-      router.replace("/");
+      router.replace(routes.dash);
     } catch {
       toast.error("Invalid username or password.");
     }

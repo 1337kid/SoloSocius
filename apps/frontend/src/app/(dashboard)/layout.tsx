@@ -2,8 +2,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-import { useAuth } from "@/hooks/auth/useAuth";
+import Navbar from "@/components/dashboard/Navbar";
+import { onSessionExpired } from "@/features/auth/events";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useSession } from "@/features/auth/hooks/useSession";
+import { routes } from "@/lib/routes";
 
 export default function DashboardLayout({
   children,
@@ -13,16 +16,25 @@ export default function DashboardLayout({
   const router = useRouter();
 
   const auth = useAuth();
+  const { endSession } = useSession();
+  useEffect(() => {
+    return onSessionExpired(endSession);
+  }, [endSession]);
 
   useEffect(() => {
     if (auth.isError) {
-      router.replace("/login");
+      router.replace(routes.login);
     }
   }, [auth.isError, router]);
 
   if (auth.isPending || !auth.user) {
     return <p>Loading...</p>;
   } else {
-    return children;
+    return (
+      <div>
+        <Navbar />
+        {children}
+      </div>
+    );
   }
 }
