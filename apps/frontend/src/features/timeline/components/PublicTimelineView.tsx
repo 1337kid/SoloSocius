@@ -28,9 +28,9 @@ export function PublicTimelineView() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 w-full">
+      <div className="space-y-3 w-full">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="space-y-3 p-4 border rounded-lg">
+          <div key={i} className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70">
             <div className="flex items-start gap-3">
               <Skeleton className="size-10 rounded-full shrink-0" />
               <div className="flex-1 space-y-2">
@@ -38,7 +38,7 @@ export function PublicTimelineView() {
                 <Skeleton className="h-3 w-24" />
               </div>
             </div>
-            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-16 w-full ml-[52px]" style={{ width: "calc(100% - 52px)" }} />
           </div>
         ))}
       </div>
@@ -48,7 +48,7 @@ export function PublicTimelineView() {
   if (isError) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-2 p-6 rounded-xl border border-destructive/20 bg-destructive/5">
           <p className="text-destructive font-semibold">
             Failed to load timeline
           </p>
@@ -62,8 +62,8 @@ export function PublicTimelineView() {
 
   if (allPosts.length === 0 && !isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center space-y-2">
+      <div className="flex items-center justify-center p-8 w-full">
+        <div className="text-center space-y-2 p-8 rounded-xl border border-border/60 bg-muted/30">
           <p className="font-semibold text-muted-foreground">No posts yet</p>
           <p className="text-sm text-muted-foreground">
             Check back later for new content
@@ -74,16 +74,16 @@ export function PublicTimelineView() {
   }
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-3 w-full">
       {allPosts.map((post) => (
         <TimelineItem key={post.id} entry={post} />
       ))}
 
-      <div ref={ref} className="space-y-4">
+      <div ref={ref} className="space-y-3">
         {isFetchingNextPage && (
           <>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="space-y-3 p-4 border rounded-lg">
+              <div key={i} className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70">
                 <div className="flex items-start gap-3">
                   <Skeleton className="size-10 rounded-full shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -91,7 +91,7 @@ export function PublicTimelineView() {
                     <Skeleton className="h-3 w-24" />
                   </div>
                 </div>
-                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-16 w-full" />
               </div>
             ))}
           </>
