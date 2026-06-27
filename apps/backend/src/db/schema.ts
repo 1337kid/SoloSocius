@@ -20,9 +20,13 @@ export const actors = pgTable("actors", {
   inboxUrl: text("inbox_url").notNull(),
   sharedInboxUrl: text("shared_inbox_url"),
   isLocal: boolean("is_local").default(false).notNull(),
-  lastFetchedAt: timestamp("last_fetched_at"),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const users = pgTable("users", {
@@ -46,7 +50,9 @@ export const posts = pgTable("posts", {
   isLocal: boolean("is_local").default(false).notNull(),
   inReplyTo: text("in_reply_to"),
   url: text("url"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const followers = pgTable(
@@ -57,7 +63,9 @@ export const followers = pgTable(
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
     incomingFollowActivityId: text().notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [uniqueIndex("follower_uri_idx").on(table.followerActorUri)],
 );
@@ -71,7 +79,9 @@ export const following = pgTable(
       .references(() => actors.actorUri, { onDelete: "cascade" }),
     status: text("status").notNull().default("pending"),
     followActivityId: text().notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [uniqueIndex("followed_uri_idx").on(table.followedActorUri)],
 );
@@ -85,7 +95,9 @@ export const notifications = pgTable("notifications", {
   targetPostUri: text("target_post_uri"),
   activityId: text("activity_id").unique(),
   isRead: boolean("is_read").default(false).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const interactions = pgTable("interactions", {
@@ -99,7 +111,9 @@ export const interactions = pgTable("interactions", {
     .notNull()
     .references(() => posts.idUri, { onDelete: "cascade" }),
 
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const timelineEvents = pgTable("timeline_events", {
@@ -111,5 +125,7 @@ export const timelineEvents = pgTable("timeline_events", {
   postUri: text("post_uri")
     .notNull()
     .references(() => posts.idUri, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
