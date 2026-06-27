@@ -9,14 +9,14 @@ import {
   handleOutboundPostInteraction,
   handleUndoPostInteraction,
 } from "../controllers/interaction.controller.js";
-import {
-  getHomeFeed,
-  getPublicTimeline,
-} from "../controllers/timeline.controller.js";
+import { getHomeFeed } from "../controllers/timeline.controller.js";
 import { validatePagination } from "../middlewares/validatePagination.js";
 import { validateInteraction } from "../middlewares/validateInteraction.js";
+import { authenticate } from "../middlewares/authenticate.js";
 
-export async function APIRoutes(fastify: FastifyInstance) {
+export async function PrivateRoutes(fastify: FastifyInstance) {
+  fastify.addHook("preHandler", authenticate);
+
   fastify.post("/follow", handleFollowRemoteUser);
 
   // user post routes
@@ -26,12 +26,6 @@ export async function APIRoutes(fastify: FastifyInstance) {
 
   // social
   fastify.get("/feed", { preHandler: [validatePagination] }, getHomeFeed);
-
-  fastify.get(
-    "/timeline",
-    { preHandler: [validatePagination] },
-    getPublicTimeline,
-  );
 
   fastify.post(
     "/interact",

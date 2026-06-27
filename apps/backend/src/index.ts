@@ -1,13 +1,12 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import cookie from "@fastify/cookie";
-import jwt from "@fastify/jwt";
 import dotenv from "dotenv";
 import { activityPubRoutes } from "./routes/activitypub.router.js";
-import { APIRoutes } from "./routes/api.router.js";
-import { PORT, NODE_ENV, JWT_SECRET } from "./config/env.js";
+import { PublicRoutes } from "./routes/public.router.js";
+import { PORT, NODE_ENV } from "./config/env.js";
 import { AuthRoutes } from "./routes/auth.router.js";
 import authPlugin from "./plugins/authPlugin.js";
+import { PrivateRoutes } from "./routes/private.router.js";
 
 dotenv.config();
 
@@ -57,7 +56,8 @@ fastify.addContentTypeParser(
 
 await fastify.register(activityPubRoutes);
 await fastify.register(AuthRoutes, { prefix: "/api/auth" });
-await fastify.register(APIRoutes, { prefix: "/api" });
+await fastify.register(PrivateRoutes, { prefix: "/api" });
+await fastify.register(PublicRoutes, { prefix: "/api" });
 
 const start = async () => {
   try {
