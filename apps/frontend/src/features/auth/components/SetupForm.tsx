@@ -52,12 +52,12 @@ const SetupForm = () => {
         name="username"
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>Admin username</FieldLabel>
+            <FieldLabel htmlFor={field.name}>Username</FieldLabel>
             <Input
               {...field}
               id={field.name}
               autoComplete="username"
-              placeholder="admin"
+              placeholder="bobfromearth"
               aria-invalid={fieldState.invalid}
             />
             <FieldError errors={fieldState.error ? [fieldState.error] : []} />
