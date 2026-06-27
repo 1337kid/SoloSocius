@@ -2,7 +2,11 @@
 import { ProfileCard } from "@/features/timeline/components/ProfileCard";
 import { PublicTimelineView } from "@/features/timeline/components/PublicTimelineView";
 
+import { useProfileData } from "@/features/profile/hooks/useProfile";
+import { ProfileData } from "@/features/profile/api";
+
 export default function PublicTimeline() {
+  const { data: profile } = useProfileData();
 
   return (
     <main className="min-h-screen bg-background">
@@ -13,20 +17,24 @@ export default function PublicTimeline() {
         <div className="relative mx-4 h-52 overflow-hidden rounded-b-2xl shadow-md">
           <div className="absolute inset-0 bg-linear-to-br from-primary/40 via-accent to-muted" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,var(--color-primary)/20%,transparent_60%)]" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={profile.banner}
-            alt="Profile banner"
-            className="relative w-full h-full object-cover p-[2px] rounded-b-2xl"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
+          {profile?.avatarUrl && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={profile?.avatarUrl}
+                alt="Profile banner"
+                className="relative w-full h-full object-cover p-[2px] rounded-b-2xl"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </>
+          )}
           <div className="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-background/60 to-transparent" />
         </div>
 
         <div className="flex gap-4 p-4 max-md:flex-col">
-          <ProfileCard profile={profile} />
+          <ProfileCard profile={profile as ProfileData} />
           <PublicTimelineView />
         </div>
       </div>
