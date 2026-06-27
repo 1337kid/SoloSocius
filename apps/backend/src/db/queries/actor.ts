@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { actors } from "../schema.js";
 import { ActorObject } from "../../types/index.js";
@@ -64,4 +64,29 @@ export const addActorToDB = async (params: ActorObject) => {
     .returning();
 
   return actor;
+};
+
+export const getLocalActorProfileData = async () => {
+  return await db.query.actors.findFirst({
+    where: eq(actors.isLocal, true),
+    columns: {
+      username: true,
+      displayName: true,
+      summary: true,
+      domain: true,
+      avatarUrl: true,
+    },
+    extras: {
+      followersCount: sql<number>`(SELECT count(*) FROM followers)`.as(
+        "followers_count",
+      ),
+      followingCount: sql<number>`(SELECT count(*) FROM following)`.as(
+        "following_count",
+      ),
+      postsCount:
+        sql<number>`(SELECT count(*) FROM posts WHERE posts.actor_uri = ${actors.actorUri})`.as(
+          "posts_count",
+        ),
+    },
+  });
 };
