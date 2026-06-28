@@ -126,6 +126,7 @@ export const getProfileTimeline = async (
       },
 
       parentPost: {
+        idUri: parentPost.idUri,
         url: parentPost.url || parentPost.idUri,
         content: parentPost.content,
       },

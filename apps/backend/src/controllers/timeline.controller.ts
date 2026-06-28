@@ -38,13 +38,25 @@ export const getPublicTimeline = async (request: any, reply: FastifyReply) => {
       request.offsetValue,
     );
 
+    const serializedItems = feedItems.map((item) => {
+      return {
+        event: item.event,
+        actor: item.actor,
+        post: {
+          ...item.post,
+          actor: item.postActor,
+          inReplyTo: { ...item.parentPost, actor: item.parentActor },
+        },
+      };
+    });
+
     return reply.send({
       page: request.pageNumber,
       limit: TIMELINE_LIMIT,
       count: feedItems.length,
       nextPage:
         feedItems.length === TIMELINE_LIMIT ? request.pageNumber + 1 : null,
-      items: feedItems,
+      items: serializedItems,
     });
   } catch (error) {
     console.error("Failed assembling public timeline:", error);
