@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ADD CONSTRAINT "posts_in_reply_to_posts_id_uri_fk" FOREIGN KEY ("in_reply_to") REFERENCES "public"."posts"("id_uri") ON DELETE set null ON UPDATE no action;

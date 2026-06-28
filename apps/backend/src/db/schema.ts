@@ -6,6 +6,7 @@ import {
   boolean,
   uniqueIndex,
   integer,
+  AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 export const actors = pgTable("actors", {
@@ -49,7 +50,9 @@ export const posts = pgTable("posts", {
   idUri: text("id_uri").notNull().unique(),
   content: text("content").notNull(),
   isLocal: boolean("is_local").default(false).notNull(),
-  inReplyTo: text("in_reply_to"),
+  inReplyTo: text("in_reply_to").references((): AnyPgColumn => posts.idUri, {
+    onDelete: "set null",
+  }),
   url: text("url"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()

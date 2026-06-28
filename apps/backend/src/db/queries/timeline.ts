@@ -88,6 +88,22 @@ export const getProfileTimeline = async (limit: number, offset: number) => {
       },
       post: {
         with: {
+          inReplyTo: {
+            columns: {
+              content: true,
+              url: true,
+            },
+            with: {
+              actor: {
+                columns: {
+                  actorUri: true,
+                  avatarUrl: true,
+                  username: true,
+                  domain: true,
+                },
+              },
+            },
+          },
           actor: {
             columns: {
               actorUri: true,
