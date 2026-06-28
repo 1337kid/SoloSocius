@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import ProfileStat from "./ProfileStat";
 import { ProfileData } from "@/features/profile/api";
 
@@ -11,9 +10,9 @@ export function ProfileCard({ profile }: { profile: ProfileData }) {
     <Card className="w-sm max-md:mx-auto max-md:w-full mb-auto bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
       <CardContent className="p-3 space-y-4">
         {/* Avatar */}
-        <div className="flex flex-col items-center space-y-3">
-          <div className="p-0.5 rounded-full bg-linear-to-br from-primary/70 via-accent-foreground/10 to-primary/30 shadow-md">
-            <Avatar className="size-28 border-2 border-card">
+        <div className="flex flex-col items-center space-y-3 max-md:space-y-2">
+            <div className="p-0.5 rounded-full bg-linear-to-br from-primary/70 via-accent-foreground/10 to-primary/30 shadow-md">
+            <Avatar className="size-28 border-2 border-card max-md:size-20">
               {profile?.avatarUrl && (
                 <AvatarImage src={profile.avatarUrl} alt={profile.username} />
               )}
