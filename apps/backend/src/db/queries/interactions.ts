@@ -28,7 +28,7 @@ export const addInteractionEntry = async ({
       .onConflictDoNothing()
       .returning();
 
-    if (inserted) return;
+    if (inserted.length === 0) return;
 
     await tx
       .update(posts)
