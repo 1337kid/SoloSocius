@@ -15,15 +15,14 @@ export default function PublicTimeline() {
       <div className="relative max-w-4xl mx-auto">
         {/* Banner */}
         <div className="relative mx-4 h-52 overflow-hidden rounded-b-2xl shadow-md">
-          <div className="absolute inset-0 bg-linear-to-br from-primary/40 via-accent to-muted" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,var(--color-primary)/20%,transparent_60%)]" />
-          {profile?.avatarUrl && (
+          <div className="absolute inset-0 bg-primary" />
+          {profile?.bannerUrl && (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={profile?.avatarUrl}
+                src={profile.bannerUrl}
                 alt="Profile banner"
-                className="relative w-full h-full object-cover p-[2px] rounded-b-2xl"
+                className="relative w-full h-full object-cover pb-0.5 rounded-b-2xl"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}

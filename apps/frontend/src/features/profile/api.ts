@@ -1,7 +1,7 @@
 import { api } from "@/lib/api/axios";
 
 export interface ProfileData {
-  // banner: string;
+  bannerUrl: string | null;
   username: string;
   avatarUrl: string | null;
   displayName: string | null;

@@ -77,6 +77,7 @@ export const getLocalActorProfileData = async () => {
       summary: true,
       domain: true,
       avatarUrl: true,
+      bannerUrl: true,
     },
     extras: {
       followersCount: sql<number>`(SELECT count(*) FROM followers)`.as(
