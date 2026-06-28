@@ -87,7 +87,7 @@ export const getLocalActorProfileData = async () => {
         "following_count",
       ),
       postsCount:
-        sql<number>`(SELECT count(*) FROM posts WHERE posts.actor_uri = ${actors.actorUri})`.as(
+        sql<number>`(SELECT count(*) FROM posts WHERE posts.actor_uri = ${userEndpoints.actorUri})`.as(
           "posts_count",
         ),
     },
