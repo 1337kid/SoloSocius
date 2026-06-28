@@ -1,7 +1,8 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../index.js";
-import { timelineEvents } from "../schema.js";
+import { actors, interactions, posts, timelineEvents } from "../schema.js";
 import { userEndpoints } from "../../activitypub/actor.js";
+import { alias } from "drizzle-orm/pg-core";
 
 interface timelineEvent {
   type: "post" | "boost";
@@ -75,53 +76,103 @@ export const getFeedEvents = async (
   });
 };
 
-export const getProfileTimeline = async (limit: number, offset: number) => {
-  return await db.query.timelineEvents.findMany({
-    with: {
+const actor = alias(actors, "actor");
+const postActor = alias(actors, "post_actor");
+const parentPost = alias(posts, "parent_post");
+const parentActor = alias(actors, "parent_actor");
+
+const myLike = alias(interactions, "my_like");
+const myBoost = alias(interactions, "my_boost");
+
+export const getProfileTimeline = async (
+  limit: number,
+  offset: number,
+) => {
+  return db
+    .select({
+      event: {
+        createdAt: timelineEvents.createdAt,
+        type: timelineEvents.type,
+      },
+
       actor: {
-        columns: {
-          actorUri: true,
-          avatarUrl: true,
-          displayName: true,
-          username: true,
-          domain: true,
-        },
+        avatarUrl: actor.avatarUrl,
+        displayName: actor.displayName,
+        username: actor.username,
+        domain: actor.domain,
       },
+
       post: {
-        with: {
-          inReplyTo: {
-            columns: {
-              content: true,
-              url: true,
-              idUri: true,
-            },
-            with: {
-              actor: {
-                columns: {
-                  actorUri: true,
-                  avatarUrl: true,
-                  displayName: true,
-                  username: true,
-                  domain: true,
-                },
-              },
-            },
-          },
-          actor: {
-            columns: {
-              actorUri: true,
-              avatarUrl: true,
-              displayName: true,
-              username: true,
-              domain: true,
-            },
-          },
-        },
+        id: posts.id,
+        idUri: posts.idUri,
+        url: posts.url || posts.idUri,
+        content: posts.content,
+        createdAt: posts.createdAt,
+
+        // likeCount: posts.likeCount,
+        // boostCount: posts.boostCount,
+
+        liked: sql<boolean>`${myLike.id} IS NOT NULL`,
+        boosted: sql<boolean>`${myBoost.id} IS NOT NULL`,
       },
-    },
-    where: eq(timelineEvents.actorUri, userEndpoints.actorUri),
-    orderBy: desc(timelineEvents.createdAt),
-    limit,
-    offset,
-  });
+
+      postActor: {
+        actorUri: postActor.actorUri,
+        avatarUrl: postActor.avatarUrl,
+        displayName: postActor.displayName,
+        username: postActor.username,
+        domain: postActor.domain,
+      },
+
+      parentPost: {
+        url: parentPost.url || parentPost.idUri,
+        content: parentPost.content,
+      },
+
+      parentActor: {
+        avatarUrl: parentActor.avatarUrl,
+        displayName: parentActor.displayName,
+        username: parentActor.username,
+        domain: parentActor.domain,
+      },
+    })
+    .from(timelineEvents)
+
+    // Event actor
+    .innerJoin(actor, eq(actor.actorUri, timelineEvents.actorUri))
+
+    // Timeline post
+    .innerJoin(posts, eq(posts.idUri, timelineEvents.postUri))
+
+    // Author of the post
+    .innerJoin(postActor, eq(postActor.actorUri, posts.actorUri))
+
+    // Local user's Like
+    .leftJoin(
+      myLike,
+      and(
+        eq(myLike.postUri, posts.idUri),
+        eq(myLike.actorUri, userEndpoints.actorUri),
+        eq(myLike.type, "like"),
+      ),
+    )
+
+    // Local user's Boost
+    .leftJoin(
+      myBoost,
+      and(
+        eq(myBoost.postUri, posts.idUri),
+        eq(myBoost.actorUri, userEndpoints.actorUri),
+        eq(myBoost.type, "boost"),
+      ),
+    )
+
+    // parent post information
+    .leftJoin(parentPost, eq(parentPost.idUri, posts.inReplyTo))
+    .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri))
+
+    .where(eq(timelineEvents.actorUri, userEndpoints.actorUri))
+    .orderBy(desc(timelineEvents.createdAt))
+    .limit(limit)
+    .offset(offset);
 };
