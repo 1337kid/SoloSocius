@@ -75,8 +75,8 @@ export function PublicTimelineView() {
 
   return (
     <div className="space-y-3 w-full">
-      {allPosts.map((post) => (
-        <TimelineItem key={post.id} entry={post} />
+      {allPosts.length > 0 && allPosts.map((entry) => (
+        <TimelineItem key={entry.post.id} entry={entry} />
       ))}
 
       <div ref={ref} className="space-y-3">

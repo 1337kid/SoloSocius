@@ -6,9 +6,10 @@ import purify from "dompurify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Repeat, Reply } from "lucide-react";
+import { Ellipsis, Heart, Repeat, Reply } from "lucide-react";
 
-import type { TimelineActor, TimelinePost } from "../api";
+import type { TimelineActor, TimelineItem } from "../api";
+import { Button } from "@/components/ui/button";
 
 function ActorAvatar({
   actor,
@@ -41,13 +42,13 @@ function ActorHandle({ actor }: { actor: TimelineActor }) {
   );
 }
 
-export function TimelineItem({ entry }: { entry: TimelinePost }) {
-  const isBoost = entry.type === "boost";
+export function TimelineItem({ entry }: { entry: TimelineItem }) {
+  const isBoost = entry.event.type === "boost";
 
   const postAuthor = entry.post.actor;
   const booster = isBoost ? entry.actor : null;
 
-  const timeAgo = formatDistanceToNow(new Date(entry.createdAt), {
+  const timeAgo = formatDistanceToNow(new Date(entry.event.createdAt), {
     addSuffix: true,
   });
 
@@ -96,7 +97,8 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
             href={
               entry.post.inReplyTo.url ||
               entry.post.inReplyTo.idUri ||
-              entry.post.url
+              entry.post.url ||
+              "#"
             }
             target="_blank"
             rel="noopener noreferrer"
@@ -120,7 +122,7 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
                   </Avatar>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Reply className="size-4 text-primary inline mb-1"/>
+                      <Reply className="size-4 text-primary inline mb-1" />
                       Replying to{" "}
                       <span className="font-medium text-foreground">
                         {entry.post.inReplyTo.actor.displayName ||

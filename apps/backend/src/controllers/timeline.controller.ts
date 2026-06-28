@@ -45,7 +45,7 @@ export const getPublicTimeline = async (request: any, reply: FastifyReply) => {
         post: {
           ...item.post,
           actor: item.postActor,
-          inReplyTo: { ...item.parentPost, actor: item.parentActor },
+          inReplyTo: item.parentPost ? { ...item.parentPost, actor: item.parentActor } : null,
         },
       };
     });
