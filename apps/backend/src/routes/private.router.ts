@@ -15,7 +15,7 @@ import { validateInteraction } from "../middlewares/validateInteraction.js";
 import { authenticate } from "../middlewares/authenticate.js";
 
 export async function PrivateRoutes(fastify: FastifyInstance) {
-  fastify.addHook("preHandler", authenticate);
+  //fastify.addHook("preHandler", authenticate);
 
   fastify.post("/follow", handleFollowRemoteUser);
 

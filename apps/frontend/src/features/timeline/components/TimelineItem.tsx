@@ -29,10 +29,7 @@ export function TimelineItem({ entry }: TimelineItemProps) {
           <div className="flex items-start gap-3 min-w-0 flex-1">
             <Avatar className="size-10 shrink-0 ring-1 ring-border">
               {entry.actor.avatarUrl && (
-                <AvatarImage
-                  src={entry.actor.avatarUrl}
-                  alt={displayName}
-                />
+                <AvatarImage src={entry.actor.avatarUrl} alt={displayName} />
               )}
               <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
                 {displayName.charAt(0)}
@@ -43,12 +40,17 @@ export function TimelineItem({ entry }: TimelineItemProps) {
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-semibold text-sm truncate">{displayName}</p>
                 {isLocal && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20"
+                  >
                     Admin
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground font-mono">{handle}</p>
+              <p className="text-xs text-muted-foreground font-mono">
+                {handle}
+              </p>
             </div>
           </div>
 
@@ -58,6 +60,46 @@ export function TimelineItem({ entry }: TimelineItemProps) {
         </div>
 
         {/* Content */}
+        {entry.post.inReplyTo && (
+          <a
+            href={entry.post.inReplyTo.url || entry.post.inReplyTo.idUri || entry.post.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block pl-[52px]"
+          >
+            <Card className="bg-muted/40 hover:bg-muted transition-colors border-dashed shadow-none">
+              <CardContent>
+                <div className="flex items-start gap-2">
+                  <Avatar className="size-6">
+                    <AvatarImage
+                      src={entry.post.inReplyTo.actor.avatarUrl || undefined}
+                    />
+                    <AvatarFallback className="text-[10px]">
+                      {entry.post.inReplyTo.actor.username[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-muted-foreground">
+                      Replying to{" "}
+                      <span className="font-medium text-foreground">
+                        @{entry.post.inReplyTo.actor.username}@
+                        {entry.post.inReplyTo.actor.domain}
+                      </span>
+                    </p>
+
+                    <div
+                      className="mt-0.5 text-xs text-muted-foreground line-clamp-2 prose prose-sm dark:prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: entry.post.inReplyTo.content,
+                      }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </a>
+        )}
         <div className="text-sm leading-relaxed line-clamp-4 text-foreground/90 pl-[52px]">
           {entry.post.content}
         </div>

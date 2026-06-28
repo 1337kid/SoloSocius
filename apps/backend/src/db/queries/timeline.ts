@@ -92,6 +92,7 @@ export const getProfileTimeline = async (limit: number, offset: number) => {
             columns: {
               content: true,
               url: true,
+              idUri: true,
             },
             with: {
               actor: {

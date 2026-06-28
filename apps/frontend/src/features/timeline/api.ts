@@ -20,6 +20,12 @@ export interface TimelinePost {
     content: string;
     createdAt: string;
     url: string;
+    inReplyTo: {
+      url: string;
+      idUri: string;
+      content: string;
+      actor: TimelinePost["actor"];
+    } | null;
   };
   interactions: {
     likes: number;
