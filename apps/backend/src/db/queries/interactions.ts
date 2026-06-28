@@ -1,6 +1,6 @@
-import { interactions } from "../schema.js";
+import { interactions, posts } from "../schema.js";
 import { db } from "../index.js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { userEndpoints } from "../../activitypub/actor.js";
 
 interface InteractionObject {
@@ -16,11 +16,27 @@ export const addInteractionEntry = async ({
   actorUri,
   postUri,
 }: InteractionObject) => {
-  await db.insert(interactions).values({
-    type,
-    activityId,
-    actorUri,
-    postUri,
+  await db.transaction(async (tx) => {
+    const inserted = await tx
+      .insert(interactions)
+      .values({
+        type,
+        activityId,
+        actorUri,
+        postUri,
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    if (inserted) return;
+
+    await tx
+      .update(posts)
+      .set({
+        [type === "like" ? "likeCount" : "boostCount"]:
+          sql`${posts[type === "like" ? "likeCount" : "boostCount"]} + 1`,
+      })
+      .where(and(eq(posts.idUri, postUri), eq(posts.isLocal, true)));
   });
 };
 
@@ -68,5 +84,25 @@ export const findInteractionByPostAndType = async (
 };
 
 export const removeInteractionById = async (interactionId: string) => {
-  await db.delete(interactions).where(eq(interactions.id, interactionId));
+  await db.transaction(async (tx) => {
+    const interaction = (
+      await tx
+        .delete(interactions)
+        .where(eq(interactions.id, interactionId))
+        .returning()
+    )[0];
+
+    if (!interaction) return;
+
+    await tx
+      .update(posts)
+
+      .set({
+        [interaction.type === "like" ? "likeCount" : "boostCount"]:
+          sql`GREATEST(0, ${posts[interaction.type === "like" ? "likeCount" : "boostCount"]} - 1)`,
+      })
+      .where(
+        and(eq(posts.idUri, interaction.postUri), eq(posts.isLocal, true)),
+      );
+  });
 };

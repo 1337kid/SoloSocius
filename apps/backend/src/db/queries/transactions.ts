@@ -1,3 +1,4 @@
+import { userEndpoints } from "../../activitypub/actor.js";
 import { db } from "../index.js";
 import {
   interactions,
@@ -25,6 +26,15 @@ export const removeBoostByActivityId = async (activityId: string) => {
           eq(timelineEvents.actorUri, interaction.actorUri),
           eq(timelineEvents.postUri, interaction.postUri),
         ),
+      );
+
+    await tx
+      .update(posts)
+      .set({
+        boostCount: sql`GREATEST(0, ${posts.boostCount} - 1)`,
+      })
+      .where(
+        and(eq(posts.idUri, interaction.postUri), eq(posts.isLocal, true)),
       );
 
     await tx
