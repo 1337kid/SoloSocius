@@ -69,7 +69,9 @@ export const remoteActorLookup = async (actorUri: string) => {
 
 export const remotePostLookup = async (postUri: string) => {
   const post = await getPostFromDB(postUri);
+  console.log("post", post);
   if (post) return post;
+
 
   const lookup = await remoteFetch(postUri);
 
@@ -78,13 +80,25 @@ export const remotePostLookup = async (postUri: string) => {
 
   const data = await lookup.json();
 
+  console.log("data", data);
+
   await remoteActorLookup(data.attributedTo);
+
+  let inReplyToPost = null;
+
+  if (data.inReplyTo) {
+    inReplyToPost = await getPostFromDB(data.inReplyTo);
+
+    if (!inReplyToPost) {
+      inReplyToPost = await remotePostLookup(data.inReplyTo);
+    }
+  }
 
   const newPost = await storeRemotePost({
     actorUri: data.attributedTo,
     idUri: postUri,
     content: data.content,
-    inReplyTo: data.inReplyTo,
+    inReplyTo: inReplyToPost?.idUri || null,
     url: data.url,
     published: data.published,
   });

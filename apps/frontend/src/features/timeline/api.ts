@@ -1,31 +1,36 @@
 import { api } from "@/lib/api/axios";
 
+export interface TimelineActor {
+  actorUri: string;
+  username: string;
+  domain: string;
+  displayName?: string | null;
+  avatarUrl?: string | null;
+  summary?: string | null;
+  isLocal?: boolean;
+}
+
 export interface TimelinePost {
   id: string;
-  idUri: string;
-  content: string;
+  type: "post" | "boost";
+  actorUri: string;
+  postUri: string;
   createdAt: string;
-  actor: {
-    actorUri: string;
-    username: string;
-    domain: string;
-    displayName: string | null;
-    avatarUrl: string | null;
-    summary: string | null;
-    isLocal: boolean;
-  };
+  actor: TimelineActor;
   post: {
     id: string;
     idUri: string;
     content: string;
-    createdAt: string;
-    url: string;
+    isLocal: boolean;
     inReplyTo: {
       url: string;
       idUri: string;
       content: string;
-      actor: TimelinePost["actor"];
+      actor: TimelineActor;
     } | null;
+    url: string;
+    createdAt: string;
+    actor: TimelineActor;
   };
   interactions: {
     likes: number;

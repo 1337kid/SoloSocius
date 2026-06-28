@@ -3,6 +3,7 @@ import {
   deliverActivity,
   deliverActivityToFollowers,
   remoteActorLookup,
+  remotePostLookup,
 } from "../utils/activitypub.js";
 import { getPostFromDB } from "../db/queries/posts.js";
 import {
@@ -31,7 +32,7 @@ export const handleOutboundPostInteraction = async (
   };
 
   try {
-    const targetPost = await getPostFromDB(targetPostUri);
+    const targetPost = await remotePostLookup(targetPostUri);
 
     if (!targetPost)
       return reply.status(404).send({ error: "Target post not found" });
