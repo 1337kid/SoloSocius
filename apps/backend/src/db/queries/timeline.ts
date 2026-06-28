@@ -82,6 +82,7 @@ export const getProfileTimeline = async (limit: number, offset: number) => {
         columns: {
           actorUri: true,
           avatarUrl: true,
+          displayName: true,
           username: true,
           domain: true,
         },
@@ -99,6 +100,7 @@ export const getProfileTimeline = async (limit: number, offset: number) => {
                 columns: {
                   actorUri: true,
                   avatarUrl: true,
+                  displayName: true,
                   username: true,
                   domain: true,
                 },
@@ -109,6 +111,7 @@ export const getProfileTimeline = async (limit: number, offset: number) => {
             columns: {
               actorUri: true,
               avatarUrl: true,
+              displayName: true,
               username: true,
               domain: true,
             },
