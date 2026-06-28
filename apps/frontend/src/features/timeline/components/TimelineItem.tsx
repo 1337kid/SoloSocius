@@ -10,6 +10,7 @@ import { Ellipsis, Heart, Repeat, Reply } from "lucide-react";
 
 import type { TimelineActor, TimelineItem } from "../api";
 import { Button } from "@/components/ui/button";
+import PostStat from "./PostStat";
 
 function ActorAvatar({
   actor,
@@ -154,6 +155,22 @@ export function TimelineItem({ entry }: { entry: TimelineItem }) {
               __html: purify.sanitize(entry.post.content),
             }}
           />
+        </div>
+
+        <div className="flex items-center justify-between ml-[52px]">
+          <PostStat
+            count={entry.post.replyCount}
+            icon={<Reply className="size-4 text-primary" />}
+          />
+          <PostStat
+            count={entry.post.boostCount}
+            icon={<Repeat className="size-4 text-primary" />}
+          />
+          <PostStat
+            count={entry.post.likeCount}
+            icon={<Heart className="size-4 text-primary" />}
+          />
+          <PostStat icon={<Ellipsis className="size-4 text-primary" />} />
         </div>
       </CardContent>
     </Card>
