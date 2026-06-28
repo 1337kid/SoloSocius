@@ -6,6 +6,7 @@ import purify from "dompurify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Repeat, Reply } from "lucide-react";
 
 import type { TimelineActor, TimelinePost } from "../api";
 
@@ -34,14 +35,6 @@ function ActorHandle({ actor }: { actor: TimelineActor }) {
     <div className="min-w-0 flex-1">
       <div className="flex items-center gap-2 flex-wrap">
         <p className="font-semibold text-sm truncate">{name}</p>
-        {actor.isLocal && (
-          <Badge
-            variant="secondary"
-            className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20"
-          >
-            Admin
-          </Badge>
-        )}
       </div>
       <p className="text-xs text-muted-foreground font-mono">{handle}</p>
     </div>
@@ -61,25 +54,10 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
   return (
     <Card className="overflow-hidden border-l-[3px] border-l-primary/50 hover:border-l-primary hover:bg-muted/40 hover:shadow-sm transition-all duration-200 bg-card/70 p-0">
       <CardContent className="p-4 space-y-3">
-
         {/* Boost attribution row */}
         {isBoost && booster && (
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground pl-1">
-            {/* boost icon */}
-            <svg
-              viewBox="0 0 24 24"
-              className="size-3.5 text-primary/70 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17 1l4 4-4 4" />
-              <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-              <path d="M7 23l-4-4 4-4" />
-              <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-            </svg>
+            <Repeat className="size-4 text-primary" />
             <Avatar className="size-4 ring-0">
               {booster.avatarUrl && (
                 <AvatarImage
@@ -88,7 +66,9 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
                 />
               )}
               <AvatarFallback className="text-[8px] bg-primary/10 text-primary">
-                {(booster.displayName || booster.username).charAt(0).toUpperCase()}
+                {(booster.displayName || booster.username)
+                  .charAt(0)
+                  .toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <span>
@@ -100,7 +80,6 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
           </div>
         )}
 
-        {/* Main header — always shows the post author */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0 flex-1">
             <ActorAvatar actor={postAuthor} />
@@ -123,27 +102,37 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
             rel="noopener noreferrer"
             className="block pl-[52px]"
           >
-            <Card className="bg-muted/40 hover:bg-muted transition-colors border-dashed shadow-none">
-              <CardContent>
+            <Card className="bg-muted/40 hover:bg-muted transition-colors border-dashed shadow-none p-2">
+              <CardContent className="p-0">
                 <div className="flex items-start gap-2">
                   <Avatar className="size-6">
                     <AvatarImage
                       src={entry.post.inReplyTo.actor.avatarUrl || undefined}
                     />
-                    <AvatarFallback className="text-[10px]">
-                      {entry.post.inReplyTo.actor.username[0].toUpperCase()}
+                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                      {(
+                        entry.post.inReplyTo.actor.displayName ||
+                        entry.post.inReplyTo.actor.username
+                      )
+                        .charAt(0)
+                        .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Reply className="size-4 text-primary inline mb-1"/>
                       Replying to{" "}
                       <span className="font-medium text-foreground">
+                        {entry.post.inReplyTo.actor.displayName ||
+                          entry.post.inReplyTo.actor.username}
+                      </span>
+                      <span className="font-medium text-primary">
                         @{entry.post.inReplyTo.actor.username}@
                         {entry.post.inReplyTo.actor.domain}
                       </span>
                     </p>
                     <div
-                      className="mt-0.5 text-xs text-muted-foreground line-clamp-2 prose prose-sm dark:prose-invert max-w-none"
+                      className="mt-0.5 text-xs text-muted-foreground line-clamp-1 prose prose-sm dark:prose-invert max-w-none"
                       dangerouslySetInnerHTML={{
                         __html: purify.sanitize(entry.post.inReplyTo.content),
                       }}
@@ -164,7 +153,6 @@ export function TimelineItem({ entry }: { entry: TimelinePost }) {
             }}
           />
         </div>
-
       </CardContent>
     </Card>
   );

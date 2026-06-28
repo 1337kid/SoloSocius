@@ -24,10 +24,10 @@ export function ProfileCard({ profile }: { profile: ProfileData }) {
 
           <div className="text-center space-y-1 w-full">
             <p className="font-bold text-lg tracking-tight">
-              {profile?.username}
+              {profile?.displayName}
             </p>
             <p className="text-xs text-muted-foreground font-mono">
-              {profile?.domain}
+              @{profile?.username}@{profile?.domain}
             </p>
           </div>
         </div>
