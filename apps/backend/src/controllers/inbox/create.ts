@@ -1,6 +1,10 @@
 import { userEndpoints } from "../../activitypub/actor.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
-import { getPostFromDB, storeRemotePost } from "../../db/queries/posts.js";
+import {
+  getPostFromDB,
+  incrementPostReplyCount,
+  storeRemotePost,
+} from "../../db/queries/posts.js";
 import { createTimelineEntry } from "../../db/queries/timeline.js";
 import { InboxActivity } from "../../types/index.js";
 
@@ -30,6 +34,8 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
         const localParentPost = await getPostFromDB(nestedObject.inReplyTo);
 
         if (localParentPost?.isLocal) {
+          await incrementPostReplyCount(localParentPost.idUri);
+          
           await createNotificationEntry({
             type: "reply",
             actorUri: activity.actor,

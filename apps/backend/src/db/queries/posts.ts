@@ -139,3 +139,12 @@ export const findLocalPostByUri = async (postUri: string) => {
       .limit(1)
   )[0];
 };
+
+export const incrementPostReplyCount = async (postUri: string) => {
+  await db
+    .update(posts)
+    .set({
+      replyCount: sql`${posts.replyCount} + 1`,
+    })
+    .where(eq(posts.idUri, postUri));
+};
