@@ -54,6 +54,9 @@ export const posts = pgTable("posts", {
     onDelete: "set null",
   }),
   url: text("url"),
+  likeCount: integer("like_count").default(0).notNull(),
+  boostCount: integer("boost_count").default(0).notNull(),
+  replyCount: integer("reply_count").default(0).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -104,21 +107,31 @@ export const notifications = pgTable("notifications", {
     .notNull(),
 });
 
-export const interactions = pgTable("interactions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  type: text("type").notNull(), // Discriminating value: 'like' or 'boost'
-  activityId: text("activity_id").notNull().unique(), // activityUri for undo operations
-  actorUri: text("actor_uri")
-    .notNull()
-    .references(() => actors.actorUri, { onDelete: "cascade" }),
-  postUri: text("post_uri")
-    .notNull()
-    .references(() => posts.idUri, { onDelete: "cascade" }),
+export const interactions = pgTable(
+  "interactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    type: text("type").notNull(), // Discriminating value: 'like' or 'boost'
+    activityId: text("activity_id").notNull().unique(), // activityUri for undo operations
+    actorUri: text("actor_uri")
+      .notNull()
+      .references(() => actors.actorUri, { onDelete: "cascade" }),
+    postUri: text("post_uri")
+      .notNull()
+      .references(() => posts.idUri, { onDelete: "cascade" }),
 
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("interaction_unique").on(
+      table.actorUri,
+      table.postUri,
+      table.type,
+    ),
+  ],
+);
 
 export const timelineEvents = pgTable("timeline_events", {
   id: uuid("id").defaultRandom().primaryKey(),
