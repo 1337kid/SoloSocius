@@ -1,0 +1,1 @@
+ALTER TABLE "actors" ADD COLUMN "banner_url" text;

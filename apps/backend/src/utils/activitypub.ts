@@ -57,6 +57,7 @@ export const remoteActorLookup = async (actorUri: string) => {
     displayName: data.name,
     summary: data.summary || data.bio,
     avatarUrl: data.icon?.url ?? "",
+    bannerUrl: data.image?.url ?? "",
     publicKeyId: data.publicKey?.id,
     publicKey: data.publicKey?.publicKeyPem,
     inboxUrl: data.inbox,

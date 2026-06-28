@@ -13,6 +13,7 @@ export interface ActorObject {
   summary: string;
   publicKeyId: string;
   avatarUrl: string;
+  bannerUrl: string;
   publicKey: string;
   inboxUrl: string;
   sharedInboxUrl: string;
