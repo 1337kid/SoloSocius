@@ -1,6 +1,7 @@
 "use client";
 import { ProfileCard } from "@/features/timeline/components/ProfileCard";
 import { PublicTimelineView } from "@/features/timeline/components/PublicTimelineView";
+import Navbar from "@/components/dashboard/Navbar";
 
 import { useProfileData } from "@/features/profile/hooks/useProfile";
 import { ProfileData } from "@/features/profile/api";
@@ -10,6 +11,7 @@ export default function PublicTimeline() {
 
   return (
     <main className="min-h-screen bg-background">
+      <Navbar />
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,var(--color-primary)/6%,transparent_70%)]" />
 
       <div className="relative max-w-4xl mx-auto">
