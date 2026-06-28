@@ -10,5 +10,5 @@ export const generateAcceptActivityId = () => {
 };
 
 export const generateInteractionActivityId = (type: string) => {
-  return `${userEndpoints.activities}/${type}/${uuidv7}`;
+  return `${userEndpoints.activities}/${type}/${uuidv7()}`;
 };
