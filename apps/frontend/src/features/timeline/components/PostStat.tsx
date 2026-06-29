@@ -5,15 +5,18 @@ import React from "react";
 const PostStat = ({
   count,
   icon,
+  onClick,
 }: {
   count?: number;
   icon: React.ReactNode;
+  onClick?: () => void;
 }) => {
   return (
     <Button
       variant="ghost"
       size="icon"
       className="flex items-center gap-1 text-muted-foreground text-xs px-6"
+      onClick={onClick}
     >
       {icon}
       {count && <span>{count}</span>}

@@ -2,14 +2,10 @@
 
 import { formatDistanceToNow } from "date-fns";
 import purify from "dompurify";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Ellipsis, Heart, Repeat, Reply } from "lucide-react";
-
 import type { TimelineActor, TimelineItem } from "../api";
-import { Button } from "@/components/ui/button";
 import PostStat from "./PostStat";
 
 function ActorAvatar({
@@ -43,18 +39,30 @@ function ActorHandle({ actor }: { actor: TimelineActor }) {
   );
 }
 
-export function TimelineItem({ entry }: { entry: TimelineItem }) {
+export function TimelineItem({
+  entry,
+  onPostStatsButtonClick,
+}: {
+  entry: TimelineItem;
+  onPostStatsButtonClick: () => void;
+}) {
   const isBoost = entry.event.type === "boost";
 
   const postAuthor = entry.post.actor;
   const booster = isBoost ? entry.actor : null;
 
-  const timeAgo = formatDistanceToNow(new Date(entry.event.createdAt), {
+  const boostedTimeAgo = isBoost
+    ? formatDistanceToNow(new Date(entry.event.createdAt), {
+        addSuffix: true,
+      })
+    : undefined;
+
+  const postTimeAgo = formatDistanceToNow(new Date(entry.post.createdAt), {
     addSuffix: true,
   });
 
   return (
-    <Card className="overflow-hidden border-l-[3px] border-l-primary/50 hover:border-l-primary hover:bg-muted/40 hover:shadow-sm transition-all duration-200 bg-card/70 p-0">
+    <Card className="overflow-hidden hover:bg-muted/40 hover:shadow-sm transition-all duration-200 bg-card/70 p-0">
       <CardContent className="p-4 space-y-3">
         {/* Boost attribution row */}
         {isBoost && booster && (
@@ -77,7 +85,7 @@ export function TimelineItem({ entry }: { entry: TimelineItem }) {
               <span className="font-medium text-foreground/80">
                 {booster.displayName || booster.username}
               </span>{" "}
-              boosted
+              boosted {boostedTimeAgo}
             </span>
           </div>
         )}
@@ -88,7 +96,7 @@ export function TimelineItem({ entry }: { entry: TimelineItem }) {
             <ActorHandle actor={postAuthor} />
           </div>
           <time className="text-[11px] text-muted-foreground/70 whitespace-nowrap mt-0.5">
-            {timeAgo}
+            {postTimeAgo}
           </time>
         </div>
 
@@ -161,16 +169,21 @@ export function TimelineItem({ entry }: { entry: TimelineItem }) {
           <PostStat
             count={entry.post.replyCount}
             icon={<Reply className="size-4 text-primary" />}
+            onClick={onPostStatsButtonClick}
           />
           <PostStat
             count={entry.post.boostCount}
             icon={<Repeat className="size-4 text-primary" />}
+            onClick={onPostStatsButtonClick}
           />
           <PostStat
             count={entry.post.likeCount}
             icon={<Heart className="size-4 text-primary" />}
+            onClick={onPostStatsButtonClick}
           />
-          <PostStat icon={<Ellipsis className="size-4 text-primary" />} />
+          <PostStat
+            icon={<Ellipsis className="size-4 text-primary" />}
+          />
         </div>
       </CardContent>
     </Card>

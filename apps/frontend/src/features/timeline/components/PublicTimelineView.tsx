@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePublicTimeline } from "../hooks/usePublicTimeline";
 import { TimelineItem } from "./TimelineItem";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { Dialog } from "@/components/ui/dialog";
+import { ShowLoginDialog } from "./ShowLoginDialog";
 
 export function PublicTimelineView() {
   const {
@@ -26,11 +29,26 @@ export function PublicTimelineView() {
 
   const allPosts = data?.pages.flatMap((page) => page.items) ?? [];
 
+  const { isAuthenticated } = useAuth();
+
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+
+  const handlePostStatsButtonClick = () => {
+    if (isAuthenticated) {
+      return;
+    }
+
+    setIsLoginDialogOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-3 w-full">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70">
+          <div
+            key={i}
+            className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70"
+          >
             <div className="flex items-start gap-3">
               <Skeleton className="size-10 rounded-full shrink-0" />
               <div className="flex-1 space-y-2">
@@ -38,7 +56,10 @@ export function PublicTimelineView() {
                 <Skeleton className="h-3 w-24" />
               </div>
             </div>
-            <Skeleton className="h-16 w-full ml-[52px]" style={{ width: "calc(100% - 52px)" }} />
+            <Skeleton
+              className="h-16 w-full ml-[52px]"
+              style={{ width: "calc(100% - 52px)" }}
+            />
           </div>
         ))}
       </div>
@@ -75,15 +96,23 @@ export function PublicTimelineView() {
 
   return (
     <div className="space-y-3 w-full">
-      {allPosts.length > 0 && allPosts.map((entry) => (
-        <TimelineItem key={entry.post.id} entry={entry} />
-      ))}
+      {allPosts.length > 0 &&
+        allPosts.map((entry) => (
+          <TimelineItem
+            key={entry.post.id}
+            entry={entry}
+            onPostStatsButtonClick={handlePostStatsButtonClick}
+          />
+        ))}
 
       <div ref={ref} className="space-y-3">
         {isFetchingNextPage && (
           <>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70">
+              <div
+                key={i}
+                className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70"
+              >
                 <div className="flex items-start gap-3">
                   <Skeleton className="size-10 rounded-full shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -97,6 +126,10 @@ export function PublicTimelineView() {
           </>
         )}
       </div>
+
+      <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+        <ShowLoginDialog />
+      </Dialog>
     </div>
   );
 }
