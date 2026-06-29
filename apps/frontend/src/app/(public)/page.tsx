@@ -12,7 +12,7 @@ export default function PublicTimeline() {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
-      <div className="relative max-w-4xl mx-auto">
+      <div className="relative max-w-5xl mx-auto">
         {/* Banner */}
         <div className="relative mx-4 h-52 overflow-hidden rounded-2xl shadow-md py-2">
           {profile?.bannerUrl && (

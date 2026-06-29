@@ -41,6 +41,14 @@ export const removeTimelineBoostEntry = async (
     );
 };
 
+const actor = alias(actors, "actor");
+const postActor = alias(actors, "post_actor");
+const parentPost = alias(posts, "parent_post");
+const parentActor = alias(actors, "parent_actor");
+
+const myLike = alias(interactions, "my_like");
+const myBoost = alias(interactions, "my_boost");
+
 export const getFeedEvents = async (
   actorUris: string[],
   limit: number,
@@ -76,15 +84,9 @@ export const getFeedEvents = async (
   });
 };
 
-const actor = alias(actors, "actor");
-const postActor = alias(actors, "post_actor");
-const parentPost = alias(posts, "parent_post");
-const parentActor = alias(actors, "parent_actor");
-
-const myLike = alias(interactions, "my_like");
-const myBoost = alias(interactions, "my_boost");
 
 export const getProfileTimeline = async (
+  actorUris: string[],
   limit: number,
   offset: number,
 ) => {
@@ -173,7 +175,7 @@ export const getProfileTimeline = async (
     .leftJoin(parentPost, eq(parentPost.idUri, posts.inReplyTo))
     .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri))
 
-    .where(eq(timelineEvents.actorUri, userEndpoints.actorUri))
+    .where(inArray(timelineEvents.actorUri, actorUris))
     .orderBy(desc(timelineEvents.createdAt))
     .limit(limit)
     .offset(offset);

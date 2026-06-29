@@ -72,7 +72,6 @@ export const remotePostLookup = async (postUri: string) => {
   console.log("post", post);
   if (post) return post;
 
-
   const lookup = await remoteFetch(postUri);
 
   if (!lookup.ok)
