@@ -1,7 +1,7 @@
 "use client";
 import { ProfileCard } from "@/features/timeline/components/ProfileCard";
 import { PublicTimelineView } from "@/features/timeline/components/PublicTimelineView";
-import Navbar from "@/components/dashboard/Navbar";
+import Navbar from "@/components/Navbar";
 
 import { useProfileData } from "@/features/profile/hooks/useProfile";
 import { ProfileData } from "@/features/profile/api";

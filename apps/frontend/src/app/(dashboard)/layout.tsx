@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/dashboard/Navbar";
+import Navbar from "@/components/Navbar";
 import { onSessionExpired } from "@/features/auth/events";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSession } from "@/features/auth/hooks/useSession";
@@ -30,11 +30,6 @@ export default function DashboardLayout({
   if (auth.isPending || !auth.user) {
     return <p>Loading...</p>;
   } else {
-    return (
-      <div>
-        <Navbar />
-        {children}
-      </div>
-    );
+    return children;
   }
 }

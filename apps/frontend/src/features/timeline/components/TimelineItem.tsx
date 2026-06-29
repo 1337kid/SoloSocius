@@ -62,7 +62,7 @@ export function TimelineItem({
   });
 
   return (
-    <Card className="overflow-hidden hover:bg-muted/40 hover:shadow-sm transition-all duration-200 bg-card/70 p-0">
+    <Card className="overflow-hidden max-w-2xl mx-auto hover:bg-muted/40 hover:shadow-sm transition-all duration-200 bg-card/70 p-0">
       <CardContent className="p-4 space-y-3">
         {/* Boost attribution row */}
         {isBoost && booster && (

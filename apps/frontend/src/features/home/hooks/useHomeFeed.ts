@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { getHomeFeed } from "../api";
-import { feedQueryKeys } from "../query-keys";
+import { feedQueryKeys } from "../keys";
 
 export function useHomeFeed() {
   return useInfiniteQuery({

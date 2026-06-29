@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { getPublicTimeline } from "../api";
-import { timelineQueryKeys } from "../query-keys";
+import { timelineQueryKeys } from "../keys";
 
 export function usePublicTimeline() {
   return useInfiniteQuery({
