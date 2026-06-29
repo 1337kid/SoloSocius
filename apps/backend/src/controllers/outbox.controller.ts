@@ -5,6 +5,7 @@ import {
   createOrderedCollectionPage,
 } from "../activitypub/collections.js";
 import { createOutboxActivity } from "../activitypub/activities.js";
+import { userEndpoints } from "../activitypub/actor.js";
 
 const PAGE_SIZE = 20;
 
@@ -19,7 +20,7 @@ export const handleOutboxRequest = async (
 
     // return metadata if no page query
     if (!page) {
-      const collectionWrapper = createOrderedCollection({
+      const collectionWrapper = createOrderedCollection(userEndpoints.outbox, {
         totalItems,
         first: "1",
         last: `${Math.max(1, Math.ceil(totalItems / PAGE_SIZE))}`,
@@ -54,7 +55,9 @@ export const handleOutboxRequest = async (
     const hasMoreItems = totalItems > pageNumber * PAGE_SIZE;
 
     const collectionPage = createOrderedCollectionPage(
+      userEndpoints.outbox,
       pageNumber,
+      totalItems,
       orderedItems,
       hasMoreItems,
     );
