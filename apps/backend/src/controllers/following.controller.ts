@@ -7,10 +7,17 @@ import {
 import {
   checkIfLocalActorIsFollowing,
   createFollowingUserEntry,
+  getAcceptedFollowingByOffset,
+  getUserFollowingCount,
   removeFollowingEntry,
 } from "../db/queries/following.js";
 import { createActivity } from "../activitypub/activities.js";
 import { generateFollowActivityId } from "../utils/activityId.js";
+import {
+  createOrderedCollection,
+  createOrderedCollectionPage,
+} from "../activitypub/collections.js";
+import { userEndpoints } from "../activitypub/actor.js";
 
 export const handleFollowRemoteUser = async (
   request: FastifyRequest,
@@ -127,6 +134,66 @@ export const handleUnfollowRemoteUser = async (
     });
   } catch (error) {
     console.log("Error sending unfollow activity: ", error);
+    return reply.status(500).send({ error: "Internal Server Error." });
+  }
+};
+
+const PAGE_SIZE = 20;
+
+export const handleFollowingCollectionRequest = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { page } = request.query as { page?: string };
+
+  try {
+    const totalItems = await getUserFollowingCount();
+
+    // return metadata if no page query
+    if (!page) {
+      const collectionWrapper = createOrderedCollection(
+        userEndpoints.following,
+        {
+          totalItems,
+          first: "1",
+          last: `${Math.max(1, Math.ceil(totalItems / PAGE_SIZE))}`,
+        },
+      );
+
+      return reply
+        .type("application/activity+json; charset=utf-8")
+        .send(collectionWrapper);
+    }
+
+    const pageNumber = parseInt(page, 10);
+    if (isNaN(pageNumber) || pageNumber < 1) {
+      return reply
+        .status(400)
+        .send({ error: "Invalid outbox page identifier specification." });
+    }
+
+    const offsetValue = (pageNumber - 1) * PAGE_SIZE;
+
+    const followingEntries = await getAcceptedFollowingByOffset(
+      offsetValue,
+      PAGE_SIZE,
+    );
+
+    const hasMoreItems = totalItems > pageNumber * PAGE_SIZE;
+
+    const collectionPage = createOrderedCollectionPage(
+      userEndpoints.following,
+      pageNumber,
+      totalItems,
+      followingEntries,
+      hasMoreItems,
+    );
+
+    return reply
+      .type("application/activity+json; charset=utf-8")
+      .send(collectionPage);
+  } catch (error) {
+    console.error("Failed compiling paginated outbox stream:", error);
     return reply.status(500).send({ error: "Internal Server Error." });
   }
 };

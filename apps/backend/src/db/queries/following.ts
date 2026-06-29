@@ -1,6 +1,6 @@
 import { following, timelineEvents } from "../schema.js";
 import { db } from "../index.js";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 
 export const createFollowingUserEntry = async (
   activityId: string,
@@ -69,4 +69,26 @@ export const removeFollowingEntry = async (actorUri: string) => {
       .delete(timelineEvents)
       .where(eq(timelineEvents.actorUri, followingEntry[0].followedActorUri));
   });
+};
+
+export const getUserFollowingCount = async () => {
+  const [totalResult] = await db
+    .select({ value: count() })
+    .from(following)
+    .where(eq(following.status, "accepted"));
+
+  return totalResult?.value || 0;
+};
+
+export const getAcceptedFollowingByOffset = async (
+  offset: number,
+  limit: number,
+) => {
+  return await db
+    .select({ followedActorUri: following.followedActorUri })
+    .from(following)
+    .where(eq(following.status, "accepted"))
+    .offset(offset)
+    .limit(limit)
+    .then((rows) => rows.map((row) => row.followedActorUri));
 };

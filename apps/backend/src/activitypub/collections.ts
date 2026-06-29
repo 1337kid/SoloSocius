@@ -1,33 +1,38 @@
 import { OrderedCollection } from "../types/index.js";
-import { userEndpoints } from "./actor.js";
 
-export const createOrderedCollection = (data: OrderedCollection) => {
+export const createOrderedCollection = (
+  id: string,
+  data: OrderedCollection,
+) => {
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: userEndpoints.outbox,
+    id: id,
     type: "OrderedCollection",
     totalItems: data.totalItems,
-    first: `${userEndpoints.outbox}?page=${data.first}`,
-    last: `${userEndpoints.outbox}?page=${data.last}`,
+    first: `${id}?page=${data.first}`,
+    last: `${id}?page=${data.last}`,
   };
 };
 
 export const createOrderedCollectionPage = (
+  id: string,
   pageNumber: number,
+  totalItems: number,
   orderedItems: any,
   hasMoreItems: boolean,
 ) => {
   let res = {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${userEndpoints.outbox}?page=${pageNumber}`,
+    id: `${id}?page=${pageNumber}`,
     type: "OrderedCollectionPage",
-    partOf: userEndpoints.outbox,
+    partOf: id,
+    totalItems: totalItems,
     orderedItems: orderedItems,
     next: undefined as string | undefined,
   };
 
   if (hasMoreItems) {
-    res.next = `${userEndpoints.outbox}?page=${pageNumber + 1}`;
+    res.next = `${id}?page=${pageNumber + 1}`;
   }
 
   return res;
