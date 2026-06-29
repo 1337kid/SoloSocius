@@ -1,5 +1,5 @@
 import { actors, followers } from "../schema.js";
-import { count, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { CreateFollowerInupt } from "../../types/index.js";
 import { db } from "../index.js";
 
@@ -51,4 +51,29 @@ export const getFollowersByOffset = async (offset: number, limit: number) => {
     .offset(offset)
     .limit(limit)
     .then((rows) => rows.map((row) => row.followerActorUri));
+};
+
+export const getFollowersDetailsByOffset = async (
+  offset: number,
+  limit: number,
+) => {
+  return await db.query.followers.findMany({
+    columns: {
+      id: true,
+    },
+    with: {
+      actor: {
+        columns: {
+          actorUri: true,
+          displayName: true,
+          username: true,
+          domain: true,
+          avatarUrl: true,
+        },
+      },
+    },
+    orderBy: [desc(followers.createdAt)],
+    offset,
+    limit,
+  });
 };
