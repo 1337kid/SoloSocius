@@ -45,10 +45,7 @@ export function PublicTimelineView() {
     return (
       <div className="space-y-3 w-full">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70"
-          >
+          <div key={i} className="space-y-3 p-4 border rounded-lg bg-card/70">
             <div className="flex items-start gap-3">
               <Skeleton className="size-10 rounded-full shrink-0" />
               <div className="flex-1 space-y-2">

@@ -7,7 +7,7 @@ import { ProfileData } from "@/features/profile/api";
 
 export function ProfileCard({ profile }: { profile: ProfileData }) {
   return (
-    <Card className="w-sm max-md:mx-auto max-md:w-full mb-auto bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
+    <Card className="w-md max-md:mx-auto max-md:w-full mb-auto bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
       <CardContent className="p-3 space-y-4">
         {/* Avatar */}
         <div className="flex flex-col items-center space-y-3 max-md:space-y-2">
