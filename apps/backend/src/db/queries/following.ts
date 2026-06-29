@@ -1,6 +1,6 @@
 import { following, timelineEvents } from "../schema.js";
 import { db } from "../index.js";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 
 export const createFollowingUserEntry = async (
   activityId: string,
@@ -91,4 +91,29 @@ export const getAcceptedFollowingByOffset = async (
     .offset(offset)
     .limit(limit)
     .then((rows) => rows.map((row) => row.followedActorUri));
+};
+
+export const getFollowingDetailsByOffset = async (
+  offset: number,
+  limit: number,
+) => {
+  return await db.query.following.findMany({
+    columns: {
+      id: true,
+    },
+    with: {
+      actor: {
+        columns: {
+          actorUri: true,
+          displayName: true,
+          username: true,
+          domain: true,
+          avatarUrl: true,
+        },
+      },
+    },
+    orderBy: [desc(following.createdAt)],
+    offset,
+    limit,
+  });
 };

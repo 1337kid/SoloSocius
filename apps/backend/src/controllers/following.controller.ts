@@ -8,6 +8,7 @@ import {
   checkIfLocalActorIsFollowing,
   createFollowingUserEntry,
   getAcceptedFollowingByOffset,
+  getFollowingDetailsByOffset,
   getUserFollowingCount,
   removeFollowingEntry,
 } from "../db/queries/following.js";
@@ -194,6 +195,33 @@ export const handleFollowingCollectionRequest = async (
       .send(collectionPage);
   } catch (error) {
     console.error("Failed compiling paginated outbox stream:", error);
+    return reply.status(500).send({ error: "Internal Server Error." });
+  }
+};
+
+export const handleGetAllFollowing = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { page } = request.query as { page?: string };
+
+  try {
+    const pageNumber = parseInt(page ?? "1", 10);
+    if (isNaN(pageNumber) || pageNumber < 1) {
+      return reply
+        .status(400)
+        .send({ error: "Invalid outbox page identifier specification." });
+    }
+
+    const offsetValue = (pageNumber - 1) * PAGE_SIZE;
+
+    const followingDetails = await getFollowingDetailsByOffset(offsetValue, PAGE_SIZE);
+
+    return reply
+      .type("application/activity+json; charset=utf-8")
+      .send(followingDetails);
+  } catch (error) {
+    console.error("Failed getting all following:", error);
     return reply.status(500).send({ error: "Internal Server Error." });
   }
 };
