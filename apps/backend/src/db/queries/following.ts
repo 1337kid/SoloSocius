@@ -1,4 +1,4 @@
-import { following } from "../schema.js";
+import { following, timelineEvents } from "../schema.js";
 import { db } from "../index.js";
 import { and, eq } from "drizzle-orm";
 
@@ -43,16 +43,30 @@ export const getAllAcceptedFollowingActorUri = async () => {
 };
 
 export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
-  const followingEntry = await db
-    .select()
-    .from(following)
-    .where(
-      and(
-        eq(following.followedActorUri, actorUri),
-        eq(following.status, "accepted"),
-      ),
-    )
-    .limit(1);
+  return await db.query.following.findFirst({
+    where: and(
+      eq(following.followedActorUri, actorUri),
+      eq(following.status, "accepted"),
+    ),
+    with: {
+      actor: {
+        columns: {
+          inboxUrl: true,
+        },
+      },
+    },
+  });
+};
 
-  return followingEntry.length > 0;
+export const removeFollowingEntry = async (actorUri: string) => {
+  return await db.transaction(async (tx) => {
+    const followingEntry = await tx
+      .delete(following)
+      .where(eq(following.followedActorUri, actorUri))
+      .returning();
+
+    await tx
+      .delete(timelineEvents)
+      .where(eq(timelineEvents.actorUri, followingEntry[0].followedActorUri));
+  });
 };

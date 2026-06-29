@@ -16,7 +16,7 @@ import ProfileCard from "@/features/home/components/ProfileCard";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import { Input } from "@/components/ui/input";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import { ButtonGroup } from "@/components/ui/button-group";
 
 export default function DashboardPage() {
@@ -41,7 +41,7 @@ export default function DashboardPage() {
         </div>
         <Separator
           orientation="vertical"
-          className="max-h-dvh bg-primary/50 my-4"
+          className="max-h-dvh bg-primary/50 mt-4"
         />
         <div className="max-h-dvh py-4 overflow-hidden">
           <Field className="mb-3">
@@ -62,7 +62,7 @@ export default function DashboardPage() {
         </div>
         <Separator
           orientation="vertical"
-          className="max-h-dvh bg-primary/50 my-4"
+          className="max-h-dvh bg-primary/50 mt-4"
         />
         <Card className="min-w-3/12 bg-transparent border-none mb-auto outline-none shadow-none ring-0 mt-4">
           <CardHeader>

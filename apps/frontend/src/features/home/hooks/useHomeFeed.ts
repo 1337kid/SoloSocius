@@ -1,6 +1,10 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-import { getHomeFeed } from "../api";
+import { createPost, CreatePostRequest, getHomeFeed } from "../api";
 import { feedQueryKeys } from "../keys";
 
 export function useHomeFeed() {
@@ -9,5 +13,16 @@ export function useHomeFeed() {
     queryFn: ({ pageParam = 1 }) => getHomeFeed(pageParam),
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
+  });
+}
+
+export function useCreatePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (post: CreatePostRequest) => createPost(post),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
+    },
   });
 }

@@ -1,5 +1,8 @@
 import { FastifyInstance } from "fastify";
-import { handleFollowRemoteUser } from "../controllers/following.controller.js";
+import {
+  handleFollowRemoteUser,
+  handleUnfollowRemoteUser,
+} from "../controllers/following.controller.js";
 import {
   createPost,
   deletePost,
@@ -18,7 +21,7 @@ export async function PrivateRoutes(fastify: FastifyInstance) {
   //fastify.addHook("preHandler", authenticate);
 
   fastify.post("/follow", handleFollowRemoteUser);
-
+  fastify.delete("/follow", handleUnfollowRemoteUser);
   // user post routes
   fastify.post("/posts", createPost);
   fastify.put("/posts/:id", updatePost);

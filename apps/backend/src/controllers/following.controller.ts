@@ -4,7 +4,11 @@ import {
   remoteActorLookup,
   webfingerLookup,
 } from "../utils/activitypub.js";
-import { createFollowingUserEntry } from "../db/queries/following.js";
+import {
+  checkIfLocalActorIsFollowing,
+  createFollowingUserEntry,
+  removeFollowingEntry,
+} from "../db/queries/following.js";
 import { createActivity } from "../activitypub/activities.js";
 import { generateFollowActivityId } from "../utils/activityId.js";
 
@@ -86,6 +90,43 @@ export const handleFollowRemoteUser = async (
     });
   } catch (error) {
     console.log("Error sending follow activity: ", error);
+    return reply.status(500).send({ error: "Internal Server Error." });
+  }
+};
+
+export const handleUnfollowRemoteUser = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { actorUri } = request.body as { actorUri: string };
+
+  try {
+    const following = await checkIfLocalActorIsFollowing(actorUri);
+
+    if (!following) {
+      return reply
+        .status(404)
+        .send({ error: "You are not following this user." });
+    }
+
+    await removeFollowingEntry(actorUri);
+
+    const unfollowActivity = createActivity(
+      `${following.followActivityId}#undo`,
+      "Undo",
+      following.followActivityId,
+    );
+
+    await deliverActivity({
+      inboxUrl: following.actor.inboxUrl,
+      activity: unfollowActivity,
+    });
+
+    return reply.status(200).send({
+      message: "Unfollow successful",
+    });
+  } catch (error) {
+    console.log("Error sending unfollow activity: ", error);
     return reply.status(500).send({ error: "Internal Server Error." });
   }
 };
