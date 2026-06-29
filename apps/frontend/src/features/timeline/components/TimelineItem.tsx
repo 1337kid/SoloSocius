@@ -156,9 +156,9 @@ export function TimelineItem({
         )}
 
         {/* Post content */}
-        <div className="text-sm leading-relaxed line-clamp-4 text-foreground/90 pl-[52px]">
+        <div className="text-sm leading-relaxed pl-[52px]">
           <div
-            className="prose prose-sm max-w-none [&_a]:text-primary hover:[&_a]:text-primary/80 [&_a]:truncate"
+            className="prose prose-sm max-w-none **:wrap-break-words [&_*]:overflow-wrap-anywhere [&_a]:text-primary hover:[&_a]:text-primary/80"
             dangerouslySetInnerHTML={{
               __html: purify.sanitize(entry.post.content),
             }}
@@ -181,9 +181,7 @@ export function TimelineItem({
             icon={<Heart className="size-4 text-primary" />}
             onClick={onPostStatsButtonClick}
           />
-          <PostStat
-            icon={<Ellipsis className="size-4 text-primary" />}
-          />
+          <PostStat icon={<Ellipsis className="size-4 text-primary" />} />
         </div>
       </CardContent>
     </Card>
