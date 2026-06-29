@@ -29,15 +29,18 @@ axiosRetry(axiosClient, {
   },
 });
 
-export const remoteFetch = async (destination: string) => {
+export const remoteFetch = async (destination: string, accept?: string) => {
   return await fetch(destination, {
-    headers: { Accept: "application/activity+json" },
+    headers: accept
+      ? { Accept: accept }
+      : { Accept: "application/activity+json" },
   });
 };
 
 export const webfingerLookup = async (domain: string, handle: string) => {
   return await remoteFetch(
     `https://${domain}/.well-known/webfinger?resource=acct:${handle}`,
+    "application/jrd+json",
   );
 };
 
