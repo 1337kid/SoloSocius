@@ -6,6 +6,7 @@ import { handleOutboxRequest } from "../controllers/outbox.controller.js";
 import { getPostActivity } from "../controllers/posts.controller.js";
 import { handleWebFinger } from "../controllers/webfinger.controller.js";
 import { handleFollowingCollectionRequest } from "../controllers/following.controller.js";
+import { handleFollowersCollectionRequest } from "../controllers/followers.controller.js";
 
 export async function activityPubRoutes(fastify: FastifyInstance) {
   fastify.get("/.well-known/webfinger", handleWebFinger);
@@ -20,4 +21,5 @@ export async function activityPubRoutes(fastify: FastifyInstance) {
   fastify.get("/outbox", handleOutboxRequest);
   fastify.get("/posts/:id", getPostActivity);
   fastify.get("/following", handleFollowingCollectionRequest);
+  fastify.get("/followers", handleFollowersCollectionRequest);
 }

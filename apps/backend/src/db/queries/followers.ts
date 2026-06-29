@@ -1,5 +1,5 @@
 import { actors, followers } from "../schema.js";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { CreateFollowerInupt } from "../../types/index.js";
 import { db } from "../index.js";
 
@@ -36,4 +36,19 @@ export const getFollowerByActivityId = async (activityId: string) => {
       .where(eq(followers.followerActorUri, activityId))
       .limit(1)
   )[0];
+};
+
+export const getUserFollowersCount = async () => {
+  const [totalResult] = await db.select({ value: count() }).from(followers);
+
+  return totalResult?.value || 0;
+};
+
+export const getFollowersByOffset = async (offset: number, limit: number) => {
+  return await db
+    .select({ followerActorUri: followers.followerActorUri })
+    .from(followers)
+    .offset(offset)
+    .limit(limit)
+    .then((rows) => rows.map((row) => row.followerActorUri));
 };
