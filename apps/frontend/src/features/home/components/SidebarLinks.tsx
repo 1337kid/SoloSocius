@@ -13,9 +13,23 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { routes } from "@/lib/routes";
+import { useSession } from "@/features/auth/hooks/useSession";
+import { useLogout } from "@/features/auth/hooks/useLogout";
+import { toast } from "sonner";
 
 const SidebarLinks = () => {
   const router = useRouter();
+  const { endSession } = useSession();
+  const logout = useLogout();
+
+  async function handleLogout() {
+    try {
+      await logout.mutateAsync();
+      endSession();
+    } catch {
+      toast.error("Unable to logout.");
+    }
+  }
 
   return (
     <Card className="min-w-3/12 bg-transparent border-none mb-auto outline-none shadow-none ring-0 mt-4 p-0">
@@ -67,6 +81,8 @@ const SidebarLinks = () => {
         </Button>
         <Button
           variant="destructive"
+          onClick={handleLogout}
+          disabled={logout.isPending}
           className="w-full justify-start bg-transparent! hover:bg-destructive/10!"
           size="lg"
         >
