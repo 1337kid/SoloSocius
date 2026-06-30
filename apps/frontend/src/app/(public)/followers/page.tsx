@@ -5,6 +5,7 @@ import { useInView } from "react-intersection-observer";
 import Navbar from "@/components/Navbar";
 import { useFollowers } from "@/features/profile/hooks/useFollowers";
 import FollowersPage from "@/features/profile/components/FollowersPage";
+import { useProfileData } from "@/features/profile/hooks/useProfile";
 
 const Followers = () => {
   const {
@@ -15,6 +16,9 @@ const Followers = () => {
     isFetchingNextPage,
     fetchNextPage,
   } = useFollowers();
+
+  const { data: profile } = useProfileData();
+  const totalCount = profile?.followersCount ?? 0;
 
   const { ref, inView } = useInView();
 
@@ -31,7 +35,8 @@ const Followers = () => {
       <Navbar />
       <FollowersPage
         data={followers}
-        type="Followers"
+        totalCount={totalCount}
+        type="Follower"
         isLoading={isLoading}
         isError={isError}
         isFetchingNextPage={isFetchingNextPage}

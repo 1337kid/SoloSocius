@@ -1,11 +1,14 @@
-import { Users } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { FollowerSkeleton } from "./FollowerSkeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FollowersData } from "../api";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const FollowersPage = ({
   data,
+  totalCount,
   type,
   isLoading,
   isError,
@@ -13,21 +16,29 @@ const FollowersPage = ({
   ref,
 }: {
   data: FollowersData[];
+  totalCount: number;
   type: string;
   isLoading: boolean;
   isError: boolean;
   isFetchingNextPage: boolean;
   ref: React.RefObject<HTMLDivElement>;
 }) => {
+  const router = useRouter();
   return (
     <main className="container mx-auto max-w-xl px-4 py-8">
+      <Button variant="outline" className="mb-6" onClick={() => router.back()}>
+        <ArrowLeft className="size-4" />
+        Back
+      </Button>
       <div className="flex items-center gap-2 mb-6">
         <Users className="size-5 text-muted-foreground" />
         <h1 className="text-xl font-semibold">{type}</h1>
         {!isLoading && (
           <span className="text-sm text-muted-foreground ml-auto">
-            {data.length}{" "}
-            {data.length === 1 ? `${type.toLowerCase()}s` : `${type.toLowerCase()}s`}
+            {totalCount}{" "}
+            {totalCount === 1
+              ? `${type.toLowerCase()}`
+              : `${type.toLowerCase()}s`}
           </span>
         )}
       </div>
@@ -53,9 +64,7 @@ const FollowersPage = ({
       ) : (
         <ul>
           {data.map((item) => {
-            const initials = (
-              item.actor.displayName || item.actor.username
-            )
+            const initials = (item.actor.displayName || item.actor.username)
               .slice(0, 2)
               .toUpperCase();
 
@@ -65,9 +74,7 @@ const FollowersPage = ({
                   <Avatar size="lg">
                     <AvatarImage
                       src={item.actor.avatarUrl}
-                      alt={
-                        item.actor.displayName || item.actor.username
-                      }
+                      alt={item.actor.displayName || item.actor.username}
                     />
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
