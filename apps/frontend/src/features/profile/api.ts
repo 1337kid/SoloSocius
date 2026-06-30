@@ -44,3 +44,11 @@ export const getFollowersData = async (page: number) => {
     nextPage: data.length > 0 ? page + 1 : undefined,
   };
 };
+
+export const getFollowingData = async (page: number) => {
+  const { data } = await api.get<FollowersData[]>(`/following?page=${page}`);
+  return {
+    following: data,
+    nextPage: data.length > 0 ? page + 1 : undefined,
+  };
+};
