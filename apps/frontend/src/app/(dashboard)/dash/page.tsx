@@ -11,7 +11,7 @@ export default function DashboardPage() {
   return (
     <main className="bg-background">
       <div className="container mx-auto flex gap-3">
-        <div className="min-w-3/12 flex flex-col gap-3 mt-3">
+        <div className="w-3/12 flex flex-col gap-3 mt-3">
           <div className="flex items-center gap-2">
             <Image
               src={logo}
@@ -31,7 +31,7 @@ export default function DashboardPage() {
           orientation="vertical"
           className="max-h-dvh bg-primary/50 mt-4"
         />
-        <div className="max-h-dvh py-4 overflow-hidden">
+        <div className="w-7/12 max-h-dvh py-4 overflow-hidden">
           <ScrollArea className="h-[calc(100vh-1rem)]">
             <HomeFeedView />
           </ScrollArea>

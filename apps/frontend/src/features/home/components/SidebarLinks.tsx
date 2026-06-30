@@ -32,7 +32,7 @@ const SidebarLinks = () => {
   }
 
   return (
-    <Card className="min-w-3/12 bg-transparent border-none mb-auto outline-none shadow-none ring-0 mt-4 p-0">
+    <Card className="min-w-2/12 bg-transparent border-none mb-auto outline-none shadow-none ring-0 mt-4 p-0">
       <CardContent className="space-y-2 flex flex-col p-0">
         <Button
           variant="default"
