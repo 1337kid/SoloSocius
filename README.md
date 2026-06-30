@@ -8,48 +8,8 @@ Solosocius is an experimental ActivityPub implementation focused on simplicity a
 
 ---
 
-# Deployment
-
-## Requirements
-
-- Docker
-- Docker Compose
-
----
-
-## Clone
-
-```bash
-git clone https://github.com/1337kid/solosocius.git
-
-cd solosocius
-```
-
----
-
-## Configure Environment
-
-Copy `.env.default` into `.env` and fill it.
-
-## Configure Caddy
-
-Edit
-
-```
-Caddyfile
-```
-
-Replace `localhost` with `social.example.com`
-
----
-
-## Run the application
-
-```bash
-docker compose up -d
-```
-
----
+> [!WARNING]  
+> This project is still in development and it's not ready for production use
 
 # License
 
