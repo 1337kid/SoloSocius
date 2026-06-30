@@ -3,6 +3,8 @@ export const routes = {
   login: "/login",
   setup: "/setup",
   dash: "/dash",
+  followers: "/followers",
+  following: "/following",
 } as const;
 
 export const authRoutes = [routes.login, routes.setup] as const;

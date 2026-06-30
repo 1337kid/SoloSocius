@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import ProfileStat from "./ProfileStat";
 import { ProfileData } from "@/features/profile/api";
+import { routes } from "@/lib/routes";
 
 export function ProfileCard({ profile }: { profile: ProfileData }) {
   return (
@@ -11,7 +12,7 @@ export function ProfileCard({ profile }: { profile: ProfileData }) {
       <CardContent className="p-3 space-y-4">
         {/* Avatar */}
         <div className="flex flex-col items-center space-y-3 max-md:space-y-2">
-            <div className="p-0.5 rounded-full bg-linear-to-br from-primary/70 via-accent-foreground/10 to-primary/30 shadow-md">
+          <div className="p-0.5 rounded-full bg-linear-to-br from-primary/70 via-accent-foreground/10 to-primary/30 shadow-md">
             <Avatar className="size-28 border-2 border-card max-md:size-20">
               {profile?.avatarUrl && (
                 <AvatarImage src={profile.avatarUrl} alt={profile.username} />
@@ -43,9 +44,18 @@ export function ProfileCard({ profile }: { profile: ProfileData }) {
         <div className="grid grid-cols-3 divide-x items-center text-center border-t border-border/60 pt-4">
           <ProfileStat text="Posts" value={profile?.postsCount} left />
 
-          <ProfileStat text="Followers" value={profile?.followersCount} />
+          <ProfileStat
+            text="Followers"
+            value={profile?.followersCount}
+            href={routes.followers}
+          />
 
-          <ProfileStat text="Following" value={profile?.followingCount} right />
+          <ProfileStat
+            text="Following"
+            value={profile?.followingCount}
+            right
+            href={routes.following}
+          />
         </div>
       </CardContent>
     </Card>
