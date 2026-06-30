@@ -18,7 +18,8 @@ import logo from "@/assets/logo.png";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { ButtonGroup } from "@/components/ui/button-group";
-
+import SidebarLinks from "@/features/home/components/SidebarLinks";
+  
 export default function DashboardPage() {
   return (
     <main className="bg-background">
@@ -64,43 +65,7 @@ export default function DashboardPage() {
           orientation="vertical"
           className="max-h-dvh bg-primary/50 mt-4"
         />
-        <Card className="min-w-3/12 bg-transparent border-none mb-auto outline-none shadow-none ring-0 mt-4">
-          <CardHeader>
-            <CardTitle>Quick Links</CardTitle>
-          </CardHeader>
-          <Separator />
-          <CardContent className="space-y-2 flex flex-col">
-            <Button
-              variant="default"
-              className="w-full justify-start"
-              size="lg"
-            >
-              <HomeIcon className="size-4 mr-2" />
-              Home
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" size="lg">
-              <BellIcon className="size-4 mr-2" />
-              Notifications
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" size="lg">
-              <UserIcon className="size-4 mr-2" />
-              Your Profile
-            </Button>
-            <Separator />
-            <Button variant="ghost" className="w-full justify-start" size="lg">
-              <Settings className="size-4 mr-2" />
-              Settings
-            </Button>
-            <Button
-              variant="destructive"
-              className="w-full justify-start bg-transparent! hover:bg-destructive/10!"
-              size="lg"
-            >
-              <LogOut className="size-4 mr-2" />
-              Log Out
-            </Button>
-          </CardContent>
-        </Card>
+        <SidebarLinks />
       </div>
     </main>
   );
