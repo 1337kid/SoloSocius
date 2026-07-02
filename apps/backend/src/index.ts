@@ -38,7 +38,11 @@ if (NODE_ENV !== "production") {
 
 await fastify.register(authPlugin);
 
-await fastify.register(cors, { origin: true, credentials: true });
+await fastify.register(cors, {
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+});
 
 fastify.addContentTypeParser(
   "application/activity+json",

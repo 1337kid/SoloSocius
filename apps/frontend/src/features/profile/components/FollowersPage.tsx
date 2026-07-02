@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FollowersData } from "../api";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useUnfollowRemoteUser } from "../hooks/useFollowing";
 
 const FollowersPage = ({
   data,
@@ -24,6 +26,18 @@ const FollowersPage = ({
   ref: React.RefObject<HTMLDivElement>;
 }) => {
   const router = useRouter();
+
+  const auth = useAuth();
+  const {
+    mutate: unfollowRemoteUser,
+    isPending: isUnfollowing,
+    variables,
+  } = useUnfollowRemoteUser();
+
+  const handleUnfollow = (actorUri: string) => {
+    unfollowRemoteUser(actorUri);
+  };
+
   return (
     <main className="container mx-auto max-w-xl px-4 py-8">
       <Button variant="outline" className="mb-6" onClick={() => router.back()}>
@@ -70,23 +84,36 @@ const FollowersPage = ({
 
             return (
               <li key={item.id}>
-                <div className="flex items-center gap-3 py-3">
-                  <Avatar size="lg">
-                    <AvatarImage
-                      src={item.actor.avatarUrl}
-                      alt={item.actor.displayName || item.actor.username}
-                    />
-                    <AvatarFallback>{initials}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {item.actor.displayName || item.actor.username}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      @{item.actor.username}
-                      {item.actor.domain ? `@${item.actor.domain}` : ""}
-                    </p>
+                <div className="flex items-center justify-between gap-3 py-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar size="lg">
+                      <AvatarImage
+                        src={item.actor.avatarUrl}
+                        alt={item.actor.displayName || item.actor.username}
+                      />
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {item.actor.displayName || item.actor.username}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        @{item.actor.username}
+                        {item.actor.domain ? `@${item.actor.domain}` : ""}
+                      </p>
+                    </div>
                   </div>
+                  {auth.data?.username && type === "Following" && (
+                    <Button
+                      variant="outline"
+                      disabled={isUnfollowing}
+                      onClick={() => handleUnfollow(item.actor.actorUri)}
+                    >
+                      {isUnfollowing && variables === item.actor.actorUri
+                        ? "Unfollowing..."
+                        : "Unfollow"}
+                    </Button>
+                  )}
                 </div>
                 <Separator />
               </li>

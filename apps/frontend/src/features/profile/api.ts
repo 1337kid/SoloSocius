@@ -52,3 +52,18 @@ export const getFollowingData = async (page: number) => {
     nextPage: data.length > 0 ? page + 1 : undefined,
   };
 };
+
+export const unfollowRemoteUser = async (
+  actorUri: string,
+): Promise<{ message: string }> => {
+  const { data } = await api.delete(`/follow`, {
+    data: {
+      actorUri,
+    },
+  });
+
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  return data;
+};
