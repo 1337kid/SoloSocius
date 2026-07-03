@@ -6,6 +6,7 @@ export interface TimelineActor {
   displayName: string | null;
   username: string;
   domain: string;
+  isFollowing?: boolean;
 }
 
 export interface TimelineReply {

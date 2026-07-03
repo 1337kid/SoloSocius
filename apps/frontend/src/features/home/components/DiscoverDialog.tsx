@@ -15,18 +15,18 @@ import { TimelineActor } from "@/features/timeline/api";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUnfollowRemoteUser } from "@/features/profile/hooks/useFollowing";
+import { useFollowUser } from "../hooks/useFollowUser";
 
 const handleRegex = /^@?([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
 const DiscoverDialog = () => {
   const [handle, setHandle] = useState("");
 
-  const { mutate: unfollowRemoteUser, isPending: isUnfollowing } =
-    useUnfollowRemoteUser();
+  const { mutate: followUser, isPending: isFollowingUser } = useFollowUser();
 
-  const handleUnfollow = (actorUri: string) => {
-    unfollowRemoteUser(actorUri);
+  const handleFollow = () => {
+    if (!handle.trim()) return;
+    followUser(handle);
   };
 
   const {
@@ -105,13 +105,17 @@ const DiscoverDialog = () => {
                 </p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              disabled={isUnfollowing}
-              onClick={() => handleUnfollow(user.actorUri ?? "")}
-            >
-              {isUnfollowing ? "Unfollowing..." : "Unfollow"}
-            </Button>
+            {user?.isFollowing ? (
+              <span>Following</span>
+            ) : (
+              <Button
+                variant="outline"
+                disabled={isFollowingUser}
+                onClick={handleFollow}
+              >
+                {isFollowingUser ? "Following..." : "Follow"}
+              </Button>
+            )}
           </div>
         )}
       </DialogContent>

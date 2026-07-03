@@ -22,3 +22,8 @@ export const searchRemoteUser = async (handle: string) => {
   const { data } = await api.post("/search-user", { handle });
   return data;
 };
+
+export const followRemoteUser = async (handle: string) => {
+  const { data } = await api.post("/follow", { handle });
+  return data;
+};
