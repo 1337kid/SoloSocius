@@ -209,11 +209,14 @@ export const handleSearchRemoteUser = async (
     return reply.status(404).send({ error: "User not found." });
   }
 
+  const isFollowing = await checkIfLocalActorIsFollowing(remoteActor.actorUri);
+
   return reply.status(200).send({
     actorUri: remoteActor.actorUri,
     displayName: remoteActor.displayName,
     username: remoteActor.username,
     domain: remoteActor.domain,
     avatarUrl: remoteActor.avatarUrl,
+    isFollowing: !!isFollowing,
   });
 };
