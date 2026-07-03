@@ -24,43 +24,13 @@ export const handleFollowRemoteUser = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { handle } = request.body as { handle: string };
-
-  if (!handle || !handle.includes("@")) {
-    return reply.status(400).send({
-      error: "Valid federated handle target required (user@domain.com).",
-    });
-  }
-
-  const cleanHandle = handle.startsWith("@") ? handle.slice(1) : handle;
-  const [, remoteDomain] = cleanHandle.split("@");
-
   try {
-    const webfingerResponse = await webfingerLookup(remoteDomain, cleanHandle);
+    const remoteActor = (request as any).locals.remoteActor;
 
-    if (!webfingerResponse.ok) {
-      return reply
-        .status(500)
-        .send({ error: "Error fetching webfinger of user" });
+    if (!remoteActor) {
+      return reply.status(404).send({ error: "User not found." });
     }
 
-    const webfingerData = await webfingerResponse.json();
-
-    const selfLink = webfingerData.links?.find((l: any) => l.rel === "self");
-
-    if (!selfLink || !selfLink.href) {
-      return reply
-        .status(404)
-        .send({ error: "ActivityPub profile target URI lookup failed." });
-    }
-
-    const remoteProfileUri = selfLink.href;
-
-    console.log(remoteProfileUri);
-
-    const remoteActor = await remoteActorLookup(remoteProfileUri);
-
-    console.log(remoteActor);
     const remoteInbox = remoteActor.inboxUrl;
 
     if (!remoteInbox) {
@@ -71,12 +41,12 @@ export const handleFollowRemoteUser = async (
 
     const followActivityId = generateFollowActivityId();
 
-    await createFollowingUserEntry(followActivityId, remoteProfileUri);
+    await createFollowingUserEntry(followActivityId, remoteActor.actorUri);
 
     const followActivity = createActivity(
       followActivityId,
       "Follow",
-      remoteProfileUri,
+      remoteActor.actorUri,
     );
 
     console.log(followActivity);
@@ -215,7 +185,10 @@ export const handleGetAllFollowing = async (
 
     const offsetValue = (pageNumber - 1) * PAGE_SIZE;
 
-    const followingDetails = await getFollowingDetailsByOffset(offsetValue, PAGE_SIZE);
+    const followingDetails = await getFollowingDetailsByOffset(
+      offsetValue,
+      PAGE_SIZE,
+    );
 
     return reply
       .type("application/activity+json; charset=utf-8")
@@ -224,4 +197,23 @@ export const handleGetAllFollowing = async (
     console.error("Failed getting all following:", error);
     return reply.status(500).send({ error: "Internal Server Error." });
   }
+};
+
+export const handleSearchRemoteUser = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const remoteActor = (request as any).remoteActor;
+
+  if (!remoteActor) {
+    return reply.status(404).send({ error: "User not found." });
+  }
+
+  return reply.status(200).send({
+    actorUri: remoteActor.actorUri,
+    displayName: remoteActor.displayName,
+    username: remoteActor.username,
+    domain: remoteActor.domain,
+    avatarUrl: remoteActor.avatarUrl,
+  });
 };
