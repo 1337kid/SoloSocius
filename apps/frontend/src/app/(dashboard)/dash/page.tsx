@@ -2,7 +2,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { HomeFeedView } from "@/features/home/components/HomeFeedView";
 import { Separator } from "@/components/ui/separator";
-import ProfileCard from "@/features/home/components/ProfileCard";
+import LeftSidebar from "@/features/home/components/LeftSidebar";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import SidebarLinks from "@/features/home/components/SidebarLinks";
@@ -25,7 +25,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <Separator />
-          <ProfileCard />
+          <LeftSidebar />
         </div>
         <Separator
           orientation="vertical"

@@ -17,3 +17,8 @@ export const createPost = async (post: CreatePostRequest) => {
   const { data } = await api.post("/posts", post);
   return data;
 };
+
+export const searchRemoteUser = async (handle: string) => {
+  const { data } = await api.post("/search-user", { handle });
+  return data;
+};

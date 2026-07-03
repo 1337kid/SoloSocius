@@ -18,8 +18,9 @@ import { EditProfileDialog } from "./EditProfileDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ButtonGroup } from "@/components/ui/button-group";
+import DiscoverDialog from "./DiscoverDialog";
 
-const ProfileCard = () => {
+const LeftSidebar = () => {
   const { data: profile } = useProfileData();
   return (
     <div className="flex flex-col gap-4">
@@ -62,18 +63,13 @@ const ProfileCard = () => {
         </CardContent>
       </Card>
       <Card className="mb-auto min-w-3/12 bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
-        <CardHeader>
-          <CardTitle>Discover People</CardTitle>
-          <CardDescription>Find new people to follow</CardDescription>
+        <CardHeader className="flex flex-row items-center gap-2 justify-between">
+          <div>
+            <CardTitle>Discover People</CardTitle>
+            <CardDescription>Find new people to follow</CardDescription>
+          </div>
+          <DiscoverDialog />
         </CardHeader>
-        <CardContent className="w-full">
-          <ButtonGroup className="w-full">
-            <Input placeholder="Search for a user" />
-            <Button variant="outline" aria-label="Search">
-              <SearchIcon />
-            </Button>
-          </ButtonGroup>
-        </CardContent>
       </Card>
       <Card className="mb-auto min-w-3/12 bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
         <CardContent>
@@ -94,4 +90,4 @@ const ProfileCard = () => {
   );
 };
 
-export default ProfileCard;
+export default LeftSidebar;

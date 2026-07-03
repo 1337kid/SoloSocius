@@ -3,8 +3,9 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,10 @@ export default function RootLayout({
   return (
     <html className={cn("font-sans dark", "font-sans", inter.variable)}>
       <body className="bg-background text-foreground antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster richColors />
+        </Providers>
       </body>
     </html>
   );
