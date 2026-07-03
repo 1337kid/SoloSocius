@@ -25,7 +25,7 @@ export const handleFollowRemoteUser = async (
   reply: FastifyReply,
 ) => {
   try {
-    const remoteActor = (request as any).locals.remoteActor;
+    const remoteActor = (request as any).remoteActor;
 
     if (!remoteActor) {
       return reply.status(404).send({ error: "User not found." });

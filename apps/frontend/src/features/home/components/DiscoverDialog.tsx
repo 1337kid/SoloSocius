@@ -13,7 +13,6 @@ import { searchRemoteUser } from "../api";
 import { useState } from "react";
 import { TimelineActor } from "@/features/timeline/api";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useFollowUser } from "../hooks/useFollowUser";
 
@@ -21,34 +20,44 @@ const handleRegex = /^@?([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
 const DiscoverDialog = () => {
   const [handle, setHandle] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const { mutate: followUser, isPending: isFollowingUser } = useFollowUser();
 
-  const handleFollow = () => {
-    if (!handle.trim()) return;
-    followUser(handle);
+  const [user, setUser] = useState<TimelineActor | null>(null);
+
+  const handleSearch = async () => {
+    try {
+      if (!handle.trim()) return;
+      setIsSearching(true);
+      const actor = await searchRemoteUser(handle.trim());
+      setUser(actor);
+      setIsSearching(false);
+    } catch (error) {
+      toast.error("Error searching for user");
+      setIsSearching(false);
+    }
   };
 
-  const {
-    mutate: search,
-    data: user,
-    isPending,
-    reset,
-  } = useMutation<TimelineActor, Error, string>({
-    mutationFn: (handle) => searchRemoteUser(handle),
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "An error occurred");
-    },
-  });
-
-  const handleSearch = () => {
+  const handleFollow = () => {
     if (!handleRegex.test(handle.trim())) {
       toast.error("Invalid handle");
       return;
     }
 
-    reset();
-    search(handle.trim());
+    followUser(handle.trim(), {
+      onSuccess: () => {
+        toast.success("User followed successfully");
+        setUser((prev) =>
+          prev
+            ? {
+                ...prev,
+                isFollowing: true,
+              }
+            : prev,
+        );
+      },
+    });
   };
 
   return (
@@ -74,9 +83,9 @@ const DiscoverDialog = () => {
             variant="outline"
             aria-label="Search"
             onClick={handleSearch}
-            disabled={isPending}
+            disabled={isSearching}
           >
-            {isPending ? (
+            {isSearching ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <SearchIcon className="size-4" />
