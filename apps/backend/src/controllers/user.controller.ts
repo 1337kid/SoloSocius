@@ -1,5 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { getLocalActorProfileData } from "../db/queries/actor.js";
+import {
+  getLocalActorProfileData,
+  updateLocalActorProfileData,
+} from "../db/queries/actor.js";
 
 export const getProfileData = async (
   request: FastifyRequest,
@@ -14,4 +17,20 @@ export const getProfileData = async (
   }
 
   return reply.status(200).send(actor);
+};
+
+export const updateProfileData = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { displayName, summary } = request.body as {
+    displayName: string;
+    summary: string;
+  };
+
+  await updateLocalActorProfileData({ displayName, summary });
+
+  return reply
+    .status(200)
+    .send({ message: "Profile data updated successfully." });
 };

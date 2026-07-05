@@ -18,6 +18,7 @@ import { validatePagination } from "../middlewares/validatePagination.js";
 import { validateInteraction } from "../middlewares/validateInteraction.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { actorLookupMiddleware } from "../middlewares/actorLookup.js";
+import { updateProfileData } from "../controllers/user.controller.js";
 
 export async function PrivateRoutes(fastify: FastifyInstance) {
   //fastify.addHook("preHandler", authenticate);
@@ -52,4 +53,6 @@ export async function PrivateRoutes(fastify: FastifyInstance) {
     { preHandler: [validateInteraction] },
     handleUndoPostInteraction,
   );
+
+  fastify.put("/profile", updateProfileData);
 }
