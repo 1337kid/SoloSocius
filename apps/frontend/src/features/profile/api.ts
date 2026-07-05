@@ -14,6 +14,7 @@ export interface ProfileData {
 
 export interface Profile {
   displayName: string;
+  summary?: string;
 }
 
 export interface FollowersData {

@@ -6,6 +6,7 @@ import LeftSidebar from "@/features/home/components/LeftSidebar";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import SidebarLinks from "@/features/home/components/SidebarLinks";
+import { useProfileData } from "@/features/profile/hooks/useProfile";
 
 export default function DashboardPage() {
   return (

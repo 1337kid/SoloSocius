@@ -14,7 +14,7 @@ import { useProfileData } from "@/features/profile/hooks/useProfile";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Edit, PencilIcon, SearchIcon, UserIcon, UserPlus } from "lucide-react";
-import { EditProfileDialog } from "./EditProfileDialog";
+import { EditProfileDialog } from "../../profile/components/EditProfileDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ButtonGroup } from "@/components/ui/button-group";
