@@ -60,8 +60,15 @@ const DiscoverDialog = () => {
     });
   };
 
+  const onOpenChange = (open: boolean) => {
+    if (!open) {
+      setHandle("");
+      setUser(null);
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">
           <SearchIcon className="size-4" />
