@@ -28,11 +28,7 @@ export async function PrivateRoutes(fastify: FastifyInstance) {
     { preHandler: [actorLookupMiddleware] },
     handleSearchRemoteUser,
   );
-  fastify.post(
-    "/follow",
-    { preHandler: [actorLookupMiddleware] },
-    handleFollowRemoteUser,
-  );
+  fastify.post("/follow", handleFollowRemoteUser);
   fastify.delete("/follow", handleUnfollowRemoteUser);
 
   // user post routes

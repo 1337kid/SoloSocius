@@ -24,8 +24,10 @@ export const handleFollowRemoteUser = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
+  const { actorUri } = request.body as { actorUri: string };
+  
   try {
-    const remoteActor = (request as any).remoteActor;
+    const remoteActor = await remoteActorLookup(actorUri);
 
     if (!remoteActor) {
       return reply.status(404).send({ error: "User not found." });

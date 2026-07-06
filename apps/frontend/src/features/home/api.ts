@@ -23,7 +23,7 @@ export const searchRemoteUser = async (handle: string) => {
   return data;
 };
 
-export const followRemoteUser = async (handle: string) => {
-  const { data } = await api.post("/follow", { handle });
+export const followRemoteUser = async (actorUri: string) => {
+  const { data } = await api.post("/follow", { actorUri });
   return data;
 };

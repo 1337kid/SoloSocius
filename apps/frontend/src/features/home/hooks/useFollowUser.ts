@@ -6,7 +6,7 @@ import { profileQueryKeys } from "@/features/profile/keys";
 
 export const useFollowUser = () => {
   return useMutation<{ message: string }, Error, string>({
-    mutationFn: (handle) => followRemoteUserApi(handle),
+    mutationFn: (actorUri) => followRemoteUserApi(actorUri),
     onSuccess: () => {
       toast.success("User followed successfully");
       queryClient.invalidateQueries({

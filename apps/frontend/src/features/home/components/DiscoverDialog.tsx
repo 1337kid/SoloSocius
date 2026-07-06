@@ -40,12 +40,12 @@ const DiscoverDialog = () => {
   };
 
   const handleFollow = () => {
-    if (!handleRegex.test(handle.trim())) {
+    if (!user?.actorUri) {
       toast.error("Invalid handle");
       return;
     }
 
-    followUser(handle.trim(), {
+    followUser(user?.actorUri, {
       onSuccess: () => {
         toast.success("User followed successfully");
         setUser((prev) =>
