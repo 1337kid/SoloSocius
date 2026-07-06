@@ -67,6 +67,7 @@ export const findInteractionByPostAndType = async (
           actor: {
             columns: {
               inboxUrl: true,
+              isLocal: true,
             },
           },
         },

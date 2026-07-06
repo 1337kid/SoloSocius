@@ -37,16 +37,6 @@ export const handleOutboundPostInteraction = async (
     if (!targetPost)
       return reply.status(404).send({ error: "Target post not found" });
 
-    const actorLookup = await remoteActorLookup(targetPost.actorUri);
-
-    if (!actorLookup) {
-      return reply
-        .status(400)
-        .send({ error: "Failed discovering remote actor inbox path." });
-    }
-
-    const remoteInbox = actorLookup.inboxUrl;
-
     const activityType = action === "like" ? "Like" : "Announce";
 
     const activityId = generateInteractionActivityId(action);
@@ -57,17 +47,28 @@ export const handleOutboundPostInteraction = async (
       targetPostUri,
     );
 
-    await deliverActivity({
-      inboxUrl: remoteInbox,
-      activity: interactionActivity,
-    });
-
     await addInteractionEntry({
       type: action,
       activityId,
       actorUri: userEndpoints.actorUri,
       postUri: targetPost.idUri,
     });
+
+    if (!targetPost.isLocal) {
+      const actorLookup = await remoteActorLookup(targetPost.actorUri);
+
+      if (!actorLookup) {
+        return reply
+          .status(400)
+          .send({ error: "Failed discovering remote actor inbox path." });
+      }
+
+      const remoteInbox = actorLookup.inboxUrl;
+      await deliverActivity({
+        inboxUrl: remoteInbox,
+        activity: interactionActivity,
+      });
+    }
 
     if (action === "boost") {
       await createTimelineEntry({
@@ -117,10 +118,12 @@ export const handleUndoPostInteraction = async (
 
     const actor = interaction.post.actor;
 
-    await deliverActivity({
-      inboxUrl: actor.inboxUrl,
-      activity: undoActivity,
-    });
+    if (!actor.isLocal) {
+      await deliverActivity({
+        inboxUrl: actor.inboxUrl,
+        activity: undoActivity,
+      });
+    }
 
     await removeInteractionById(interaction.id);
 
