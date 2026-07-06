@@ -3,6 +3,8 @@ import {
   getLocalActorProfileData,
   updateLocalActorProfileData,
 } from "../db/queries/actor.js";
+import { createProfileUpdateActivity } from "../activitypub/activities.js";
+import { deliverActivityToFollowers } from "../utils/activitypub.js";
 
 export const getProfileData = async (
   request: FastifyRequest,
@@ -28,7 +30,18 @@ export const updateProfileData = async (
     summary: string;
   };
 
-  await updateLocalActorProfileData({ displayName, summary });
+  const actor = await updateLocalActorProfileData({ displayName, summary });
+
+  const activity = createProfileUpdateActivity({
+    username: actor.username,
+    displayName: actor.displayName || "",
+    summary: actor.summary || "",
+    publicKey: actor.publicKey,
+  });
+
+  await deliverActivityToFollowers(activity);
+
+  console.log(activity);
 
   return reply
     .status(200)

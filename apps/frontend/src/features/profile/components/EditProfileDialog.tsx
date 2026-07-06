@@ -53,7 +53,7 @@ export function EditProfileDialog() {
     try {
       await updateProfile(values);
       toast.success("Profile updated successfully");
-      form.reset();
+      form.reset(values);
     } catch (error) {
       toast.error("Failed to update profile");
     }

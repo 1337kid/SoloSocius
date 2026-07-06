@@ -12,3 +12,7 @@ export const generateAcceptActivityId = () => {
 export const generateInteractionActivityId = (type: string) => {
   return `${userEndpoints.activities}/${type}/${uuidv7()}`;
 };
+
+export const generateProfileUpdateActivityId = () => {
+  return `${userEndpoints.actorUri}/profile-update/${uuidv7()}`;
+};

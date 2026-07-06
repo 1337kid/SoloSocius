@@ -98,5 +98,10 @@ export const updateLocalActorProfileData = async (params: {
   displayName: string;
   summary: string;
 }) => {
-  return await db.update(actors).set(params).where(eq(actors.isLocal, true));
+  const [actor] = await db
+    .update(actors)
+    .set(params)
+    .where(eq(actors.isLocal, true))
+    .returning();
+  return actor;
 };

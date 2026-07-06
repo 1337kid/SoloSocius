@@ -1,5 +1,8 @@
 import { userEndpoints } from "../activitypub/actor.js";
 import { OutboxActivity } from "../types/index.js";
+import { generateProfileUpdateActivityId } from "../utils/activityId.js";
+import { InstanceActorObject } from "../types/index.js";
+import { generateActorObject } from "./actor.js";
 
 export const createActivity = (
   activityId: string,
@@ -12,7 +15,17 @@ export const createActivity = (
     type: type,
     actor: userEndpoints.actorUri,
     object: object,
+    to: ["https://www.w3.org/ns/activitystreams#Public"],
   };
+};
+
+export const createProfileUpdateActivity = (params: InstanceActorObject) => {
+  let object = generateActorObject(params);
+  delete (object as any)["@context"];
+
+  const activityId = generateProfileUpdateActivityId();
+
+  return createActivity(activityId, "Update", object);
 };
 
 export const createNoteActivity = (params: OutboxActivity) => {
