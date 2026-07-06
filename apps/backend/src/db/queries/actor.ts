@@ -63,6 +63,12 @@ export const addActorToDB = async (params: ActorObject) => {
       isLocal: false,
       lastFetchedAt: new Date(),
     })
+    .onConflictDoUpdate({
+      target: [actors.actorUri],
+      set: {
+        ...params,
+      },
+    })
     .returning();
 
   return actor;
