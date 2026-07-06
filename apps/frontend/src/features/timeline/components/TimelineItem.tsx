@@ -170,18 +170,30 @@ export function TimelineItem({
             count={entry.post.replyCount}
             icon={<Reply className="size-4 text-primary" />}
             onClick={onPostStatsButtonClick}
+            label="Reply"
           />
           <PostStat
             count={entry.post.boostCount}
+            active={entry.post.boosted}
             icon={<Repeat className="size-4 text-primary" />}
             onClick={onPostStatsButtonClick}
+            label="Boost"
           />
           <PostStat
             count={entry.post.likeCount}
-            icon={<Heart className="size-4 text-primary" />}
+            active={entry.post.liked}
+            icon={
+              <Heart
+                className={`size-4 text-primary ${entry.post.liked ? "fill-primary" : ""}`}
+              />
+            }
             onClick={onPostStatsButtonClick}
+            label="Like"
           />
-          <PostStat icon={<Ellipsis className="size-4 text-primary" />} />
+          <PostStat
+            icon={<Ellipsis className="size-4 text-primary" />}
+            label="More"
+          />
         </div>
       </CardContent>
     </Card>

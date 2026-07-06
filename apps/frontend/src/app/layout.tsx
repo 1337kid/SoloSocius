@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./providers";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,8 +32,10 @@ export default function RootLayout({
     <html className={cn("font-sans dark", "font-sans", inter.variable)}>
       <body className="bg-background text-foreground antialiased">
         <Providers>
-          {children}
-          <Toaster richColors />
+          <TooltipProvider>
+            {children}
+            <Toaster richColors />
+          </TooltipProvider>
         </Providers>
       </body>
     </html>
