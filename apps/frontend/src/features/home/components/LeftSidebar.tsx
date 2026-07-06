@@ -13,12 +13,10 @@ import { AvatarFallback } from "@/components/ui/avatar";
 import { useProfileData } from "@/features/profile/hooks/useProfile";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Edit, PencilIcon, SearchIcon, UserIcon, UserPlus } from "lucide-react";
+import { Edit } from "lucide-react";
 import { EditProfileDialog } from "../../profile/components/EditProfileDialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { ButtonGroup } from "@/components/ui/button-group";
 import DiscoverDialog from "./DiscoverDialog";
+import CreatePostForm from "./CreatePostForm";
 
 const LeftSidebar = () => {
   const { data: profile } = useProfileData();
@@ -71,21 +69,8 @@ const LeftSidebar = () => {
           <DiscoverDialog />
         </CardHeader>
       </Card>
-      <Card className="mb-auto min-w-3/12 bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
-        <CardContent>
-          <div className="flex flex-col gap-2">
-            <Textarea
-              placeholder="What's on your mind?"
-              className="w-full"
-              rows={5}
-            />
-            <Button className="w-full">
-              <PencilIcon className="size-4 mr-2" />
-              Create Post
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Create Post Form */}
+      <CreatePostForm />
     </div>
   );
 };
