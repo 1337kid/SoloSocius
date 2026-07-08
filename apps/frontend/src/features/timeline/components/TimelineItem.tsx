@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Ellipsis, Heart, Repeat, Reply } from "lucide-react";
 import type { TimelineActor, TimelineItem } from "../api";
 import PostStat from "./PostStat";
+import { useInteraction } from "../hooks/useInteraction";
 
 function ActorAvatar({
   actor,
@@ -46,6 +47,38 @@ export function TimelineItem({
   entry: TimelineItem;
   onPostStatsButtonClick: () => void;
 }) {
+  const { interactWithPost, undoInteractWithPost } = useInteraction();
+
+  const handleBoostInteraction = async (targetPostUri: string) => {
+    onPostStatsButtonClick();
+    if (!entry.post.boosted) {
+      await interactWithPost.mutateAsync({
+        targetPostUri,
+        type: "boost",
+      });
+    } else {
+      await undoInteractWithPost.mutateAsync({
+        targetPostUri,
+        type: "boost",
+      });
+    }
+  };
+
+  const handleLikeInteraction = async (targetPostUri: string) => {
+    onPostStatsButtonClick();
+    if (!entry.post.liked) {
+      await interactWithPost.mutateAsync({
+        targetPostUri,
+        type: "like",
+      });
+    } else {
+      await undoInteractWithPost.mutateAsync({
+        targetPostUri,
+        type: "like",
+      });
+    }
+  };
+
   const isBoost = entry.event.type === "boost";
 
   const postAuthor = entry.post.actor;
@@ -169,14 +202,14 @@ export function TimelineItem({
           <PostStat
             count={entry.post.replyCount}
             icon={<Reply className="size-4 text-primary" />}
-            onClick={onPostStatsButtonClick}
+            onClick={() => {}}
             label="Reply"
           />
           <PostStat
             count={entry.post.boostCount}
             active={entry.post.boosted}
             icon={<Repeat className="size-4 text-primary" />}
-            onClick={onPostStatsButtonClick}
+            onClick={() => handleBoostInteraction(entry.post.idUri)}
             label="Boost"
           />
           <PostStat
@@ -187,7 +220,7 @@ export function TimelineItem({
                 className={`size-4 text-primary ${entry.post.liked ? "fill-primary" : ""}`}
               />
             }
-            onClick={onPostStatsButtonClick}
+            onClick={() => handleLikeInteraction(entry.post.idUri)}
             label="Like"
           />
           <PostStat

@@ -63,3 +63,22 @@ export async function getPublicTimeline(
   });
   return data;
 }
+
+export const sendInteraction = async (
+  targetPostUri: string,
+  type: "like" | "boost",
+) => {
+  console.log("sendInteraction", targetPostUri, type);
+  const { data } = await api.post("/interact", { targetPostUri, type });
+  return data;
+};
+
+export const undoInteraction = async (
+  targetPostUri: string,
+  type: "like" | "boost",
+) => {
+  const { data } = await api.delete("/interact", {
+    data: { targetPostUri, type },
+  });
+  return data;
+};

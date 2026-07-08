@@ -1,8 +1,4 @@
 import { ActorObject, InboxActivity } from "../../types/index.js";
-import {
-  getFollowerByActivityId,
-  removeFollowerEntry,
-} from "../../db/queries/followers.js";
 import { addActorToDB } from "../../db/queries/actor.js";
 
 const actorKeysToCheck = [
@@ -37,7 +33,7 @@ export const handleUpdateActivity = async (activity: InboxActivity) => {
             username: actor.preferredUsername,
             domain: new URL(actor.id).hostname,
           };
-          
+
           if ("name" in actor) update.displayName = actor.name;
 
           if ("summary" in actor) update.summary = actor.summary;
