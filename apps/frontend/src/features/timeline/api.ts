@@ -69,7 +69,7 @@ export const sendInteraction = async (
   type: "like" | "boost",
 ) => {
   console.log("sendInteraction", targetPostUri, type);
-  const { data } = await api.post("/interact", { targetPostUri, type });
+  const { data } = await api.post("/interact", { targetPostUri, action: type });
   return data;
 };
 
@@ -78,7 +78,7 @@ export const undoInteraction = async (
   type: "like" | "boost",
 ) => {
   const { data } = await api.delete("/interact", {
-    data: { targetPostUri, type },
+    data: { targetPostUri, action: type },
   });
   return data;
 };

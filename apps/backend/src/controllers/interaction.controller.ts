@@ -111,9 +111,14 @@ export const handleUndoPostInteraction = async (
         .send({ error: `You have not ${action}ed this post.` });
 
     const undoActivity = createActivity(
-      `${interaction.activityId}#undo`,
+      `${interaction.activityId}/undo`,
       "Undo",
-      interaction.activityId,
+      {
+        id: interaction.activityId,
+        type: action === "like" ? "Like" : "Announce",
+        actor: userEndpoints.actorUri,
+        object: targetPostUri,
+      },
     );
 
     const actor = interaction.post.actor;
