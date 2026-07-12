@@ -33,7 +33,10 @@ const PostStat = ({
           {count && count > 0 ? <span>{count}</span> : null}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>
+        {active && "Undo "}
+        {label}
+      </TooltipContent>
     </Tooltip>
   );
 };

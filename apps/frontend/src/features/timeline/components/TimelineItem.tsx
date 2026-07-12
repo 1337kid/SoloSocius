@@ -8,6 +8,7 @@ import { Ellipsis, Heart, Repeat, Reply } from "lucide-react";
 import type { TimelineActor, TimelineItem } from "../api";
 import PostStat from "./PostStat";
 import { useInteraction } from "../hooks/useInteraction";
+import { useState } from "react";
 
 function ActorAvatar({
   actor,
@@ -49,33 +50,60 @@ export function TimelineItem({
 }) {
   const { interactWithPost, undoInteractWithPost } = useInteraction();
 
+  const [liked, setLiked] = useState(entry.post.liked);
+  const [likeCount, setLikeCount] = useState(entry.post.likeCount);
+  const [boosted, setBoosted] = useState(entry.post.boosted);
+  const [boostCount, setBoostCount] = useState(entry.post.boostCount);
+
   const handleBoostInteraction = async (targetPostUri: string) => {
     onPostStatsButtonClick();
-    if (!entry.post.boosted) {
-      await interactWithPost.mutateAsync({
-        targetPostUri,
-        type: "boost",
-      });
-    } else {
-      await undoInteractWithPost.mutateAsync({
-        targetPostUri,
-        type: "boost",
-      });
+
+    const wasBoosted = boosted;
+
+    setBoosted(!wasBoosted);
+    setBoostCount((c) => c + (wasBoosted ? -1 : 1));
+
+    try {
+      if (wasBoosted) {
+        await undoInteractWithPost.mutateAsync({
+          targetPostUri,
+          type: "boost",
+        });
+      } else {
+        await interactWithPost.mutateAsync({
+          targetPostUri,
+          type: "boost",
+        });
+      }
+    } catch {
+      setBoosted(wasBoosted);
+      setBoostCount((c) => c + (wasBoosted ? 1 : -1));
     }
   };
 
   const handleLikeInteraction = async (targetPostUri: string) => {
     onPostStatsButtonClick();
-    if (!entry.post.liked) {
-      await interactWithPost.mutateAsync({
-        targetPostUri,
-        type: "like",
-      });
-    } else {
-      await undoInteractWithPost.mutateAsync({
-        targetPostUri,
-        type: "like",
-      });
+
+    const wasLiked = liked;
+
+    setLiked(!wasLiked);
+    setLikeCount((c) => c + (wasLiked ? -1 : 1));
+
+    try {
+      if (wasLiked) {
+        await undoInteractWithPost.mutateAsync({
+          targetPostUri,
+          type: "like",
+        });
+      } else {
+        await interactWithPost.mutateAsync({
+          targetPostUri,
+          type: "like",
+        });
+      }
+    } catch {
+      setLiked(wasLiked);
+      setLikeCount((c) => c + (wasLiked ? 1 : -1));
     }
   };
 
@@ -206,18 +234,18 @@ export function TimelineItem({
             label="Reply"
           />
           <PostStat
-            count={entry.post.boostCount}
-            active={entry.post.boosted}
+            count={boostCount}
+            active={boosted}
             icon={<Repeat className="size-4 text-primary" />}
             onClick={() => handleBoostInteraction(entry.post.idUri)}
             label="Boost"
           />
           <PostStat
-            count={entry.post.likeCount}
-            active={entry.post.liked}
+            count={likeCount}
+            active={liked}
             icon={
               <Heart
-                className={`size-4 text-primary ${entry.post.liked ? "fill-primary" : ""}`}
+                className={`size-4 text-primary ${liked ? "fill-primary" : ""}`}
               />
             }
             onClick={() => handleLikeInteraction(entry.post.idUri)}
