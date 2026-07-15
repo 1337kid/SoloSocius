@@ -9,6 +9,18 @@ import type { TimelineActor, TimelineItem } from "../api";
 import PostStat from "./PostStat";
 import { useInteraction } from "../hooks/useInteraction";
 import { useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import ReplyPopover from "./ReplyPopover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 function ActorAvatar({
   actor,
@@ -227,12 +239,24 @@ export function TimelineItem({
         </div>
 
         <div className="flex items-center justify-between ml-[52px]">
-          <PostStat
-            count={entry.post.replyCount}
-            icon={<Reply className="size-4 text-primary" />}
-            onClick={() => {}}
-            label="Reply"
-          />
+          <Popover>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={`flex items-center gap-1 text-muted-foreground text-xs`}
+                  >
+                    <Reply className="size-4 text-primary" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Reply</TooltipContent>
+            </Tooltip>
+            <PopoverContent align="start">
+              <ReplyPopover inReplyTo={entry.post.idUri} />
+            </PopoverContent>
+          </Popover>
           <PostStat
             count={boostCount}
             active={boosted}
