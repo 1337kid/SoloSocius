@@ -278,8 +278,10 @@ export function TimelineItem({
             label="Like"
           />
           <ShowMoreActions
+            id={entry.post.id}
             postUri={entry.post.idUri}
             isLocal={entry.post.actor.domain === profileData?.domain}
+            postContent={entry.post.content}
           />
         </div>
       </CardContent>

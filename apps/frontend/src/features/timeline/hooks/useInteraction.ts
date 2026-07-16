@@ -52,8 +52,8 @@ export const useInteraction = () => {
   });
 
   const deletePost = useMutation({
-    mutationFn: ({ postUri }: { postUri: string }) => {
-      return deletePostApi(postUri);
+    mutationFn: ({ id }: { id: string }) => {
+      return deletePostApi(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
@@ -63,13 +63,13 @@ export const useInteraction = () => {
 
   const updatePost = useMutation({
     mutationFn: ({
-      postUri,
+      id,
       content,
     }: {
-      postUri: string;
+      id: string;
       content: string;
     }) => {
-      return updatePostApi(postUri, content);
+      return updatePostApi(id, content);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });

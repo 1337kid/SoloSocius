@@ -83,12 +83,12 @@ export const undoInteraction = async (
   return data;
 };
 
-export const deletePostApi = async (postUri: string) => {
-  const { data } = await api.delete("/post", { data: { postUri } });
+export const deletePostApi = async (id: string) => {
+  const { data } = await api.delete(`/posts/${id}`);
   return data;
 };
 
-export const updatePostApi = async (postUri: string, content: string) => {
-  const { data } = await api.put("/post", { postUri, content });
+export const updatePostApi = async (id: string, content: string) => {
+  const { data } = await api.put(`/posts/${id}`, { content });
   return data;
 };
