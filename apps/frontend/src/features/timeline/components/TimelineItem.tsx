@@ -21,6 +21,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import ShowMoreActions from "./ShowMoreActions";
+import { useProfileData } from "@/features/profile/hooks/useProfile";
 
 function ActorAvatar({
   actor,
@@ -61,7 +63,7 @@ export function TimelineItem({
   onPostStatsButtonClick: () => void;
 }) {
   const { interactWithPost, undoInteractWithPost } = useInteraction();
-
+  const { data: profileData } = useProfileData();
   const [liked, setLiked] = useState(entry.post.liked);
   const [likeCount, setLikeCount] = useState(entry.post.likeCount);
   const [boosted, setBoosted] = useState(entry.post.boosted);
@@ -275,9 +277,9 @@ export function TimelineItem({
             onClick={() => handleLikeInteraction(entry.post.idUri)}
             label="Like"
           />
-          <PostStat
-            icon={<Ellipsis className="size-4 text-primary" />}
-            label="More"
+          <ShowMoreActions
+            postUri={entry.post.idUri}
+            isLocal={entry.post.actor.domain === profileData?.domain}
           />
         </div>
       </CardContent>

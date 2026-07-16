@@ -1,5 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { sendInteraction, undoInteraction } from "../api";
+import {
+  deletePostApi,
+  sendInteraction,
+  undoInteraction,
+  updatePostApi,
+} from "../api";
 import { createPost } from "@/features/home/api";
 import { queryClient } from "@/lib/query/client";
 import { timelineQueryKeys } from "../keys";
@@ -46,5 +51,37 @@ export const useInteraction = () => {
     },
   });
 
-  return { interactWithPost, undoInteractWithPost, replyToPost };
+  const deletePost = useMutation({
+    mutationFn: ({ postUri }: { postUri: string }) => {
+      return deletePostApi(postUri);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
+    },
+  });
+
+  const updatePost = useMutation({
+    mutationFn: ({
+      postUri,
+      content,
+    }: {
+      postUri: string;
+      content: string;
+    }) => {
+      return updatePostApi(postUri, content);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
+    },
+  });
+
+  return {
+    interactWithPost,
+    undoInteractWithPost,
+    replyToPost,
+    deletePost,
+    updatePost,
+  };
 };
