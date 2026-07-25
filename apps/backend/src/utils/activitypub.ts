@@ -12,7 +12,7 @@ import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
 const axiosClient = axios.create({ timeout: 10000 });
 
 axiosRetry(axiosClient, {
-  retries: 5,
+  retries: Infinity,
   retryCondition: (error) => {
     return (
       axiosRetry.isNetworkOrIdempotentRequestError(error) ||
@@ -20,7 +20,7 @@ axiosRetry(axiosClient, {
     );
   },
   retryDelay: (retryCount) => {
-    return axiosRetry.exponentialDelay(retryCount);
+    return Math.min(axiosRetry.exponentialDelay(retryCount), 30_000);
   },
   onRetry: (retryCount, error, requestConfig) => {
     console.warn(

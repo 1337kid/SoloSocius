@@ -85,7 +85,7 @@ export function HomeFeedView() {
         />
       ))}
 
-      <div ref={ref} className="space-y-4">
+      <div ref={ref} className="space-y-4 w-full h-[1px]">
         {isFetchingNextPage && (
           <>
             {Array.from({ length: 3 }).map((_, i) => (

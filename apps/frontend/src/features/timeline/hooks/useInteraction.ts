@@ -9,6 +9,7 @@ import { createPost } from "@/features/home/api";
 import { queryClient } from "@/lib/query/client";
 import { timelineQueryKeys } from "../keys";
 import { feedQueryKeys } from "@/features/home/keys";
+import { activityPubContent } from "@/lib/utils";
 
 export const useInteraction = () => {
   const interactWithPost = useMutation({
@@ -43,7 +44,8 @@ export const useInteraction = () => {
       inReplyTo: string;
       reply: string;
     }) => {
-      return createPost({ content: reply, inReplyTo });
+      const content = activityPubContent(reply);
+      return createPost({ content, inReplyTo });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
@@ -62,13 +64,7 @@ export const useInteraction = () => {
   });
 
   const updatePost = useMutation({
-    mutationFn: ({
-      id,
-      content,
-    }: {
-      id: string;
-      content: string;
-    }) => {
+    mutationFn: ({ id, content }: { id: string; content: string }) => {
       return updatePostApi(id, content);
     },
     onSuccess: () => {

@@ -78,6 +78,7 @@ export const getPostActivity = async (
       idUri: post.idUri,
       createdAt: post.createdAt,
       content: post.content,
+      url: post.url || post.idUri,
     });
 
     return reply
@@ -112,7 +113,10 @@ export const updatePost = async (
       idUri: updatedPost.idUri,
       createdAt: updatedPost.createdAt,
       content: updatedPost.content,
+      updatedAt: new Date(),
     });
+
+    console.log("noteUpdateActivity: ", noteUpdateActivity);
 
     await deliverActivityToFollowers(noteUpdateActivity);
 

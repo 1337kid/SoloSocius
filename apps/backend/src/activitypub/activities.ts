@@ -77,10 +77,12 @@ export const createNotePayload = ({
   idUri,
   createdAt,
   content,
+  url,
 }: {
   idUri: string;
   createdAt: Date;
   content: string;
+  url: string;
 }) => {
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
@@ -89,6 +91,7 @@ export const createNotePayload = ({
     published: createdAt.toISOString(),
     url: idUri,
     actor: userEndpoints.actorUri,
+    attributedTo: userEndpoints.actorUri,
     to: ["https://www.w3.org/ns/activitystreams#Public"],
     cc: [userEndpoints.followers],
     content: content,
@@ -98,17 +101,22 @@ export const createNotePayload = ({
 export const createNoteUpdatePayload = ({
   idUri,
   createdAt,
+  updatedAt,
   content,
 }: {
   idUri: string;
   createdAt: Date;
+  updatedAt: Date;
   content: string;
 }) => {
-  const { "@context": _context, ...notePayload } = createNotePayload({
+  let { "@context": _context, ...notePayload } = createNotePayload({
     idUri,
     createdAt,
     content,
+    url: idUri,
   });
+
+  (notePayload as any).updated = updatedAt.toISOString();
 
   return {
     "@context": "https://www.w3.org/ns/activitystreams",

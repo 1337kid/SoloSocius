@@ -231,9 +231,17 @@ export function TimelineItem({
         )}
 
         {/* Post content */}
-        <div className="text-sm leading-relaxed pl-[52px]">
+        <div className="text-sm leading-relaxed pl-[52px] min-w-0">
           <div
-            className="prose prose-sm max-w-none **:wrap-break-words [&_*]:overflow-wrap-anywhere [&_a]:text-primary hover:[&_a]:text-primary/80"
+            className="
+                prose prose-sm max-w-none min-w-0
+                break-words
+                [&_*]:break-words
+                [&_*]:overflow-wrap-anywhere
+                [&_a]:break-all
+                [&_a]:whitespace-normal
+                [&_a]:text-primary
+                hover:[&_a]:text-primary/80"
             dangerouslySetInnerHTML={{
               __html: purify.sanitize(entry.post.content),
             }}
