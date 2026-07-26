@@ -7,8 +7,10 @@ import { getPostActivity } from "../controllers/posts.controller.js";
 import { handleWebFinger } from "../controllers/webfinger.controller.js";
 import { handleFollowingCollectionRequest } from "../controllers/following.controller.js";
 import { handleFollowersCollectionRequest } from "../controllers/followers.controller.js";
+import { getMedia } from "../controllers/media.controller.js";
 
 export async function activityPubRoutes(fastify: FastifyInstance) {
+  fastify.get("/media/:key", getMedia);
   fastify.get("/.well-known/webfinger", handleWebFinger);
   fastify.get("/actor", getActorProfile);
 

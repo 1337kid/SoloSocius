@@ -1,6 +1,6 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "./s3.js";
-import { S3_BUCKET } from "../config/env.js";
+import { S3_BUCKET, STORAGE_PUBLIC_MEDIA_URL } from "../config/env.js";
 import sharp from "sharp";
 
 export const uploadBuffer = async (
@@ -36,3 +36,7 @@ export const resizeImage = async (
 
   return resized;
 };
+
+export const getPublicMediaUrl = (key: string) => {
+  return `${STORAGE_PUBLIC_MEDIA_URL}/${key}`;
+};  
