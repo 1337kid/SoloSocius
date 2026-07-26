@@ -7,6 +7,7 @@ import {
 } from "../../db/queries/posts.js";
 import { createTimelineEntry } from "../../db/queries/timeline.js";
 import { InboxActivity } from "../../types/index.js";
+import type { MediaItem } from "../../db/schema.js";
 
 export const handleCreateActivity = async (activity: InboxActivity) => {
   if (typeof activity.object === "string") return;
@@ -15,6 +16,14 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
 
   switch (nestedObject.type) {
     case "Note":
+      let mediaItems: MediaItem[] = [];
+      for (const mediaItem of nestedObject.attachment || []) {
+        mediaItems.push({
+          url: mediaItem.url,
+          mimeType: mediaItem.mediaType,
+        });
+      }
+      
       await storeRemotePost({
         actorUri: activity.actor,
         idUri: nestedObject.id,
@@ -22,6 +31,7 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
         inReplyTo: nestedObject.inReplyTo || null,
         url: nestedObject.url || null,
         published: nestedObject.published,
+        mediaItems,
       });
 
       await createTimelineEntry({
@@ -35,7 +45,7 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
 
         if (localParentPost?.isLocal) {
           await incrementPostReplyCount(localParentPost.idUri);
-          
+
           await createNotificationEntry({
             type: "reply",
             actorUri: activity.actor,

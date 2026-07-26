@@ -5,6 +5,7 @@ import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
+  console.log(data.mediaItems);
   await db
     .insert(posts)
     .values({
@@ -15,12 +16,14 @@ export const storeRemotePost = async (data: RemotePostInput) => {
       inReplyTo: data.inReplyTo,
       url: data.url,
       createdAt: data.published ? new Date(data.published) : new Date(),
+      mediaItems: data.mediaItems,
     })
     .onConflictDoUpdate({
       target: posts.idUri,
       set: {
         content: data.content,
         inReplyTo: data.inReplyTo,
+        mediaItems: data.mediaItems,
       },
     })
     .returning();

@@ -1,3 +1,5 @@
+import type { MediaItem } from "../db/schema.js";
+
 export interface InstanceActorObject {
   username: string;
   displayName: string;
@@ -25,7 +27,8 @@ export interface RemotePostInput {
   content: string;
   inReplyTo?: string | null;
   url?: string | null;
-  published?: string | Date | null;
+  published?: string | Date | null; 
+  mediaItems?: MediaItem[] | null;
 }
 
 export interface CreateFollowerInupt {

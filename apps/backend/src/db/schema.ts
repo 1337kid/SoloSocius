@@ -10,7 +10,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 
-type MediaItem = {
+export type MediaItem = {
   url: string;
   mimeType: string;
 };
