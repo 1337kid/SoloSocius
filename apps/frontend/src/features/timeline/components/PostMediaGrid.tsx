@@ -55,13 +55,13 @@ function MediaCarouselDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="min-w-2xl w-full bg-black/90 border-none shadow-2xl"
+        className="min-w-2xl w-full bg-popover border-none shadow-2xl"
       >
         <div className="relative flex items-center justify-center min-h-[300px] max-h-[85vh]">
           <Carousel
             setApi={setApi}
             opts={{ startIndex, loop: mediaItems.length > 1 }}
-            className="w-full"
+            className="w-full px-20 py-10"
           >
             <CarouselContent className="ml-0">
               {mediaItems.map((item, i) => (

@@ -8,6 +8,7 @@ import {
 import { createTimelineEntry } from "../../db/queries/timeline.js";
 import { InboxActivity } from "../../types/index.js";
 import type { MediaItem } from "../../db/schema.js";
+import { parseMediaItems } from "../../utils/activitypub.js";
 
 export const handleCreateActivity = async (activity: InboxActivity) => {
   if (typeof activity.object === "string") return;
@@ -16,13 +17,7 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
 
   switch (nestedObject.type) {
     case "Note":
-      let mediaItems: MediaItem[] = [];
-      for (const mediaItem of nestedObject.attachment || []) {
-        mediaItems.push({
-          url: mediaItem.url,
-          mimeType: mediaItem.mediaType,
-        });
-      }
+      let mediaItems: MediaItem[] = parseMediaItems(nestedObject.attachment);
       
       await storeRemotePost({
         actorUri: activity.actor,

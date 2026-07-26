@@ -8,6 +8,7 @@ import { getAllFollowersInbox } from "../db/queries/followers.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
 import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
+import type { MediaItem } from "../db/schema.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -70,6 +71,17 @@ export const remoteActorLookup = async (actorUri: string) => {
   return newActor;
 };
 
+export const parseMediaItems = (attachment: any) => {
+  let mediaItems: MediaItem[] = [];
+  for (const mediaItem of attachment || []) {
+    mediaItems.push({
+      url: mediaItem.url,
+      mimeType: mediaItem.mediaType,
+    });
+  }
+  return mediaItems;
+};
+
 export const remotePostLookup = async (postUri: string) => {
   const post = await getPostFromDB(postUri);
   console.log("post", post);
@@ -96,6 +108,8 @@ export const remotePostLookup = async (postUri: string) => {
     }
   }
 
+  let mediaItems: MediaItem[] = parseMediaItems(data.attachment);
+
   const newPost = await storeRemotePost({
     actorUri: data.attributedTo,
     idUri: postUri,
@@ -103,6 +117,7 @@ export const remotePostLookup = async (postUri: string) => {
     inReplyTo: inReplyToPost?.idUri || null,
     url: data.url,
     published: data.published,
+    mediaItems,
   });
   return newPost;
 };

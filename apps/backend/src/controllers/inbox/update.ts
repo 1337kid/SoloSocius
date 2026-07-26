@@ -2,6 +2,7 @@ import { ActorObject, InboxActivity } from "../../types/index.js";
 import { addActorToDB } from "../../db/queries/actor.js";
 import { storeRemotePost } from "../../db/queries/posts.js";
 import { MediaItem } from "../../db/schema.js";
+import { parseMediaItems } from "../../utils/activitypub.js";
 
 const actorKeysToCheck = [
   "id",
@@ -68,13 +69,7 @@ export const handleUpdateActivity = async (activity: InboxActivity) => {
         try {
           const post = activity.object;
 
-          let mediaItems: MediaItem[] = [];
-          for (const mediaItem of post.attachment || []) {
-            mediaItems.push({
-              url: mediaItem.url,
-              mimeType: mediaItem.mediaType,
-            });
-          }
+          let mediaItems: MediaItem[] = parseMediaItems(post.attachment);
 
           await storeRemotePost({
             actorUri: activity.actor,
