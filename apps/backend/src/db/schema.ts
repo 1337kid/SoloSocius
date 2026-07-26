@@ -7,7 +7,13 @@ import {
   uniqueIndex,
   integer,
   AnyPgColumn,
+  jsonb,
 } from "drizzle-orm/pg-core";
+
+type MediaItem = {
+  url: string;
+  mimeType: string;
+};
 
 export const actors = pgTable("actors", {
   actorUri: text("actor_uri").primaryKey(),
@@ -57,6 +63,7 @@ export const posts = pgTable("posts", {
   likeCount: integer("like_count").default(0).notNull(),
   boostCount: integer("boost_count").default(0).notNull(),
   replyCount: integer("reply_count").default(0).notNull(),
+  mediaItems: jsonb("media_items").$type<MediaItem[]>().default([]),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -145,4 +152,11 @@ export const timelineEvents = pgTable("timeline_events", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
+});
+
+export const media = pgTable("media", {
+  key: text("key").primaryKey(),
+  size: integer("size").notNull(),
+  mimeType: text("mime_type").notNull(),
+  version: integer("version").notNull().default(1),
 });
