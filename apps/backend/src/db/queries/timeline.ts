@@ -114,6 +114,7 @@ export const getProfileTimeline = async (
         likeCount: posts.likeCount,
         boostCount: posts.boostCount,
         replyCount: posts.replyCount,
+        mediaItems: posts.mediaItems,
 
         liked: sql<boolean>`${myLike.id} IS NOT NULL`,
         boosted: sql<boolean>`${myBoost.id} IS NOT NULL`,

@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import ShowMoreActions from "./ShowMoreActions";
 import { useProfileData } from "@/features/profile/hooks/useProfile";
+import { PostMediaGrid } from "./PostMediaGrid";
 
 function ActorAvatar({
   actor,
@@ -246,6 +247,7 @@ export function TimelineItem({
               __html: purify.sanitize(entry.post.content),
             }}
           />
+          <PostMediaGrid mediaItems={entry.post.mediaItems} />
         </div>
 
         <div className="flex items-center justify-between ml-[52px]">

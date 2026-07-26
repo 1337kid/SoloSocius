@@ -1,5 +1,10 @@
 import { api } from "@/lib/api/axios";
 
+export interface MediaItem {
+  url: string;
+  mimeType: string;
+}
+
 export interface TimelineActor {
   actorUri?: string;
   avatarUrl: string | null;
@@ -13,7 +18,6 @@ export interface TimelineReply {
   idUri: string;
   url: string | null;
   content: string;
-
   actor: TimelineActor;
 }
 
@@ -32,6 +36,7 @@ export interface TimelinePostObject {
   boosted: boolean;
 
   actor: TimelineActor;
+  mediaItems: MediaItem[] | [];
 
   inReplyTo: TimelineReply | null;
 }
