@@ -1,5 +1,7 @@
 import { ActorObject, InboxActivity } from "../../types/index.js";
 import { addActorToDB } from "../../db/queries/actor.js";
+import { storeRemotePost } from "../../db/queries/posts.js";
+import { MediaItem } from "../../db/schema.js";
 
 const actorKeysToCheck = [
   "id",
@@ -61,6 +63,35 @@ export const handleUpdateActivity = async (activity: InboxActivity) => {
           break;
         }
         break;
+
+      case "Note":
+        try {
+          const post = activity.object;
+
+          let mediaItems: MediaItem[] = [];
+          for (const mediaItem of post.attachment || []) {
+            mediaItems.push({
+              url: mediaItem.url,
+              mimeType: mediaItem.mediaType,
+            });
+          }
+
+          await storeRemotePost({
+            actorUri: activity.actor,
+            idUri: post.id,
+            content: post.content || "",
+            inReplyTo: post.inReplyTo || null,
+            url: post.url || null,
+            published: post.published,
+            mediaItems,
+          });
+        } catch (error) {
+          console.error("Not updating post because of error:", error);
+          break;
+        }
+        break;
+      default:
+        return;
     }
   }
 };

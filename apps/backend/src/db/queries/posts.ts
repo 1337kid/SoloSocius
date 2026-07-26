@@ -5,7 +5,6 @@ import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
-  console.log(data.mediaItems);
   await db
     .insert(posts)
     .values({
