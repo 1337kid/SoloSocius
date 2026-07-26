@@ -5,7 +5,7 @@ import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
-  await db
+  const [post] = await db
     .insert(posts)
     .values({
       actorUri: data.actorUri,
@@ -26,6 +26,7 @@ export const storeRemotePost = async (data: RemotePostInput) => {
       },
     })
     .returning();
+  return post;
 };
 
 export const getPostFromDB = async (idUri: string) => {
