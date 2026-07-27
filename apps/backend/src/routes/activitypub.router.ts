@@ -10,7 +10,7 @@ import { handleFollowersCollectionRequest } from "../controllers/followers.contr
 import { getMedia } from "../controllers/media.controller.js";
 
 export async function activityPubRoutes(fastify: FastifyInstance) {
-  fastify.get("/media/:key", getMedia);
+  fastify.get("/media/*", getMedia);
   fastify.get("/.well-known/webfinger", handleWebFinger);
   fastify.get("/actor", getActorProfile);
 

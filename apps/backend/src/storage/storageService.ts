@@ -4,7 +4,7 @@ import { resizeImage, uploadBuffer } from "./utils.js";
 import s3 from "./s3.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
-const STORAGE_BASE_URL = `https://${DOMAIN}/api/media`;
+const STORAGE_BASE_URL = `https://${DOMAIN}/media`;
 
 export interface UploadedFile {
   key: string;

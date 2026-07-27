@@ -55,7 +55,7 @@ async function readMultipartFile(req: FastifyRequest): Promise<{
 }
 
 export async function getMedia(req: FastifyRequest, res: FastifyReply) {
-  const { key } = req.params as { key: string };
+  const key = (req.params as { [key: string]: string })["*"];
 
   if (!key) {
     return res.code(400).send({ error: "Missing media key" });
