@@ -61,6 +61,7 @@ export interface OutboxActivity {
   inReplyTo: string | null;
   content: string;
   url: string | null;
+  attachments: MediaItem[] | null;
 }
 
 export type ActivityObject =

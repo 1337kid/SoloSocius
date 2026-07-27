@@ -3,6 +3,8 @@ import { OutboxActivity } from "../types/index.js";
 import { generateProfileUpdateActivityId } from "../utils/activityId.js";
 import { InstanceActorObject } from "../types/index.js";
 import { generateActorObject } from "./actor.js";
+import { parseAttachmentsForActivity } from "../utils/activitypub.js";
+import { MediaItem } from "../db/schema.js";
 
 export const createActivity = (
   activityId: string,
@@ -29,6 +31,8 @@ export const createProfileUpdateActivity = (params: InstanceActorObject) => {
 };
 
 export const createNoteActivity = (params: OutboxActivity) => {
+  const attachments = parseAttachmentsForActivity(params.attachments || []);
+
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
     id: `${params.idUri}/activity`,
@@ -44,14 +48,18 @@ export const createNoteActivity = (params: OutboxActivity) => {
       published: params.createdAt.toISOString(),
       url: params.url,
       actor: userEndpoints.actorUri,
+      attributedTo: userEndpoints.actorUri,
       to: ["https://www.w3.org/ns/activitystreams#Public"],
       cc: [userEndpoints.followers],
       content: params.content,
+      attachment: attachments,
     },
   };
 };
 
 export const createOutboxActivity = (params: OutboxActivity) => {
+  const attachments = parseAttachmentsForActivity(params.attachments || []);
+
   return {
     id: `${params.idUri}/activity`,
     type: "Create",
@@ -66,9 +74,11 @@ export const createOutboxActivity = (params: OutboxActivity) => {
       inReplyTo: params.inReplyTo,
       published: params.createdAt.toISOString(),
       url: params.url || `${userEndpoints.home}/posts/${params.id}`,
+      attributedTo: userEndpoints.actorUri,
       to: ["https://www.w3.org/ns/activitystreams#Public"],
       cc: [userEndpoints.followers],
       content: params.content,
+      attachment: attachments,
     },
   };
 };
@@ -78,11 +88,13 @@ export const createNotePayload = ({
   createdAt,
   content,
   url,
+  attachments,
 }: {
   idUri: string;
   createdAt: Date;
   content: string;
   url: string;
+  attachments?: MediaItem[];
 }) => {
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
@@ -95,6 +107,7 @@ export const createNotePayload = ({
     to: ["https://www.w3.org/ns/activitystreams#Public"],
     cc: [userEndpoints.followers],
     content: content,
+    attachment: parseAttachmentsForActivity(attachments || []),
   };
 };
 
@@ -103,11 +116,13 @@ export const createNoteUpdatePayload = ({
   createdAt,
   updatedAt,
   content,
+  attachments,
 }: {
   idUri: string;
   createdAt: Date;
   updatedAt: Date;
   content: string;
+  attachments?: MediaItem[];
 }) => {
   let { "@context": _context, ...notePayload } = createNotePayload({
     idUri,
@@ -124,7 +139,10 @@ export const createNoteUpdatePayload = ({
     type: "Update",
     actor: userEndpoints.actorUri,
     to: ["https://www.w3.org/ns/activitystreams#Public"],
-    object: notePayload,
+    object: {
+      ...notePayload,
+      attachment: parseAttachmentsForActivity(attachments || []),
+    },
   };
 };
 

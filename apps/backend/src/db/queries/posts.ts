@@ -1,8 +1,9 @@
-import { interactions, posts } from "../schema.js";
+import { posts } from "../schema.js";
 import { eq, desc, count, inArray, and, sql } from "drizzle-orm";
 import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
+import type { MediaItem } from "../schema.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
   const [post] = await db
@@ -65,9 +66,11 @@ export const getUserPosts = async (offset: number, limit: number) => {
 export const createUserPost = async ({
   content,
   inReplyTo,
+  attachments,
 }: {
   content: string;
   inReplyTo?: string;
+  attachments?: MediaItem[];
 }) => {
   const [newPost] = await db
     .insert(posts)
@@ -77,6 +80,7 @@ export const createUserPost = async ({
       isLocal: true,
       idUri: "",
       inReplyTo: inReplyTo || null,
+      mediaItems: attachments || [],
     })
     .returning();
   return newPost;

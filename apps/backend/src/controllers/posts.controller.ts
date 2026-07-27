@@ -15,15 +15,17 @@ import {
   createNoteUpdatePayload,
 } from "../activitypub/activities.js";
 import { userEndpoints } from "../activitypub/actor.js";
-import { createTimelineEntry, getFeedEvents } from "../db/queries/timeline.js";
+import { createTimelineEntry } from "../db/queries/timeline.js";
+import type { MediaItem } from "../db/schema.js";
 
 export const createPost = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { content, inReplyTo } = request.body as {
+  const { content, inReplyTo, mediaItems } = request.body as {
     content: string;
     inReplyTo?: string;
+    mediaItems?: MediaItem[];
   };
 
   if (!content || content.trim() === "") {
@@ -34,6 +36,7 @@ export const createPost = async (
     const newPost = await createUserPost({
       content,
       inReplyTo,
+      attachments: mediaItems,
     });
 
     const postUri = await updateUserPostUri(newPost.id);
@@ -45,6 +48,7 @@ export const createPost = async (
       content: newPost.content,
       id: newPost.id,
       url: postUri,
+      attachments: newPost.mediaItems,
     });
 
     await createTimelineEntry({
@@ -79,6 +83,7 @@ export const getPostActivity = async (
       createdAt: post.createdAt,
       content: post.content,
       url: post.url || post.idUri,
+      attachments: post.mediaItems || [],
     });
 
     return reply
@@ -114,6 +119,7 @@ export const updatePost = async (
       createdAt: updatedPost.createdAt,
       content: updatedPost.content,
       updatedAt: new Date(),
+      attachments: updatedPost.mediaItems || [],
     });
 
     console.log("noteUpdateActivity: ", noteUpdateActivity);

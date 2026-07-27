@@ -67,7 +67,7 @@ export async function getMedia(req: FastifyRequest, res: FastifyReply) {
 
   const url = getPublicMediaUrl(key);
   res.header("Cache-Control", "public, max-age=31536000, immutable");
-  return res.redirect(url);
+  return res.code(301).redirect(url);
 }
 
 export async function uploadAvatarHandler(

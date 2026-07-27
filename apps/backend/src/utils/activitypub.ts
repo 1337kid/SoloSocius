@@ -194,3 +194,13 @@ export const deliverActivityToFollowers = async (activityPayload: any) => {
     });
   }
 };
+
+export const parseAttachmentsForActivity = (attachments: MediaItem[]) => {
+  return attachments.map((attachment) => {
+    return {
+      type: "Image",
+      mediaType: attachment.mimeType,
+      url: attachment.url,
+    };
+  });
+};
