@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { media } from "../schema.js";
 
@@ -12,7 +12,11 @@ export const storeMediaRecord = async (params: {
     .values(params)
     .onConflictDoUpdate({
       target: media.key,
-      set: { size: params.size, mimeType: params.mimeType },
+      set: {
+        size: params.size,
+        mimeType: params.mimeType,
+        version: sql`${media.version} + 1`,
+      },
     })
     .returning();
   return record;

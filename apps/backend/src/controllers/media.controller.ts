@@ -86,21 +86,20 @@ export async function uploadAvatarHandler(
 
   const avatarKey = "profile/avatar.webp";
   await deleteFile(avatarKey);
-  await deleteMediaRecord(avatarKey);
 
   const uploaded = await uploadAvatar(file.buffer);
 
-  await storeMediaRecord({
+  const mediaRecord = await storeMediaRecord({
     key: uploaded.key,
     size: uploaded.size,
     mimeType: uploaded.mimeType,
   });
 
-  await updateLocalActorAvatar(uploaded.url);
+  await updateLocalActorAvatar(`${uploaded.url}?v=${mediaRecord.version}`);
 
   return res.code(200).send({
     key: uploaded.key,
-    url: uploaded.url,
+    url: `${uploaded.url}?v=${mediaRecord.version}`,
     width: uploaded.width,
     height: uploaded.height,
     mimeType: uploaded.mimeType,
@@ -123,21 +122,20 @@ export async function uploadBannerHandler(
 
   const bannerKey = "profile/banner.webp";
   await deleteFile(bannerKey);
-  await deleteMediaRecord(bannerKey);
 
   const uploaded = await uploadBanner(file.buffer);
 
-  await storeMediaRecord({
+  const mediaRecord = await storeMediaRecord({
     key: uploaded.key,
     size: uploaded.size,
     mimeType: uploaded.mimeType,
   });
 
-  await updateLocalActorBanner(uploaded.url);
+  await updateLocalActorBanner(`${uploaded.url}?v=${mediaRecord.version}`);
 
   return res.code(200).send({
     key: uploaded.key,
-    url: uploaded.url,
+    url: `${uploaded.url}?v=${mediaRecord.version}`,
     width: uploaded.width,
     height: uploaded.height,
     mimeType: uploaded.mimeType,
