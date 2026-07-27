@@ -19,6 +19,8 @@ export const getActorProfile = async (
     displayName: actor.displayName || "",
     summary: actor.summary || "",
     publicKey: actor.publicKey,
+    avatarUrl: actor.avatarUrl || "",
+    bannerUrl: actor.bannerUrl || "",
   });
 
   return reply

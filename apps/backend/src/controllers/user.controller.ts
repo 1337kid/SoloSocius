@@ -37,11 +37,11 @@ export const updateProfileData = async (
     displayName: actor.displayName || "",
     summary: actor.summary || "",
     publicKey: actor.publicKey,
+    avatarUrl: actor.avatarUrl || "",
+    bannerUrl: actor.bannerUrl || "",
   });
 
   await deliverActivityToFollowers(activity);
-
-  console.log(activity);
 
   return reply
     .status(200)

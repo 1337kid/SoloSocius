@@ -5,6 +5,8 @@ export interface InstanceActorObject {
   displayName: string;
   summary: string;
   publicKey: string;
+  avatarUrl?: string;
+  bannerUrl?: string;
 }
 
 export interface ActorObject {

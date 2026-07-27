@@ -12,6 +12,8 @@ import {
   updateLocalActorAvatar,
   updateLocalActorBanner,
 } from "../db/queries/actor.js";
+import { createProfileUpdateActivity } from "../activitypub/activities.js";
+import { deliverActivityToFollowers } from "../utils/activitypub.js";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_MIME_TYPES = [
@@ -97,6 +99,17 @@ export async function uploadAvatarHandler(
 
   await updateLocalActorAvatar(`${uploaded.url}?v=${mediaRecord.version}`);
 
+  const activity = createProfileUpdateActivity({
+    username: actor.username,
+    displayName: actor.displayName || "",
+    summary: actor.summary || "",
+    publicKey: actor.publicKey,
+    avatarUrl: `${uploaded.url}?v=${mediaRecord.version}`,
+    bannerUrl: actor.bannerUrl || "",
+  });
+
+  await deliverActivityToFollowers(activity);
+
   return res.code(200).send({
     key: uploaded.key,
     url: `${uploaded.url}?v=${mediaRecord.version}`,
@@ -132,6 +145,17 @@ export async function uploadBannerHandler(
   });
 
   await updateLocalActorBanner(`${uploaded.url}?v=${mediaRecord.version}`);
+
+  const activity = createProfileUpdateActivity({
+    username: actor.username,
+    displayName: actor.displayName || "",
+    summary: actor.summary || "",
+    publicKey: actor.publicKey,
+    avatarUrl: actor.avatarUrl || "",
+    bannerUrl: `${uploaded.url}?v=${mediaRecord.version}`,
+  });
+
+  await deliverActivityToFollowers(activity);
 
   return res.code(200).send({
     key: uploaded.key,

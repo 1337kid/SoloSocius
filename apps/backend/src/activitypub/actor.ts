@@ -6,6 +6,8 @@ export const generateActorObject = ({
   displayName,
   summary,
   publicKey,
+  avatarUrl,
+  bannerUrl,
 }: InstanceActorObject) => {
   return {
     "@context": [
@@ -27,6 +29,17 @@ export const generateActorObject = ({
       id: `${userEndpoints.actorUri}#main-key`,
       owner: userEndpoints.actorUri,
       publicKeyPem: publicKey,
+    },
+
+    icon: {
+      type: "Image",
+      mediaType: "image/webp",
+      url: avatarUrl || "",
+    },
+    image: {
+      type: "Image",
+      mediaType: "image/webp",
+      url: bannerUrl || "",
     },
   };
 };
