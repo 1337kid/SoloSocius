@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ReplyPopover from "./ReplyPopover";
+import { PostComposer } from "@/features/home/components/PostComposer";
 import {
   Tooltip,
   TooltipContent,
@@ -265,8 +265,11 @@ export function TimelineItem({
               </TooltipTrigger>
               <TooltipContent>Reply</TooltipContent>
             </Tooltip>
-            <PopoverContent align="start">
-              <ReplyPopover inReplyTo={entry.post.idUri} />
+            <PopoverContent align="start" className="w-80 p-3">
+              <PostComposer
+                inReplyTo={entry.post.idUri}
+                variant="inline"
+              />
             </PopoverContent>
           </Popover>
           <PostStat

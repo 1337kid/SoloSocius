@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import { EditProfileDialog } from "../../profile/components/EditProfileDialog";
 import DiscoverDialog from "./DiscoverDialog";
-import CreatePostForm from "./CreatePostForm";
+import { PostComposer } from "./PostComposer";
 
 const LeftSidebar = () => {
   const { data: profile } = useProfileData();
@@ -70,7 +70,7 @@ const LeftSidebar = () => {
         </CardHeader>
       </Card>
       {/* Create Post Form */}
-      <CreatePostForm />
+      <PostComposer />
     </div>
   );
 };

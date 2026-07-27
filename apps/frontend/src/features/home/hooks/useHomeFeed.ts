@@ -27,6 +27,7 @@ export function useCreatePost() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["timeline"] });
     },
   });
 }

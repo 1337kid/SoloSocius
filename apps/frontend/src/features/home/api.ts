@@ -1,10 +1,32 @@
 import { api } from "@/lib/api/axios";
-import type { TimelineResponse } from "@/features/timeline/api";
+import type { TimelineResponse, MediaItem } from "@/features/timeline/api";
 
 export interface CreatePostRequest {
   content: string;
   inReplyTo?: string;
+  mediaItems?: MediaItem[];
 }
+
+export interface UploadedAttachment {
+  key: string;
+  url: string;
+  width: number;
+  height: number;
+  mimeType: string;
+}
+
+export const uploadAttachment = async (file: File): Promise<UploadedAttachment> => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post<UploadedAttachment>("/media/attachment", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+
+export const deleteAttachment = async (key: string): Promise<void> => {
+  await api.delete("/media/attachment", { data: { key } });
+};
 
 export async function getHomeFeed(page: number = 1): Promise<TimelineResponse> {
   const { data } = await api.get<TimelineResponse>("/feed", {

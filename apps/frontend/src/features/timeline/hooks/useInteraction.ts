@@ -40,12 +40,18 @@ export const useInteraction = () => {
     mutationFn: ({
       inReplyTo,
       reply,
+      mediaItems,
     }: {
       inReplyTo: string;
       reply: string;
+      mediaItems?: import("@/features/home/api").UploadedAttachment[];
     }) => {
       const content = activityPubContent(reply);
-      return createPost({ content, inReplyTo });
+      return createPost({
+        content,
+        inReplyTo,
+        mediaItems: mediaItems?.map((m) => ({ url: m.url, mimeType: m.mimeType })),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
