@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import multipart from "@fastify/multipart";
 import dotenv from "dotenv";
 import { activityPubRoutes } from "./routes/activitypub.router.js";
 import { PublicRoutes } from "./routes/public.router.js";
@@ -37,6 +38,8 @@ if (NODE_ENV !== "production") {
 }
 
 await fastify.register(authPlugin);
+
+await fastify.register(multipart);
 
 await fastify.register(cors, {
   origin: true,

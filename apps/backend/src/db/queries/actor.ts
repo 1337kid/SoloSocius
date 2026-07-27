@@ -111,3 +111,11 @@ export const updateLocalActorProfileData = async (params: {
     .returning();
   return actor;
 };
+
+export const updateLocalActorAvatar = async (avatarUrl: string) => {
+  await db.update(actors).set({ avatarUrl }).where(eq(actors.isLocal, true));
+};
+
+export const updateLocalActorBanner = async (bannerUrl: string) => {
+  await db.update(actors).set({ bannerUrl }).where(eq(actors.isLocal, true));
+};
