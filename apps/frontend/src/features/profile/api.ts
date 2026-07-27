@@ -38,6 +38,24 @@ export const updateProfile = async (profile: Profile): Promise<ProfileData> => {
   return data;
 };
 
+export const uploadProfileAvatar = async (file: File): Promise<{ url: string }> => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post<{ url: string }>("/media/avatar", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+
+export const uploadProfileBanner = async (file: File): Promise<{ url: string }> => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post<{ url: string }>("/media/banner", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+
 export const getFollowersData = async (page: number) => {
   const { data } = await api.get<FollowersData[]>(`/followers?page=${page}`);
   return {
