@@ -1,6 +1,8 @@
 import { following, timelineEvents } from "../schema.js";
 import { db } from "../index.js";
 import { and, count, desc, eq } from "drizzle-orm";
+import { getCache, setCache, deleteCache } from "../../cache/redis.js";
+import { CacheKeys, TTL } from "../../cache/keys.js";
 
 export const createFollowingUserEntry = async (
   activityId: string,
@@ -21,6 +23,7 @@ export const markFollowingAsAccepted = async (actorUri: string) => {
     .update(following)
     .set({ status: "accepted" })
     .where(eq(following.followedActorUri, actorUri));
+  await deleteCache(CacheKeys.followingUris);
 };
 
 export const getFollowingByActivityId = async (activityId: string) => {
@@ -34,12 +37,17 @@ export const getFollowingByActivityId = async (activityId: string) => {
 };
 
 export const getAllAcceptedFollowingActorUri = async () => {
+  const cached = await getCache<string[]>(CacheKeys.followingUris);
+  if (cached) return cached;
+
   const followedAccounts = await db
     .select({ uri: following.followedActorUri })
     .from(following)
     .where(eq(following.status, "accepted"));
 
-  return followedAccounts.map((account) => account.uri);
+  const uris = followedAccounts.map((account) => account.uri);
+  await setCache(CacheKeys.followingUris, uris, TTL.followingUris);
+  return uris;
 };
 
 export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
@@ -59,7 +67,7 @@ export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
 };
 
 export const removeFollowingEntry = async (actorUri: string) => {
-  return await db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     const followingEntry = await tx
       .delete(following)
       .where(eq(following.followedActorUri, actorUri))
@@ -69,6 +77,7 @@ export const removeFollowingEntry = async (actorUri: string) => {
       .delete(timelineEvents)
       .where(eq(timelineEvents.actorUri, followingEntry[0].followedActorUri));
   });
+  await deleteCache(CacheKeys.followingUris);
 };
 
 export const getUserFollowingCount = async () => {

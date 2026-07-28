@@ -4,6 +4,8 @@ import { actors } from "../schema.js";
 import { ActorObject } from "../../types/index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
 import { DOMAIN } from "../../config/env.js";
+import { getCache, setCache, deleteCache } from "../../cache/redis.js";
+import { CacheKeys, TTL } from "../../cache/keys.js";
 
 export const setupAdminActor = async (username: string, publicKey: string) => {
   await db
@@ -27,7 +29,12 @@ export const setupAdminActor = async (username: string, publicKey: string) => {
 };
 
 export const getActorOnThisInstance = async () => {
-  return (await db.select().from(actors).where(eq(actors.isLocal, true)))[0];
+  const cached = await getCache<(typeof actors.$inferSelect)>(CacheKeys.localActor);
+  if (cached) return cached;
+
+  const actor = (await db.select().from(actors).where(eq(actors.isLocal, true)))[0];
+  if (actor) await setCache(CacheKeys.localActor, actor, TTL.localActor);
+  return actor;
 };
 
 export const checkActorOnThisInstance = async (username: string) => {
@@ -40,9 +47,15 @@ export const checkActorOnThisInstance = async (username: string) => {
 };
 
 export const getActorFromDB = async (actorUri: string) => {
-  return (
+  const cacheKey = CacheKeys.actor(actorUri);
+  const cached = await getCache<(typeof actors.$inferSelect)>(cacheKey);
+  if (cached) return cached;
+
+  const actor = (
     await db.select().from(actors).where(eq(actors.actorUri, actorUri)).limit(1)
   )[0];
+  if (actor) await setCache(cacheKey, actor, TTL.remoteActor);
+  return actor;
 };
 
 export const addActorToDB = async (params: ActorObject) => {
@@ -71,11 +84,14 @@ export const addActorToDB = async (params: ActorObject) => {
     })
     .returning();
 
+  await deleteCache(CacheKeys.actor(params.actorUri));
   return actor;
 };
 
-export const getLocalActorProfileData = async () => {
-  return await db.query.actors.findFirst({
+type LocalActorProfile = Awaited<ReturnType<typeof fetchLocalActorProfileData>>;
+
+const fetchLocalActorProfileData = async () =>
+  db.query.actors.findFirst({
     where: eq(actors.isLocal, true),
     columns: {
       username: true,
@@ -98,6 +114,14 @@ export const getLocalActorProfileData = async () => {
         ),
     },
   });
+
+export const getLocalActorProfileData = async () => {
+  const cached = await getCache<LocalActorProfile>(CacheKeys.localProfile);
+  if (cached) return cached;
+
+  const profile = await fetchLocalActorProfileData();
+  if (profile) await setCache(CacheKeys.localProfile, profile, TTL.localProfile);
+  return profile;
 };
 
 export const updateLocalActorProfileData = async (params: {
@@ -109,13 +133,16 @@ export const updateLocalActorProfileData = async (params: {
     .set(params)
     .where(eq(actors.isLocal, true))
     .returning();
+  await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
   return actor;
 };
 
 export const updateLocalActorAvatar = async (avatarUrl: string) => {
   await db.update(actors).set({ avatarUrl }).where(eq(actors.isLocal, true));
+  await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
 };
 
 export const updateLocalActorBanner = async (bannerUrl: string) => {
   await db.update(actors).set({ bannerUrl }).where(eq(actors.isLocal, true));
+  await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
 };

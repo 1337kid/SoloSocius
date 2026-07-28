@@ -19,3 +19,5 @@ export const S3_BUCKET = process.env.S3_BUCKET;
 export const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
 export const S3_SECRET_KEY = process.env.S3_SECRET_KEY;
 export const STORAGE_PUBLIC_MEDIA_URL = process.env.STORAGE_PUBLIC_MEDIA_URL;
+
+export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
