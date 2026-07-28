@@ -38,7 +38,15 @@ services:
       - caddy_data:/data
       - caddy_config:/config
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 volumes:
   caddy_data:
   caddy_config:
   postgres-data:
+  redis-data:
