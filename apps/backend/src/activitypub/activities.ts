@@ -160,6 +160,18 @@ export const createDeleteActivity = (idUri: string) => {
   };
 };
 
+export const createDeleteActorActivity = () => {
+  const actorUri = userEndpoints.actorUri;
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: `${actorUri}/activity/delete-${Date.now()}`,
+    type: "Delete",
+    actor: actorUri,
+    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    object: actorUri
+  };
+};
+
 export const createInteractionActivity = (
   activityId: string,
   activityType: "Like" | "Announce",

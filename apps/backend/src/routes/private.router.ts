@@ -6,7 +6,7 @@ import { PrivateMediaRoutes } from "./media.router.js";
 import { authenticate } from "../middlewares/authenticate.js";
 
 export async function PrivateRoutes(fastify: FastifyInstance) {
-  //fastify.addHook("preHandler", authenticate);
+  fastify.addHook("preHandler", authenticate);
   fastify.register(InteractionRoutes);
   fastify.register(PostsRoutes);
   fastify.register(UserRoutes);

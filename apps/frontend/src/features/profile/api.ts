@@ -86,3 +86,7 @@ export const unfollowRemoteUser = async (
   }
   return data;
 };
+
+export const deleteAccount = async (password: string): Promise<void> => {
+  await api.delete("/account", { data: { password } });
+};

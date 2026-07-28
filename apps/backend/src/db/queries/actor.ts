@@ -146,3 +146,14 @@ export const updateLocalActorBanner = async (bannerUrl: string) => {
   await db.update(actors).set({ bannerUrl }).where(eq(actors.isLocal, true));
   await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
 };
+
+export const deleteLocalActor = async () => {
+  await db.delete(actors).where(eq(actors.isLocal, true));
+
+  await deleteCache(
+    CacheKeys.localActor,
+    CacheKeys.localProfile,
+    CacheKeys.privateKey,
+    CacheKeys.followingUris,
+  );
+};

@@ -4,7 +4,10 @@ import {
   handleSearchRemoteUser,
   handleUnfollowRemoteUser,
 } from "../controllers/following.controller.js";
-import { updateProfileData } from "../controllers/user.controller.js";
+import {
+  updateProfileData,
+  deleteAccount,
+} from "../controllers/user.controller.js";
 import { actorLookupMiddleware } from "../middlewares/actorLookup.js";
 
 export async function UserRoutes(fastify: FastifyInstance) {
@@ -17,4 +20,5 @@ export async function UserRoutes(fastify: FastifyInstance) {
   fastify.delete("/follow", handleUnfollowRemoteUser);
 
   fastify.put("/profile", updateProfileData);
+  fastify.delete("/account", deleteAccount);
 }
