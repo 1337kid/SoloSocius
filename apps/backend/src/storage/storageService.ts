@@ -22,11 +22,12 @@ export const uploadAvatar = async (buffer: Buffer): Promise<UploadedFile> => {
     throw new Error("Failed to resize image");
   }
 
-  await uploadBuffer("profile/avatar.webp", resized, "image/webp");
+  const key = `profile/avatar-${Number(Date.now())}.webp`;
+  await uploadBuffer(key, resized, "image/webp");
 
   return {
-    key: "profile/avatar.webp",
-    url: `${STORAGE_BASE_URL}/profile/avatar.webp`,
+    key,
+    url: `${STORAGE_BASE_URL}/${key}`,
     width: 256,
     height: 256,
     size: resized.length,
@@ -41,11 +42,12 @@ export const uploadBanner = async (buffer: Buffer): Promise<UploadedFile> => {
     throw new Error("Failed to resize image");
   }
 
-  await uploadBuffer("profile/banner.webp", resized, "image/webp");
+  const key = `profile/banner-${Number(Date.now())}.webp`;
+  await uploadBuffer(key, resized, "image/webp");
 
   return {
-    key: "profile/banner.webp",
-    url: `${STORAGE_BASE_URL}/profile/banner.webp`,
+    key,
+    url: `${STORAGE_BASE_URL}/${key}`,
     width: 1500,
     height: 500,
     size: resized.length,

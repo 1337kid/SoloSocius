@@ -6,7 +6,12 @@ import {
   uploadPostAttachment,
   deleteFile,
 } from "../storage/storageService.js";
-import { storeMediaRecord, deleteMediaRecord } from "../db/queries/media.js";
+import {
+  storeMediaRecord,
+  deleteMediaRecord,
+  getAvatarKey,
+  getBannerKey,
+} from "../db/queries/media.js";
 import {
   getActorOnThisInstance,
   updateLocalActorAvatar,
@@ -86,33 +91,38 @@ export async function uploadAvatarHandler(
     return res.code(404).send({ error: "Local actor not found" });
   }
 
-  const avatarKey = "profile/avatar.webp";
-  await deleteFile(avatarKey);
+  const oldAvatarKey = await getAvatarKey();
 
   const uploaded = await uploadAvatar(file.buffer);
 
-  const mediaRecord = await storeMediaRecord({
+  await storeMediaRecord({
     key: uploaded.key,
     size: uploaded.size,
     mimeType: uploaded.mimeType,
+    type: "avatar",
   });
 
-  await updateLocalActorAvatar(`${uploaded.url}?v=${mediaRecord.version}`);
+  await updateLocalActorAvatar(uploaded.url);
 
   const activity = createProfileUpdateActivity({
     username: actor.username,
     displayName: actor.displayName || "",
     summary: actor.summary || "",
     publicKey: actor.publicKey,
-    avatarUrl: `${uploaded.url}?v=${mediaRecord.version}`,
+    avatarUrl: uploaded.url,
     bannerUrl: actor.bannerUrl || "",
   });
 
   await deliverActivityToFollowers(activity);
 
+  if (oldAvatarKey) {
+    await deleteFile(oldAvatarKey);
+    await deleteMediaRecord(oldAvatarKey);
+  }
+
   return res.code(200).send({
     key: uploaded.key,
-    url: `${uploaded.url}?v=${mediaRecord.version}`,
+    url: uploaded.url,
     width: uploaded.width,
     height: uploaded.height,
     mimeType: uploaded.mimeType,
@@ -133,18 +143,18 @@ export async function uploadBannerHandler(
     return res.code(404).send({ error: "Local actor not found" });
   }
 
-  const bannerKey = "profile/banner.webp";
-  await deleteFile(bannerKey);
+  const oldBannerKey = await getBannerKey();
 
   const uploaded = await uploadBanner(file.buffer);
 
-  const mediaRecord = await storeMediaRecord({
+  await storeMediaRecord({
     key: uploaded.key,
     size: uploaded.size,
     mimeType: uploaded.mimeType,
+    type: "banner",
   });
 
-  await updateLocalActorBanner(`${uploaded.url}?v=${mediaRecord.version}`);
+  await updateLocalActorBanner(uploaded.url);
 
   const activity = createProfileUpdateActivity({
     username: actor.username,
@@ -152,14 +162,19 @@ export async function uploadBannerHandler(
     summary: actor.summary || "",
     publicKey: actor.publicKey,
     avatarUrl: actor.avatarUrl || "",
-    bannerUrl: `${uploaded.url}?v=${mediaRecord.version}`,
+    bannerUrl: uploaded.url,
   });
 
   await deliverActivityToFollowers(activity);
 
+  if (oldBannerKey) {
+    await deleteFile(oldBannerKey);
+    await deleteMediaRecord(oldBannerKey);
+  }
+
   return res.code(200).send({
     key: uploaded.key,
-    url: `${uploaded.url}?v=${mediaRecord.version}`,
+    url: uploaded.url,
     width: uploaded.width,
     height: uploaded.height,
     mimeType: uploaded.mimeType,

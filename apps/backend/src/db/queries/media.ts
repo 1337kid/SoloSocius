@@ -6,22 +6,27 @@ export const storeMediaRecord = async (params: {
   key: string;
   size: number;
   mimeType: string;
+  type?: "post" | "avatar" | "banner";
 }) => {
-  const [record] = await db
+  const type = params.type || "post";
+  return await db
     .insert(media)
-    .values(params)
-    .onConflictDoUpdate({
-      target: media.key,
-      set: {
-        size: params.size,
-        mimeType: params.mimeType,
-        version: sql`${media.version} + 1`,
-      },
-    })
+    .values({ ...params, type })
     .returning();
-  return record;
 };
 
 export const deleteMediaRecord = async (key: string) => {
   await db.delete(media).where(eq(media.key, key));
+};
+
+export const getAvatarKey = async () => {
+  return [
+    ...(await db.select().from(media).where(eq(media.type, "avatar")).limit(1)),
+  ][0].key;
+};
+
+export const getBannerKey = async () => {
+  return [
+    ...(await db.select().from(media).where(eq(media.type, "banner")).limit(1)),
+  ][0].key;
 };

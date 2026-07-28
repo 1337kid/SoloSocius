@@ -158,5 +158,8 @@ export const media = pgTable("media", {
   key: text("key").primaryKey(),
   size: integer("size").notNull(),
   mimeType: text("mime_type").notNull(),
-  version: integer("version").notNull().default(1),
+  type: text("type")
+    .notNull()
+    .default("post")
+    .$type<"post" | "avatar" | "banner">(),
 });
