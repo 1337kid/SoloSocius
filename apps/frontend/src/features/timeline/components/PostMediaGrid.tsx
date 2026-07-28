@@ -171,7 +171,7 @@ export function PostMediaGrid({ mediaItems }: PostMediaGridProps) {
 
           return (
             <button
-              key={item.url}
+              key={i}
               className={itemClass}
               onClick={() => openDialog(i)}
               aria-label={`View image ${i + 1}`}

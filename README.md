@@ -1,6 +1,9 @@
-# SoloSocius
+<p align="center">
+    <img src="docs/logo.png" width="200px" alt="logo" /><br/>
+    🔥 A lightweight, single-user ActivityPub server built for self-hosting. 🙋
+</p>
 
-> A lightweight, single-user ActivityPub server built for self-hosting.
+---
 
 SoloSocius is an experimental ActivityPub implementation focused on simplicity. It allows a single user to publish posts, interact with the [Fediverse](https://en.wikipedia.org/wiki/Fediverse) (Decentralised social network), and host their own social presence without the complexity of a multi-user platform.
 
@@ -17,6 +20,7 @@ SoloSocius is an experimental ActivityPub implementation focused on simplicity. 
 - Follow remote users on Mastodon, Misskey and other ActivityPub servers
 - Receive remote posts in timeline
 - Like and repost remote posts
+- Publish posts and replies with image attachments
 - Unfollow users
 - Self-host with Docker
 
@@ -46,6 +50,8 @@ Built with:
 - ActivityPub
 - Docker
 - Caddy
+- AWS S3 Storage
+- Redis
 
 > [!NOTE]
 > ActivityPub requires HTTPS for federation. Caddy is used as the reverse proxy and automatically provisions TLS certificates.
