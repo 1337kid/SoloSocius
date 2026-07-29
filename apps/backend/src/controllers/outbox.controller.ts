@@ -49,6 +49,7 @@ export const handleOutboxRequest = async (
         inReplyTo: post.inReplyTo,
         content: post.content,
         url: post.url,
+        attachments: post.mediaItems,
       }),
     );
 
