@@ -8,7 +8,8 @@
     "dev": "tsx watch src/index.ts",
     "dev:seed": "tsx src/db/dev.seedAdmin.ts",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "migrate": "drizzle-kit migrate"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "axios-retry": "^4.5.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",
     "fastify": "^5.8.5",
     "fastify-plugin": "^6.0.0",
@@ -38,7 +40,6 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
-    "drizzle-kit": "^0.31.10",
     "pino-pretty": "^13.1.3",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"

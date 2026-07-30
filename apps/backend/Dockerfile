@@ -21,9 +21,12 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
 COPY --from=builder /app/apps/backend ./apps/backend
+COPY apps/backend/entrypoint.sh ./entrypoint.sh
 
 RUN corepack enable
 
-RUN pnpm install --prod
+RUN pnpm install --prod --frozen-lockfile
 
-CMD ["pnpm", "--filter", "backend", "start"]
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]
