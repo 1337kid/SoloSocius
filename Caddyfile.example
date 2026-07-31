@@ -23,6 +23,10 @@ example.com { # change exmaple.com  with your domain name
         reverse_proxy backend:4000
     }
 
+    handle /media/* {
+        reverse_proxy backend:4000
+    }
+
     handle {
         reverse_proxy frontend:3000
     }

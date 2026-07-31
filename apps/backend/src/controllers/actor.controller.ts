@@ -6,6 +6,12 @@ export const getActorProfile = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
+
+  const requestContentType = request.headers["accept"] as string;
+  if (requestContentType !== "application/activity+json") {
+    return reply.redirect("/");
+  }
+
   const actor = await getActorOnThisInstance();
 
   if (!actor) {
