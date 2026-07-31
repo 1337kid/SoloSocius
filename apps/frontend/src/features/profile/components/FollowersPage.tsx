@@ -6,7 +6,7 @@ import { FollowersData } from "../api";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useUnfollowRemoteUser } from "../hooks/useFollowing";
+import { useUnfollowRemoteUser } from "../hooks/useUnfollowRemoteUser";
 
 const FollowersPage = ({
   data,

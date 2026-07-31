@@ -10,7 +10,7 @@ import {
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@/components/ui/avatar";
-import { useProfileData } from "@/features/profile/hooks/useProfile";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";

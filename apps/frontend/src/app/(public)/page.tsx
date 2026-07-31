@@ -4,7 +4,7 @@ import { PublicTimelineView } from "@/features/timeline/components/PublicTimelin
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
-import { useProfileData } from "@/features/profile/hooks/useProfile";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
 import { ProfileData } from "@/features/profile/api";
 import { ApiError } from "@/lib/api/axios";
 

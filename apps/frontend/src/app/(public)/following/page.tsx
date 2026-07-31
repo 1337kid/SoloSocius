@@ -5,7 +5,7 @@ import { useInView } from "react-intersection-observer";
 import Navbar from "@/components/Navbar";
 import { useFollowing } from "@/features/profile/hooks/useFollowing";
 import FollowersPage from "@/features/profile/components/FollowersPage";
-import { useProfileData } from "@/features/profile/hooks/useProfile";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
 
 const Following = () => {
   const {

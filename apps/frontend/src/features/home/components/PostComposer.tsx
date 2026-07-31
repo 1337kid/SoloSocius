@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, PencilIcon, ImagePlus, X, Send } from "lucide-react";
 import { toast } from "sonner";
-import { useCreatePost } from "@/features/home/hooks/useHomeFeed";
+import { useCreatePost } from "@/features/home/hooks/useCreatePost";
 import { useInteraction } from "@/features/timeline/hooks/useInteraction";
 import {
   uploadAttachment,

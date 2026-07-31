@@ -9,7 +9,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useProfileData, useUpdateProfile } from "../hooks/useProfile";
+import { useProfileData } from "../hooks/useProfileData";
+import { useUpdateProfile } from "../hooks/useUpdateProfile";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";

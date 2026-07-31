@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import ShowMoreActions from "./ShowMoreActions";
-import { useProfileData } from "@/features/profile/hooks/useProfile";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
 import { PostMediaGrid } from "./PostMediaGrid";
 
 function ActorAvatar({
