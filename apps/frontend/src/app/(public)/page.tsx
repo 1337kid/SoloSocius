@@ -2,12 +2,41 @@
 import { ProfileCard } from "@/features/timeline/components/ProfileCard";
 import { PublicTimelineView } from "@/features/timeline/components/PublicTimelineView";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 import { useProfileData } from "@/features/profile/hooks/useProfile";
 import { ProfileData } from "@/features/profile/api";
+import { ApiError } from "@/lib/api/axios";
 
 export default function PublicTimeline() {
-  const { data: profile } = useProfileData();
+  const { data: profile, error, isLoading } = useProfileData();
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </main>
+    );
+  }
+
+  if (error instanceof ApiError && error.status === 404) {
+    return (
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-semibold">No account set up yet</h1>
+        <p className="text-muted-foreground">Get started by setting up your profile.</p>
+        <Link
+          href="/setup"
+          className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          Setup
+        </Link>
+      </main>
+    );
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <main className="min-h-screen bg-background">

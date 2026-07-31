@@ -5,6 +5,14 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -12,7 +20,8 @@ api.interceptors.response.use(
       error.response?.data?.error ??
       error.response?.data?.message ??
       "Something went wrong";
+    const status = error.response?.status ?? 0;
 
-    return Promise.reject(new Error(message));
+    return Promise.reject(new ApiError(message, status));
   },
 );
