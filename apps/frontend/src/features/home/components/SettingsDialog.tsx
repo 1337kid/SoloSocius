@@ -51,11 +51,12 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
     try {
       await deleteAccount.mutateAsync(password);
-      handleOpenChange(false);
-      endSession();
     } catch {
       toast.error("Failed to delete account. Check your password and try again.");
+      return;
     }
+    handleOpenChange(false);
+    endSession();
   }
 
   return (
@@ -156,7 +157,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 onClick={handleDeleteAccount}
                 disabled={deleteAccount.isPending || !password}
               >
-                {deleteAccount.isPending ? "Deleting…" : "Delete Account"}
+                {deleteAccount.isPending ? "Verifying…" : "Delete Account"}
               </Button>
             </DialogFooter>
           </>

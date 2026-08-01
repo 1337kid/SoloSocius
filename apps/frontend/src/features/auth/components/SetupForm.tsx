@@ -37,7 +37,9 @@ const SetupForm = () => {
 
       router.replace(routes.dash);
     } catch {
-      toast.error("Unable to create admin account. This instance may already be configured.");
+      toast.error(
+        "Unable to create admin account. This instance may already be configured.",
+      );
     }
   }
 
@@ -100,6 +102,12 @@ const SetupForm = () => {
           </Field>
         )}
       />
+
+      {setup.isPending && (
+        <div className="flex items-center justify-center">
+          Setting up your account... Will take a few seconds to create RSA keys.
+        </div>
+      )}
 
       <Button className="w-full" disabled={setup.isPending}>
         {setup.isPending ? "Creating account..." : "Create admin account"}

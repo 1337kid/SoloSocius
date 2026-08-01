@@ -9,7 +9,8 @@ import {
   createProfileUpdateActivity,
   createDeleteActorActivity,
 } from "../activitypub/activities.js";
-import { deliverActivityToFollowers } from "../utils/activitypub.js";
+import { deliverActivityToFollowers, deliverActivity } from "../utils/activitypub.js";
+import { getAllFollowersInbox } from "../db/queries/followers.js";
 import bcrypt from "bcryptjs";
 
 export const getProfileData = async (
@@ -75,12 +76,30 @@ export const deleteAccount = async (
   }
 
   const activity = createDeleteActorActivity();
-  await deliverActivityToFollowers(activity);
 
-  await deleteLocalActor();
+  // Respond immediately so the client can log out without waiting for
+  // the slow ActivityPub fan-out and DB deletion to finish.
+  reply.clearCookie("auth", { path: "/" }).status(202).send({
+    message: "Account deletion scheduled. You have been logged out.",
+  });
 
-  return reply
-    .clearCookie("auth", { path: "/" })
-    .status(200)
-    .send({ message: "Account deleted successfully." });
+  (async () => {
+    try {
+      console.log("Delivering Delete activity to followers...");
+      const followers = await getAllFollowersInbox();
+      const uniqueInboxes = new Set(
+        followers.map((f) => f.actor.sharedInboxUrl || f.actor.inboxUrl),
+      );
+      await Promise.allSettled(
+        Array.from(uniqueInboxes).map((inboxUrl) =>
+          deliverActivity({ inboxUrl, activity }),
+        ),
+      );
+      console.log("Deleting local actor...");
+      await deleteLocalActor();
+      console.log("Account deletion complete.");
+    } catch (err) {
+      console.error("Background account deletion failed:", err);
+    }
+  })();
 };

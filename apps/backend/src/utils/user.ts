@@ -7,7 +7,7 @@ import { userEndpoints } from "../activitypub/actor.js";
 export const setupAdminUser = async (username: string, password: string) => {
   const { publicKey, privateKey } = generateRSAKeyPair();
 
-  const passwordHash = await bcrypt.hash(password, 20);
+  const passwordHash = await bcrypt.hash(password, 12);
 
   await setupAdminActor(username, publicKey);
 

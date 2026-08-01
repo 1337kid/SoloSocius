@@ -19,7 +19,7 @@ const seedAdmin = async () => {
   const { publicKey, privateKey } = generateRSAKeyPair();
 
   const password = crypto.randomBytes(10).toString("base64");
-  const passwordHash = await bcrypt.hash(password, 20);
+  const passwordHash = await bcrypt.hash(password, 12);
 
   const [actor] = await db
     .insert(actors)
