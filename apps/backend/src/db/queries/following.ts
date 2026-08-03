@@ -3,6 +3,7 @@ import { db } from "../index.js";
 import { and, count, desc, eq } from "drizzle-orm";
 import { getCache, setCache, deleteCache } from "../../cache/redis.js";
 import { CacheKeys, TTL } from "../../cache/keys.js";
+import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
 
 export const createFollowingUserEntry = async (
   activityId: string,
@@ -24,6 +25,7 @@ export const markFollowingAsAccepted = async (actorUri: string) => {
     .set({ status: "accepted" })
     .where(eq(following.followedActorUri, actorUri));
   await deleteCache(CacheKeys.followingUris);
+  await invalidateLocalActorCache("following");
 };
 
 export const getFollowingByActivityId = async (activityId: string) => {
@@ -78,6 +80,7 @@ export const removeFollowingEntry = async (actorUri: string) => {
       .where(eq(timelineEvents.actorUri, followingEntry[0].followedActorUri));
   });
   await deleteCache(CacheKeys.followingUris);
+  await invalidateLocalActorCache("following");
 };
 
 export const getUserFollowingCount = async () => {
@@ -87,6 +90,15 @@ export const getUserFollowingCount = async () => {
     .where(eq(following.status, "accepted"));
 
   return totalResult?.value || 0;
+};
+
+export const getCachedFollowingCount = async () => {
+  const cached = await getCache<number>(CacheKeys.localFollowingCount);
+  if (cached !== null) return cached;
+
+  const value = await getUserFollowingCount();
+  await setCache(CacheKeys.localFollowingCount, value, TTL.localCounts);
+  return value;
 };
 
 export const getAcceptedFollowingByOffset = async (

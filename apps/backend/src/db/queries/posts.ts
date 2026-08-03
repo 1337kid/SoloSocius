@@ -4,6 +4,9 @@ import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
 import { userEndpoints } from "../../activitypub/actor.js";
 import type { MediaItem } from "../schema.js";
+import { getCache, setCache } from "../../cache/redis.js";
+import { CacheKeys, TTL } from "../../cache/keys.js";
+import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
   const [post] = await db
@@ -63,6 +66,24 @@ export const getUserPosts = async (offset: number, limit: number) => {
     .offset(offset);
 };
 
+export const getLocalPostsCount = async () => {
+  const [totalResult] = await db
+    .select({ value: count() })
+    .from(posts)
+    .where(eq(posts.actorUri, userEndpoints.actorUri));
+
+  return totalResult?.value || 0;
+};
+
+export const getCachedLocalPostsCount = async () => {
+  const cached = await getCache<number>(CacheKeys.localPostsCount);
+  if (cached !== null) return cached;
+
+  const value = await getLocalPostsCount();
+  await setCache(CacheKeys.localPostsCount, value, TTL.localCounts);
+  return value;
+};
+
 export const createUserPost = async ({
   content,
   inReplyTo,
@@ -83,6 +104,7 @@ export const createUserPost = async ({
       mediaItems: attachments || [],
     })
     .returning();
+  await invalidateLocalActorCache("posts");
   return newPost;
 };
 
@@ -112,6 +134,7 @@ export const updatePostContent = async (id: string, content: string) => {
 
 export const deletePostById = async (id: string) => {
   await db.delete(posts).where(eq(posts.id, id));
+  await invalidateLocalActorCache("posts");
 };
 
 export const removeRemoteActorPost = async (

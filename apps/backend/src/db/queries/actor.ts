@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../index.js";
 import { actors } from "../schema.js";
 import { ActorObject } from "../../types/index.js";
@@ -6,6 +6,10 @@ import { userEndpoints } from "../../activitypub/actor.js";
 import { DOMAIN } from "../../config/env.js";
 import { getCache, setCache, deleteCache } from "../../cache/redis.js";
 import { CacheKeys, TTL } from "../../cache/keys.js";
+import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
+import { getCachedFollowersCount } from "./followers.js";
+import { getCachedFollowingCount } from "./following.js";
+import { getCachedLocalPostsCount } from "./posts.js";
 
 export const setupAdminActor = async (username: string, publicKey: string) => {
   await db
@@ -29,10 +33,14 @@ export const setupAdminActor = async (username: string, publicKey: string) => {
 };
 
 export const getActorOnThisInstance = async () => {
-  const cached = await getCache<(typeof actors.$inferSelect)>(CacheKeys.localActor);
+  const cached = await getCache<(typeof actors.$inferSelect)>(
+    CacheKeys.localActor,
+  );
   if (cached) return cached;
 
-  const actor = (await db.select().from(actors).where(eq(actors.isLocal, true)))[0];
+  const actor = (
+    await db.select().from(actors).where(eq(actors.isLocal, true))
+  )[0];
   if (actor) await setCache(CacheKeys.localActor, actor, TTL.localActor);
   return actor;
 };
@@ -88,10 +96,20 @@ export const addActorToDB = async (params: ActorObject) => {
   return actor;
 };
 
-type LocalActorProfile = Awaited<ReturnType<typeof fetchLocalActorProfileData>>;
+type LocalActorIdentity = {
+  username: string;
+  displayName: string | null;
+  summary: string | null;
+  domain: string;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+};
 
-const fetchLocalActorProfileData = async () =>
-  db.query.actors.findFirst({
+const getLocalActorIdentity = async (): Promise<LocalActorIdentity | undefined> => {
+  const cached = await getCache<LocalActorIdentity>(CacheKeys.localProfile);
+  if (cached) return cached;
+
+  const profile = await db.query.actors.findFirst({
     where: eq(actors.isLocal, true),
     columns: {
       username: true,
@@ -101,27 +119,31 @@ const fetchLocalActorProfileData = async () =>
       avatarUrl: true,
       bannerUrl: true,
     },
-    extras: {
-      followersCount: sql<number>`(SELECT count(*) FROM followers)`.as(
-        "followers_count",
-      ),
-      followingCount: sql<number>`(SELECT count(*) FROM following)`.as(
-        "following_count",
-      ),
-      postsCount:
-        sql<number>`(SELECT count(*) FROM posts WHERE posts.actor_uri = ${userEndpoints.actorUri})`.as(
-          "posts_count",
-        ),
-    },
   });
 
-export const getLocalActorProfileData = async () => {
-  const cached = await getCache<LocalActorProfile>(CacheKeys.localProfile);
-  if (cached) return cached;
-
-  const profile = await fetchLocalActorProfileData();
-  if (profile) await setCache(CacheKeys.localProfile, profile, TTL.localProfile);
+  if (profile) {
+    await setCache(CacheKeys.localProfile, profile, TTL.localProfile);
+  }
   return profile;
+};
+
+export const getLocalActorProfileData = async () => {
+  const [profile, followersCount, followingCount, postsCount] =
+    await Promise.all([
+      getLocalActorIdentity(),
+      getCachedFollowersCount(),
+      getCachedFollowingCount(),
+      getCachedLocalPostsCount(),
+    ]);
+
+  if (!profile) return undefined;
+
+  return {
+    ...profile,
+    followersCount,
+    followingCount,
+    postsCount,
+  };
 };
 
 export const updateLocalActorProfileData = async (params: {
@@ -133,27 +155,21 @@ export const updateLocalActorProfileData = async (params: {
     .set(params)
     .where(eq(actors.isLocal, true))
     .returning();
-  await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
+  await invalidateLocalActorCache("profile");
   return actor;
 };
 
 export const updateLocalActorAvatar = async (avatarUrl: string) => {
   await db.update(actors).set({ avatarUrl }).where(eq(actors.isLocal, true));
-  await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
+  await invalidateLocalActorCache("profile");
 };
 
 export const updateLocalActorBanner = async (bannerUrl: string) => {
   await db.update(actors).set({ bannerUrl }).where(eq(actors.isLocal, true));
-  await deleteCache(CacheKeys.localActor, CacheKeys.localProfile);
+  await invalidateLocalActorCache("profile");
 };
 
 export const deleteLocalActor = async () => {
   await db.delete(actors).where(eq(actors.isLocal, true));
-
-  await deleteCache(
-    CacheKeys.localActor,
-    CacheKeys.localProfile,
-    CacheKeys.privateKey,
-    CacheKeys.followingUris,
-  );
+  await invalidateLocalActorCache("all");
 };

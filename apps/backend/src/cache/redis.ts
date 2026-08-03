@@ -6,6 +6,16 @@ const redis = new Redis(REDIS_URL, {
   enableOfflineQueue: false,
 });
 
+export const initializeRedis = async () => {
+  await redis.connect();
+  console.log("[cache] Redis connected");
+  await redis.flushall().then(() => {
+    console.log("[cache] Redis flushed");
+  }).catch((err: Error) => {
+    console.error("[cache] Failed to flush Redis on ready:", err.message);
+  });
+};
+
 redis.on("error", (err: Error) => {
   console.error("[cache] Redis error:", err.message);
 });

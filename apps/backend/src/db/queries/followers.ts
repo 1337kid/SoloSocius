@@ -1,14 +1,19 @@
-import { actors, followers } from "../schema.js";
+import { followers } from "../schema.js";
 import { count, desc, eq } from "drizzle-orm";
 import { CreateFollowerInupt } from "../../types/index.js";
 import { db } from "../index.js";
+import { getCache, setCache } from "../../cache/redis.js";
+import { CacheKeys, TTL } from "../../cache/keys.js";
+import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
 
 export const createFollowerEntry = async (data: CreateFollowerInupt) => {
   await db.insert(followers).values(data).onConflictDoNothing();
+  await invalidateLocalActorCache("followers");
 };
 
 export const removeFollowerEntry = async (actorId: string) => {
   await db.delete(followers).where(eq(followers.followerActorUri, actorId));
+  await invalidateLocalActorCache("followers");
 };
 
 export const getAllFollowers = async () => {
@@ -42,6 +47,15 @@ export const getUserFollowersCount = async () => {
   const [totalResult] = await db.select({ value: count() }).from(followers);
 
   return totalResult?.value || 0;
+};
+
+export const getCachedFollowersCount = async () => {
+  const cached = await getCache<number>(CacheKeys.localFollowersCount);
+  if (cached !== null) return cached;
+
+  const value = await getUserFollowersCount();
+  await setCache(CacheKeys.localFollowersCount, value, TTL.localCounts);
+  return value;
 };
 
 export const getFollowersByOffset = async (offset: number, limit: number) => {
