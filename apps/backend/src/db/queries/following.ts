@@ -19,6 +19,19 @@ export const createFollowingUserEntry = async (
     .onConflictDoNothing();
 };
 
+export const getAllFollowingInbox = async () => {
+  return await db.query.following.findMany({
+    with: {
+      actor: {
+        columns: {
+          inboxUrl: true,
+          sharedInboxUrl: true,
+        },
+      },
+    },
+  });
+};
+
 export const markFollowingAsAccepted = async (actorUri: string) => {
   await db
     .update(following)

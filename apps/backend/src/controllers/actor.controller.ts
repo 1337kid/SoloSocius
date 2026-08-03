@@ -8,7 +8,7 @@ export const getActorProfile = async (
 ) => {
 
   const requestContentType = request.headers["accept"] as string;
-  if (requestContentType !== "application/activity+json") {
+  if (requestContentType === "text/html") {
     return reply.redirect("/");
   }
 

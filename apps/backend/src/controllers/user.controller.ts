@@ -9,9 +9,13 @@ import {
   createProfileUpdateActivity,
   createDeleteActorActivity,
 } from "../activitypub/activities.js";
-import { deliverActivityToFollowers, deliverActivity } from "../utils/activitypub.js";
+import {
+  deliverActivityToFollowers,
+  deliverActivity,
+} from "../utils/activitypub.js";
 import { getAllFollowersInbox } from "../db/queries/followers.js";
 import bcrypt from "bcryptjs";
+import { getAllFollowingInbox } from "../db/queries/following.js";
 
 export const getProfileData = async (
   request: FastifyRequest,
@@ -87,9 +91,11 @@ export const deleteAccount = async (
     try {
       console.log("Delivering Delete activity to followers...");
       const followers = await getAllFollowersInbox();
-      const uniqueInboxes = new Set(
-        followers.map((f) => f.actor.sharedInboxUrl || f.actor.inboxUrl),
-      );
+      const following = await getAllFollowingInbox();
+      const uniqueInboxes = new Set([
+        ...followers.map((f) => f.actor.sharedInboxUrl || f.actor.inboxUrl),
+        ...following.map((f) => f.actor.sharedInboxUrl || f.actor.inboxUrl),
+      ]);
       await Promise.allSettled(
         Array.from(uniqueInboxes).map((inboxUrl) =>
           deliverActivity({ inboxUrl, activity }),
