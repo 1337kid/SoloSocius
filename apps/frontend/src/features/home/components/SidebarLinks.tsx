@@ -18,9 +18,11 @@ import { useSession } from "@/features/auth/hooks/useSession";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { toast } from "sonner";
 import { SettingsDialog } from "./SettingsDialog";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
 
 const SidebarLinks = () => {
   const router = useRouter();
+  const { data: profileData } = useProfileData();
   const { endSession } = useSession();
   const logout = useLogout();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -60,6 +62,17 @@ const SidebarLinks = () => {
             <UserIcon className="size-4 mr-2" />
             Your Profile
           </Button>
+          {profileData?.manuallyApprovesFollowers && (
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              size="lg"
+              onClick={() => router.push(routes.followRequests)}
+            >
+              <Users className="size-4 mr-2" />
+              Follow Requests
+            </Button>
+          )}
           <Button
             variant="ghost"
             className="w-full justify-start"

@@ -5,6 +5,7 @@ export const routes = {
   dash: "/dash",
   followers: "/followers",
   following: "/following",
+  followRequests: "/followrequests",
 } as const;
 
 export const authRoutes = [routes.login, routes.setup] as const;

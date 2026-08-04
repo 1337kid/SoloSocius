@@ -8,4 +8,8 @@ export const profileQueryKeys = {
   followingLists: () => [...profileQueryKeys.following, "list"] as const,
   followingList: (page: number) =>
     [...profileQueryKeys.following, page] as const,
+  followRequests: ["followRequests"] as const,
+  followRequestsLists: () => [...profileQueryKeys.followRequests, "list"] as const,
+  followRequestsList: (page: number) =>
+    [...profileQueryKeys.followRequests, page] as const,
 };

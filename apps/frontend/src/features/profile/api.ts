@@ -91,3 +91,43 @@ export const unfollowRemoteUser = async (
 export const deleteAccount = async (password: string): Promise<void> => {
   await api.delete("/account", { data: { password } });
 };
+
+export interface FollowRequestData {
+  id: string;
+  actor: {
+    actorUri: string;
+    displayName: string;
+    username: string;
+    domain: string;
+    avatarUrl: string;
+  };
+  incomingFollowActivityId: string;
+}
+
+export const getFollowRequestsData = async (page: number) => {
+  const { data } = await api.get<FollowRequestData[]>(`/follow-requests?page=${page}`);
+  return {
+    followRequests: data,
+    nextPage: data.length > 0 ? page + 1 : undefined,
+  };
+};
+
+export const approveFollowRequest = async (
+  id: string,
+): Promise<{ message: string }> => {
+  const { data } = await api.post(`/follow-requests/${id}/approve`);
+  
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  return data;
+};
+
+export const toggleManuallyApprovesFollowers = async (): Promise<{ manuallyApprovesFollowers: boolean }> => {
+  const { data } = await api.post("/follow-requests/toggle");
+  
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  return data;
+};
