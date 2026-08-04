@@ -50,7 +50,7 @@ export const getFollowerByActivityId = async (activityId: string) => {
     await db
       .select({ actorUri: followers.followerActorUri })
       .from(followers)
-      .where(eq(followers.followerActorUri, activityId))
+      .where(eq(followers.incomingFollowActivityId, activityId))
       .limit(1)
   )[0];
 };
@@ -150,7 +150,7 @@ export const approveFollowRequest = async (id: string) => {
     where: and(eq(followers.id, id), eq(followers.status, "accepted")),
     with: {
       actor: {
-        columns: { inboxUrl: true },
+        columns: { inboxUrl: true, actorUri: true },
       },
     },
   });

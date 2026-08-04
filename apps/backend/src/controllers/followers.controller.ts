@@ -148,8 +148,15 @@ export const handleApproveFollowRequest = async (
     const acceptActivity = createActivity(
       generateAcceptActivityId(),
       "Accept",
-      { type: "Follow", activityId: followRequest?.incomingFollowActivityId },
+      {
+        type: "Follow",
+        id: followRequest?.incomingFollowActivityId,
+        actor: followRequest.actor.actorUri,
+        object: userEndpoints.actorUri,
+      },
     );
+
+    console.log("acceptActivity", acceptActivity);
 
     await deliverActivity({
       inboxUrl: followRequest.actor.inboxUrl,

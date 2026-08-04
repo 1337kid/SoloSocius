@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { actors } from "../schema.js";
 import { ActorObject } from "../../types/index.js";
@@ -164,13 +164,12 @@ export const updateLocalActorProfileData = async (params: {
   return actor;
 };
 
-export const setLocalActorManuallyApprovesFollowers = async (
-  value: boolean,
-) => {
+export const setLocalActorManuallyApprovesFollowers = async () => {
   const [actor] = await db
     .update(actors)
-    .set({ manuallyApprovesFollowers: value })
-    .where(eq(actors.isLocal, true));
+    .set({ manuallyApprovesFollowers: sql`not manually_approves_followers` })
+    .where(eq(actors.isLocal, true))
+    .returning();
   await invalidateLocalActorCache("profile");
   return actor;
 };

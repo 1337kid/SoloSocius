@@ -103,17 +103,11 @@ export const toggleManuallyApprovesFollowers = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { manuallyApprovesFollowers } = request.body as {
-    manuallyApprovesFollowers: boolean;
-  };
-
-  const actor = await setLocalActorManuallyApprovesFollowers(
-    manuallyApprovesFollowers,
-  );
+  const actor = await setLocalActorManuallyApprovesFollowers();
 
   await broadcastProfileUpdate(actor);
 
   return reply
     .status(200)
-    .send({ message: "Manually approves followers toggled successfully." });
+    .send({ manuallyApprovesFollowers: actor.manuallyApprovesFollowers });
 };
