@@ -1,9 +1,14 @@
 import { following, timelineEvents } from "../schema.js";
 import { db } from "../index.js";
-import { and, count, desc, eq } from "drizzle-orm";
-import { getCache, setCache, deleteCache } from "../../cache/redis.js";
+import { and, count, desc, eq, ne } from "drizzle-orm";
+import {
+  getCache,
+  setCache,
+  adjustCachedCount,
+  addToCachedList,
+  removeFromCachedList,
+} from "../../cache/redis.js";
 import { CacheKeys, TTL } from "../../cache/keys.js";
-import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
 
 export const createFollowingUserEntry = async (
   activityId: string,
@@ -33,12 +38,23 @@ export const getAllFollowingInbox = async () => {
 };
 
 export const markFollowingAsAccepted = async (actorUri: string) => {
-  await db
+  const updated = await db
     .update(following)
     .set({ status: "accepted" })
-    .where(eq(following.followedActorUri, actorUri));
-  await deleteCache(CacheKeys.followingUris);
-  await invalidateLocalActorCache("following");
+    .where(
+      and(
+        eq(following.followedActorUri, actorUri),
+        ne(following.status, "accepted"),
+      ),
+    )
+    .returning({ id: following.id });
+
+  if (updated.length === 0) return;
+
+  await Promise.all([
+    addToCachedList(CacheKeys.followingUris, actorUri),
+    adjustCachedCount(CacheKeys.localFollowingCount, 1),
+  ]);
 };
 
 export const getFollowingByActivityId = async (activityId: string) => {
@@ -82,18 +98,28 @@ export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
 };
 
 export const removeFollowingEntry = async (actorUri: string) => {
-  await db.transaction(async (tx) => {
-    const followingEntry = await tx
+  const deleted = await db.transaction(async (tx) => {
+    const [followingEntry] = await tx
       .delete(following)
       .where(eq(following.followedActorUri, actorUri))
       .returning();
 
+    if (!followingEntry) return undefined;
+
     await tx
       .delete(timelineEvents)
-      .where(eq(timelineEvents.actorUri, followingEntry[0].followedActorUri));
+      .where(eq(timelineEvents.actorUri, followingEntry.followedActorUri));
+
+    return followingEntry;
   });
-  await deleteCache(CacheKeys.followingUris);
-  await invalidateLocalActorCache("following");
+
+  if (!deleted) return;
+
+  await removeFromCachedList(CacheKeys.followingUris, actorUri);
+
+  if (deleted.status === "accepted") {
+    await adjustCachedCount(CacheKeys.localFollowingCount, -1);
+  }
 };
 
 export const getUserFollowingCount = async () => {

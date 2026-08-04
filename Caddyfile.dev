@@ -24,7 +24,7 @@
     }
 
     handle /media/* {
-        reverse_proxy backend:4000
+        reverse_proxy host.docker.internal:4000
     }
 
     handle {

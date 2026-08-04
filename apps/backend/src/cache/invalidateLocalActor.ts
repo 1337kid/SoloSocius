@@ -1,17 +1,10 @@
 import { deleteCache } from "./redis.js";
 import { CacheKeys } from "./keys.js";
 
-type LocalActorCacheScope =
-  | "profile"
-  | "followers"
-  | "following"
-  | "posts"
-  | "all";
+type LocalActorCacheScope = "profile" | "posts" | "all";
 
 const scopeKeys: Record<LocalActorCacheScope, string[]> = {
   profile: [CacheKeys.localActor, CacheKeys.localProfile],
-  followers: [CacheKeys.localFollowersCount],
-  following: [CacheKeys.localFollowingCount],
   posts: [CacheKeys.localPostsCount],
   all: [
     CacheKeys.localActor,
