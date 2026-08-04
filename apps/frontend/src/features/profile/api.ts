@@ -10,6 +10,7 @@ export interface ProfileData {
   followersCount: number;
   followingCount: number;
   postsCount: number;
+  manuallyApprovesFollowers: boolean;
 }
 
 export interface Profile {

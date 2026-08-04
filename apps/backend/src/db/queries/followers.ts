@@ -1,5 +1,5 @@
 import { followers } from "../schema.js";
-import { count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { CreateFollowerInupt } from "../../types/index.js";
 import { db } from "../index.js";
 import { getCache, setCache, adjustCachedCount } from "../../cache/redis.js";
@@ -12,7 +12,7 @@ export const createFollowerEntry = async (data: CreateFollowerInupt) => {
     .onConflictDoNothing()
     .returning({ id: followers.id });
 
-  if (inserted.length > 0) {
+  if (inserted.length > 0 && data.status === "accepted") {
     await adjustCachedCount(CacheKeys.localFollowersCount, 1);
   }
 };
@@ -101,5 +101,57 @@ export const getFollowersDetailsByOffset = async (
     orderBy: [desc(followers.createdAt)],
     offset,
     limit,
+  });
+};
+
+export const getFollowRequestsByOffset = async (
+  offset: number,
+  limit: number,
+) => {
+  return await db.query.followers.findMany({
+    columns: {
+      id: true,
+      status: true,
+    },
+    with: {
+      actor: {
+        columns: {
+          actorUri: true,
+          displayName: true,
+          username: true,
+          domain: true,
+          avatarUrl: true,
+        },
+      },
+    },
+    where: eq(followers.status, "pending"),
+    orderBy: [desc(followers.createdAt)],
+    offset,
+    limit,
+  });
+};
+
+export const approveFollowRequest = async (id: string) => {
+  const [followRequest] = await db
+    .update(followers)
+    .set({ status: "accepted" })
+    .where(eq(followers.id, id))
+    .returning();
+
+  if (!followRequest) return;
+
+  await adjustCachedCount(CacheKeys.localFollowersCount, 1);
+
+  return await db.query.followers.findFirst({
+    columns: {
+      id: true,
+      incomingFollowActivityId: true,
+    },
+    where: and(eq(followers.id, id), eq(followers.status, "accepted")),
+    with: {
+      actor: {
+        columns: { inboxUrl: true },
+      },
+    },
   });
 };

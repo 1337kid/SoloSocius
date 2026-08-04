@@ -3,6 +3,7 @@ import {
   getLocalActorProfileData,
   updateLocalActorProfileData,
   deleteLocalActor,
+  setLocalActorManuallyApprovesFollowers,
 } from "../db/queries/actor.js";
 import { getUserCredentials } from "../db/queries/users.js";
 import {
@@ -96,4 +97,23 @@ export const deleteAccount = async (
       console.error("Background account deletion failed:", err);
     }
   })();
+};
+
+export const toggleManuallyApprovesFollowers = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { manuallyApprovesFollowers } = request.body as {
+    manuallyApprovesFollowers: boolean;
+  };
+
+  const actor = await setLocalActorManuallyApprovesFollowers(
+    manuallyApprovesFollowers,
+  );
+
+  await broadcastProfileUpdate(actor);
+
+  return reply
+    .status(200)
+    .send({ message: "Manually approves followers toggled successfully." });
 };

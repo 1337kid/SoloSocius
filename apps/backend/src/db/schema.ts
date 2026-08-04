@@ -80,6 +80,10 @@ export const followers = pgTable(
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
     incomingFollowActivityId: text().notNull(),
+    status: text("status")
+      .notNull()
+      .default("pending")
+      .$type<"pending" | "accepted">(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

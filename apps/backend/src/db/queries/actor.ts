@@ -33,7 +33,7 @@ export const setupAdminActor = async (username: string, publicKey: string) => {
 };
 
 export const getActorOnThisInstance = async () => {
-  const cached = await getCache<(typeof actors.$inferSelect)>(
+  const cached = await getCache<typeof actors.$inferSelect>(
     CacheKeys.localActor,
   );
   if (cached) return cached;
@@ -56,7 +56,7 @@ export const checkActorOnThisInstance = async (username: string) => {
 
 export const getActorFromDB = async (actorUri: string) => {
   const cacheKey = CacheKeys.actor(actorUri);
-  const cached = await getCache<(typeof actors.$inferSelect)>(cacheKey);
+  const cached = await getCache<typeof actors.$inferSelect>(cacheKey);
   if (cached) return cached;
 
   const actor = (
@@ -104,9 +104,12 @@ type LocalActorIdentity = {
   domain: string;
   avatarUrl: string | null;
   bannerUrl: string | null;
+  manuallyApprovesFollowers: boolean;
 };
 
-const getLocalActorIdentity = async (): Promise<LocalActorIdentity | undefined> => {
+const getLocalActorIdentity = async (): Promise<
+  LocalActorIdentity | undefined
+> => {
   const cached = await getCache<LocalActorIdentity>(CacheKeys.localProfile);
   if (cached) return cached;
 
@@ -119,6 +122,7 @@ const getLocalActorIdentity = async (): Promise<LocalActorIdentity | undefined> 
       domain: true,
       avatarUrl: true,
       bannerUrl: true,
+      manuallyApprovesFollowers: true,
     },
   });
 
@@ -158,6 +162,23 @@ export const updateLocalActorProfileData = async (params: {
     .returning();
   await invalidateLocalActorCache("profile");
   return actor;
+};
+
+export const setLocalActorManuallyApprovesFollowers = async (
+  value: boolean,
+) => {
+  const [actor] = await db
+    .update(actors)
+    .set({ manuallyApprovesFollowers: value })
+    .where(eq(actors.isLocal, true));
+  await invalidateLocalActorCache("profile");
+  return actor;
+};
+
+export const isManuallyApprovingFollowers = async () => {
+  const actor = await getActorOnThisInstance();
+  if (!actor) return false;
+  return actor.manuallyApprovesFollowers;
 };
 
 export const updateLocalActorAvatar = async (avatarUrl: string) => {
