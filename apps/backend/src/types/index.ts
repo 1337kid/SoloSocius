@@ -7,6 +7,7 @@ export interface InstanceActorObject {
   publicKey: string;
   avatarUrl?: string;
   bannerUrl?: string;
+  manuallyApprovesFollowers?: boolean;
 }
 
 export interface ActorObject {
@@ -21,6 +22,7 @@ export interface ActorObject {
   publicKey: string;
   inboxUrl: string;
   sharedInboxUrl: string;
+  manuallyApprovesFollowers: boolean;
 }
 
 export interface RemotePostInput {

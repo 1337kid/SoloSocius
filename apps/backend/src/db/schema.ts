@@ -28,6 +28,9 @@ export const actors = pgTable("actors", {
   inboxUrl: text("inbox_url").notNull(),
   sharedInboxUrl: text("shared_inbox_url"),
   isLocal: boolean("is_local").default(false).notNull(),
+  manuallyApprovesFollowers: boolean("manually_approves_followers")
+    .default(false)
+    .notNull(),
   lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()

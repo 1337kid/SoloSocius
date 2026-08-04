@@ -8,6 +8,7 @@ export const generateActorObject = ({
   publicKey,
   avatarUrl,
   bannerUrl,
+  manuallyApprovesFollowers,
 }: InstanceActorObject) => {
   return {
     "@context": [
@@ -24,6 +25,7 @@ export const generateActorObject = ({
     name: displayName,
     summary: summary,
     url: userEndpoints.actorUri,
+    manuallyApprovesFollowers: manuallyApprovesFollowers,
 
     publicKey: {
       id: `${userEndpoints.actorUri}#main-key`,

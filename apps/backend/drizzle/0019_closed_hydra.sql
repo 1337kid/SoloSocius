@@ -1,0 +1,1 @@
+ALTER TABLE "actors" ADD COLUMN "manually_approves_followers" boolean DEFAULT false NOT NULL;

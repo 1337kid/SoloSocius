@@ -6,13 +6,10 @@ import {
 } from "../db/queries/actor.js";
 import { getUserCredentials } from "../db/queries/users.js";
 import {
-  createProfileUpdateActivity,
+  broadcastProfileUpdate,
   createDeleteActorActivity,
 } from "../activitypub/activities.js";
-import {
-  deliverActivityToFollowers,
-  deliverActivity,
-} from "../utils/activitypub.js";
+import { deliverActivity } from "../utils/activitypub.js";
 import { getAllFollowersInbox } from "../db/queries/followers.js";
 import bcrypt from "bcryptjs";
 import { getAllFollowingInbox } from "../db/queries/following.js";
@@ -43,16 +40,7 @@ export const updateProfileData = async (
 
   const actor = await updateLocalActorProfileData({ displayName, summary });
 
-  const activity = createProfileUpdateActivity({
-    username: actor.username,
-    displayName: actor.displayName || "",
-    summary: actor.summary || "",
-    publicKey: actor.publicKey,
-    avatarUrl: actor.avatarUrl || "",
-    bannerUrl: actor.bannerUrl || "",
-  });
-
-  await deliverActivityToFollowers(activity);
+  await broadcastProfileUpdate(actor);
 
   return reply
     .status(200)

@@ -66,6 +66,7 @@ export const remoteActorLookup = async (actorUri: string) => {
     publicKey: data.publicKey?.publicKeyPem,
     inboxUrl: data.inbox,
     sharedInboxUrl: data.endpoints?.sharedInbox || data.inbox,
+    manuallyApprovesFollowers: data.manuallyApprovesFollowers || false,
   });
 
   return newActor;

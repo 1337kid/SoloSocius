@@ -17,8 +17,7 @@ import {
   updateLocalActorAvatar,
   updateLocalActorBanner,
 } from "../db/queries/actor.js";
-import { createProfileUpdateActivity } from "../activitypub/activities.js";
-import { deliverActivityToFollowers } from "../utils/activitypub.js";
+import { broadcastProfileUpdate } from "../activitypub/activities.js";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_MIME_TYPES = [
@@ -104,16 +103,7 @@ export async function uploadAvatarHandler(
 
   await updateLocalActorAvatar(uploaded.url);
 
-  const activity = createProfileUpdateActivity({
-    username: actor.username,
-    displayName: actor.displayName || "",
-    summary: actor.summary || "",
-    publicKey: actor.publicKey,
-    avatarUrl: uploaded.url,
-    bannerUrl: actor.bannerUrl || "",
-  });
-
-  await deliverActivityToFollowers(activity);
+  await broadcastProfileUpdate(actor, { avatarUrl: uploaded.url });
 
   if (oldAvatarKey) {
     await deleteFile(oldAvatarKey);
@@ -156,16 +146,7 @@ export async function uploadBannerHandler(
 
   await updateLocalActorBanner(uploaded.url);
 
-  const activity = createProfileUpdateActivity({
-    username: actor.username,
-    displayName: actor.displayName || "",
-    summary: actor.summary || "",
-    publicKey: actor.publicKey,
-    avatarUrl: actor.avatarUrl || "",
-    bannerUrl: uploaded.url,
-  });
-
-  await deliverActivityToFollowers(activity);
+  await broadcastProfileUpdate(actor, { bannerUrl: uploaded.url });
 
   if (oldBannerKey) {
     await deleteFile(oldBannerKey);

@@ -27,6 +27,7 @@ export const getActorProfile = async (
     publicKey: actor.publicKey,
     avatarUrl: actor.avatarUrl || "",
     bannerUrl: actor.bannerUrl || "",
+    manuallyApprovesFollowers: actor.manuallyApprovesFollowers,
   });
 
   return reply

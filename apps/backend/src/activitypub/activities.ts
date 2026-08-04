@@ -3,8 +3,11 @@ import { OutboxActivity } from "../types/index.js";
 import { generateProfileUpdateActivityId } from "../utils/activityId.js";
 import { InstanceActorObject } from "../types/index.js";
 import { generateActorObject } from "./actor.js";
-import { parseAttachmentsForActivity } from "../utils/activitypub.js";
-import { MediaItem } from "../db/schema.js";
+import {
+  deliverActivityToFollowers,
+  parseAttachmentsForActivity,
+} from "../utils/activitypub.js";
+import { MediaItem, actors } from "../db/schema.js";
 
 export const createActivity = (
   activityId: string,
@@ -28,6 +31,34 @@ export const createProfileUpdateActivity = (params: InstanceActorObject) => {
   const activityId = generateProfileUpdateActivityId();
 
   return createActivity(activityId, "Update", object);
+};
+
+type LocalActorRecord = Pick<
+  typeof actors.$inferSelect,
+  | "username"
+  | "displayName"
+  | "summary"
+  | "publicKey"
+  | "avatarUrl"
+  | "bannerUrl"
+  | "manuallyApprovesFollowers"
+>;
+
+export const broadcastProfileUpdate = async (
+  actor: LocalActorRecord,
+  overrides: { avatarUrl?: string; bannerUrl?: string } = {},
+) => {
+  const activity = createProfileUpdateActivity({
+    username: actor.username,
+    displayName: actor.displayName || "",
+    summary: actor.summary || "",
+    publicKey: actor.publicKey,
+    avatarUrl: overrides.avatarUrl ?? actor.avatarUrl ?? "",
+    bannerUrl: overrides.bannerUrl ?? actor.bannerUrl ?? "",
+    manuallyApprovesFollowers: actor.manuallyApprovesFollowers,
+  });
+
+  await deliverActivityToFollowers(activity);
 };
 
 export const createNoteActivity = (params: OutboxActivity) => {

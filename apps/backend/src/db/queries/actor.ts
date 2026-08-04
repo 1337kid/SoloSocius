@@ -82,6 +82,7 @@ export const addActorToDB = async (params: ActorObject) => {
       inboxUrl: params.inboxUrl,
       sharedInboxUrl: params.sharedInboxUrl,
       isLocal: false,
+      manuallyApprovesFollowers: params.manuallyApprovesFollowers,
       lastFetchedAt: new Date(),
     })
     .onConflictDoUpdate({

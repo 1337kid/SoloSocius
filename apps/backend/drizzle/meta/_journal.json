@@ -134,6 +134,13 @@
       "when": 1785248418715,
       "tag": "0018_strange_malice",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1785814584235,
+      "tag": "0019_closed_hydra",
+      "breakpoints": true
     }
   ]
 }
