@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getFollowRequestsData, approveFollowRequest, toggleManuallyApprovesFollowers } from "../api";
 import { profileQueryKeys } from "../keys";
+import { toast } from "sonner";
 
 export function useFollowRequests() {
   const queryClient = useQueryClient();
@@ -30,6 +31,7 @@ export function useFollowRequests() {
   const toggleManualApprovalMutation = useMutation({
     mutationFn: toggleManuallyApprovesFollowers,
     onSuccess: () => {
+      toast.success("Followers approval setting updated successfully");
       queryClient.invalidateQueries({
         queryKey: profileQueryKeys.public,
       });

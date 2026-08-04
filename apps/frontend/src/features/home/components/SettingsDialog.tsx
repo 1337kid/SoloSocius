@@ -16,6 +16,9 @@ import { Trash2, ChevronLeft, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useDeleteAccount } from "@/features/profile/hooks/useDeleteAccount";
 import { useSession } from "@/features/auth/hooks/useSession";
+import { Switch } from "@/components/ui/switch";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
+import { useFollowRequests } from "@/features/profile/hooks/useFollowRequests";
 
 type View = "settings" | "confirm-delete";
 
@@ -29,6 +32,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [password, setPassword] = useState("");
   const deleteAccount = useDeleteAccount();
   const { endSession } = useSession();
+  const { data: profileData } = useProfileData();
+
+  const { isTogglingManualApproval, toggleManualApproval } =
+    useFollowRequests();
 
   function handleOpenChange(next: boolean) {
     if (!next) {
@@ -52,7 +59,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     try {
       await deleteAccount.mutateAsync(password);
     } catch {
-      toast.error("Failed to delete account. Check your password and try again.");
+      toast.error(
+        "Failed to delete account. Check your password and try again.",
+      );
       return;
     }
     handleOpenChange(false);
@@ -73,6 +82,21 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             <div className="space-y-4 py-2">
               <p className="text-sm font-medium">Account</p>
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium">
+                    Manually approve followers
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Manually approve followers to your account.
+                  </p>
+                </div>
+                <Switch
+                  checked={profileData?.manuallyApprovesFollowers ?? false}
+                  onCheckedChange={toggleManualApproval}
+                  disabled={isTogglingManualApproval}
+                />
+              </div>
               <Separator />
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
@@ -129,7 +153,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) =>
-                  e.key === "Enter" && !deleteAccount.isPending && handleDeleteAccount()
+                  e.key === "Enter" &&
+                  !deleteAccount.isPending &&
+                  handleDeleteAccount()
                 }
                 autoFocus
               />
