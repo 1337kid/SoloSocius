@@ -12,7 +12,6 @@ const scopeKeys: Record<LocalActorCacheScope, string[]> = {
     CacheKeys.localFollowersCount,
     CacheKeys.localFollowingCount,
     CacheKeys.localPostsCount,
-    CacheKeys.privateKey,
     CacheKeys.followingUris,
   ],
 };

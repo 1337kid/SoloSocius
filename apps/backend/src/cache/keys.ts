@@ -4,7 +4,6 @@ export const CacheKeys = {
   localFollowersCount: "actor:local:counts:followers",
   localFollowingCount: "actor:local:counts:following",
   localPostsCount: "actor:local:counts:posts",
-  privateKey: "user:private_key",
   followingUris: "following:accepted_uris",
   actor: (uri: string) => `actor:${uri}`,
 };
@@ -15,5 +14,4 @@ export const TTL = {
   localCounts: 6 * 60 * 60,
   remoteActor: 30 * 60,
   followingUris: 6 * 60 * 60,
-  privateKey: 48 * 60 * 60,
 };

@@ -1,7 +1,5 @@
 import { users } from "../schema.js";
 import { db } from "../index.js";
-import { getCache, setCache } from "../../cache/redis.js";
-import { CacheKeys, TTL } from "../../cache/keys.js";
 
 interface UserType {
   username: string;
@@ -11,15 +9,11 @@ interface UserType {
 }
 
 export const getUserPrivateKey = async () => {
-  const cached = await getCache<string>(CacheKeys.privateKey);
-  if (cached) return cached;
-
   const result = await db
     .select({ privateKey: users.privateKey })
     .from(users)
     .limit(1);
   const privateKey = result[0].privateKey;
-  await setCache(CacheKeys.privateKey, privateKey, TTL.privateKey);
   return privateKey;
 };
 
