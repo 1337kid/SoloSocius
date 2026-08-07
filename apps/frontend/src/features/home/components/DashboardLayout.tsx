@@ -43,7 +43,7 @@ export function DashboardLayout({
         <div className="flex items-center justify-start px-4 py-2 bg-background border-b">
           <Logo />
         </div>
-        <div className="pb-20 px-4 pt-4">{children}</div>
+        <div className="pb-20 px-4 pt-4 max-sm:p-2">{children}</div>
 
         <MobileBottomNav
           onComposeClick={() => setComposeOpen(true)}

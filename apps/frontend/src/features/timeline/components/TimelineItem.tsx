@@ -139,7 +139,7 @@ export function TimelineItem({
 
   return (
     <Card className="overflow-hidden w-full mx-auto hover:bg-muted/40 hover:shadow-sm transition-all duration-200 bg-card/70 p-0">
-      <CardContent className="p-4 space-y-3">
+      <CardContent className="p-4 max-sm:p-2 space-y-3">
         {/* Boost attribution row */}
         {isBoost && booster && (
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground pl-1">
@@ -187,7 +187,7 @@ export function TimelineItem({
             }
             target="_blank"
             rel="noopener noreferrer"
-            className="block pl-[52px]"
+            className="block sm:pl-[52px]"
           >
             <Card className="bg-muted/40 hover:bg-muted transition-colors border-dashed shadow-none p-2">
               <CardContent className="p-0">
@@ -232,7 +232,7 @@ export function TimelineItem({
         )}
 
         {/* Post content */}
-        <div className="text-sm leading-relaxed pl-[52px] min-w-0">
+        <div className="text-sm leading-relaxed sm:pl-[52px] min-w-0">
           <div
             className="
                 prose prose-sm max-w-none min-w-0
@@ -250,7 +250,7 @@ export function TimelineItem({
           <PostMediaGrid mediaItems={entry.post.mediaItems} />
         </div>
 
-        <div className="flex items-center justify-between ml-[52px]">
+        <div className="flex items-center justify-between sm:ml-[52px]">
           <Popover>
             <Tooltip>
               <TooltipTrigger asChild>

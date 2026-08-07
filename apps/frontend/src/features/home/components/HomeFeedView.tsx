@@ -30,7 +30,7 @@ export function HomeFeedView() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 max-sm:space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="space-y-3 p-4 border rounded-lg">
             <div className="flex items-start gap-3">
@@ -76,7 +76,7 @@ export function HomeFeedView() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-sm:space-y-3">
       {allPosts.map((entry) => (
         <TimelineItem
           key={`${entry.event.createdAt}-${entry.post.idUri}`}
@@ -85,7 +85,7 @@ export function HomeFeedView() {
         />
       ))}
 
-      <div ref={ref} className="space-y-4 w-full h-[1px]">
+      <div ref={ref} className="space-y-4 max-sm:space-y-3 w-full h-[1px]">
         {isFetchingNextPage && (
           <>
             {Array.from({ length: 3 }).map((_, i) => (
