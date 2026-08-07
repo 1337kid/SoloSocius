@@ -6,6 +6,7 @@ import { MobileBottomNav } from "./mobile/MobileBottomNav";
 import { MobileComposeDialog } from "./mobile/MobileComposeDialog";
 import { MobileProfileSheet } from "./mobile/MobileProfileSheet";
 import DiscoverDialog from "@/features/home/components/DiscoverDialog";
+import Logo from "@/features/home/components/Logo";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -39,6 +40,9 @@ export function DashboardLayout({
       </div>
 
       <div className="lg:hidden">
+        <div className="flex items-center justify-start px-4 py-2 bg-background border-b">
+          <Logo />
+        </div>
         <div className="pb-20 px-4 pt-4">{children}</div>
 
         <MobileBottomNav
