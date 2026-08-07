@@ -15,7 +15,7 @@ export const handleFollowActivity = async (activity: InboxActivity) => {
   await createFollowerEntry({
     followerActorUri: actorLookup.actorUri,
     incomingFollowActivityId: activity.id,
-    status: manuallyApprovingFollowers ? "pending" : "accepted",
+    accepted: manuallyApprovingFollowers ? false : true,
   });
 
   if (!manuallyApprovingFollowers) {

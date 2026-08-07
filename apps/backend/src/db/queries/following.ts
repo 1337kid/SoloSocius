@@ -19,7 +19,7 @@ export const createFollowingUserEntry = async (
     .values({
       followActivityId: activityId,
       followedActorUri,
-      status: "pending",
+      accepted: false,
     })
     .onConflictDoNothing();
 };
@@ -40,11 +40,11 @@ export const getAllFollowingInbox = async () => {
 export const markFollowingAsAccepted = async (actorUri: string) => {
   const updated = await db
     .update(following)
-    .set({ status: "accepted" })
+    .set({ accepted: true })
     .where(
       and(
         eq(following.followedActorUri, actorUri),
-        ne(following.status, "accepted"),
+        ne(following.accepted, true),
       ),
     )
     .returning({ id: following.id });
@@ -74,7 +74,7 @@ export const getAllAcceptedFollowingActorUri = async () => {
   const followedAccounts = await db
     .select({ uri: following.followedActorUri })
     .from(following)
-    .where(eq(following.status, "accepted"));
+    .where(eq(following.accepted, true));
 
   const uris = followedAccounts.map((account) => account.uri);
   await setCache(CacheKeys.followingUris, uris, TTL.followingUris);
@@ -85,7 +85,7 @@ export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
   return await db.query.following.findFirst({
     where: and(
       eq(following.followedActorUri, actorUri),
-      eq(following.status, "accepted"),
+      eq(following.accepted, true),
     ),
     with: {
       actor: {
@@ -117,7 +117,7 @@ export const removeFollowingEntry = async (actorUri: string) => {
 
   await removeFromCachedList(CacheKeys.followingUris, actorUri);
 
-  if (deleted.status === "accepted") {
+  if (deleted.accepted) {
     await adjustCachedCount(CacheKeys.localFollowingCount, -1);
   }
 };
@@ -126,7 +126,7 @@ export const getUserFollowingCount = async () => {
   const [totalResult] = await db
     .select({ value: count() })
     .from(following)
-    .where(eq(following.status, "accepted"));
+    .where(eq(following.accepted, true));
 
   return totalResult?.value || 0;
 };
@@ -147,7 +147,7 @@ export const getAcceptedFollowingByOffset = async (
   return await db
     .select({ followedActorUri: following.followedActorUri })
     .from(following)
-    .where(eq(following.status, "accepted"))
+    .where(eq(following.accepted, true))
     .offset(offset)
     .limit(limit)
     .then((rows) => rows.map((row) => row.followedActorUri));

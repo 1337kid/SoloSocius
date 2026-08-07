@@ -38,7 +38,7 @@ export interface RemotePostInput {
 export interface CreateFollowerInupt {
   followerActorUri: string;
   incomingFollowActivityId: string;
-  status: "pending" | "accepted";
+  accepted: boolean;
 }
 
 export interface DeliverParams {

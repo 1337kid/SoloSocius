@@ -12,7 +12,7 @@ export const createFollowerEntry = async (data: CreateFollowerInupt) => {
     .onConflictDoNothing()
     .returning({ id: followers.id });
 
-  if (inserted.length > 0 && data.status === "accepted") {
+  if (inserted.length > 0 && data.accepted) {
     await adjustCachedCount(CacheKeys.localFollowersCount, 1);
   }
 };
@@ -111,7 +111,7 @@ export const getFollowRequestsByOffset = async (
   return await db.query.followers.findMany({
     columns: {
       id: true,
-      status: true,
+      accepted: true,
     },
     with: {
       actor: {
@@ -124,7 +124,7 @@ export const getFollowRequestsByOffset = async (
         },
       },
     },
-    where: eq(followers.status, "pending"),
+    where: eq(followers.accepted, false),
     orderBy: [desc(followers.createdAt)],
     offset,
     limit,
@@ -134,8 +134,8 @@ export const getFollowRequestsByOffset = async (
 export const approveFollowRequest = async (id: string) => {
   const [followRequest] = await db
     .update(followers)
-    .set({ status: "accepted" })
-    .where(eq(followers.id, id))
+    .set({ accepted: true })
+    .where(and(eq(followers.id, id), eq(followers.accepted, false)))
     .returning();
 
   if (!followRequest) return;
@@ -147,7 +147,7 @@ export const approveFollowRequest = async (id: string) => {
       id: true,
       incomingFollowActivityId: true,
     },
-    where: and(eq(followers.id, id), eq(followers.status, "accepted")),
+    where: and(eq(followers.id, id), eq(followers.accepted, true)),
     with: {
       actor: {
         columns: { inboxUrl: true, actorUri: true },

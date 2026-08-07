@@ -80,10 +80,7 @@ export const followers = pgTable(
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
     incomingFollowActivityId: text().notNull(),
-    status: text("status")
-      .notNull()
-      .default("pending")
-      .$type<"pending" | "accepted">(),
+    accepted: boolean("accepted").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -98,8 +95,8 @@ export const following = pgTable(
     followedActorUri: text("followed_actor_uri")
       .notNull()
       .references(() => actors.actorUri, { onDelete: "cascade" }),
-    status: text("status").notNull().default("pending"),
     followActivityId: text().notNull(),
+    accepted: boolean("accepted").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
