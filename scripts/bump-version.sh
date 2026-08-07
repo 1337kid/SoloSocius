@@ -16,21 +16,18 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Package files to update (relative to ROOT_DIR)
 PACKAGE_FILES=(
   "package.json"
   "apps/backend/package.json"
   "apps/frontend/package.json"
 )
 
-# ---------- helpers ---------------------------------------------------------
-
 usage() {
   echo "Usage: $0 [major|minor|patch|<version>] [--dry-run] [--message <msg>]"
   echo ""
-  echo "  major          Bump the major version (1.2.3 → 2.0.0)"
-  echo "  minor          Bump the minor version (1.2.3 → 1.3.0)"
-  echo "  patch          Bump the patch version (1.2.3 → 1.2.4)"
+  echo "  major          Bump the major version (1.2.3 to 2.0.0)"
+  echo "  minor          Bump the minor version (1.2.3 to 1.3.0)"
+  echo "  patch          Bump the patch version (1.2.3 to 1.2.4)"
   echo "  <version>      Set an explicit version (e.g. 2.0.0-beta.1)"
   echo ""
   echo "  --dry-run      Show what would change without writing or committing"
@@ -57,7 +54,6 @@ is_valid_semver() {
   [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][a-zA-Z0-9.]+)?$ ]]
 }
 
-# ---------- arg parsing -----------------------------------------------------
 
 BUMP_TYPE=""
 EXPLICIT_VERSION=""
@@ -102,8 +98,6 @@ if [[ -z "$BUMP_TYPE" && -z "$EXPLICIT_VERSION" ]]; then
   usage
 fi
 
-# ---------- resolve current & new versions ----------------------------------
-
 ROOT_PKG="$ROOT_DIR/package.json"
 CURRENT_VERSION="$(node -p "require('$ROOT_PKG').version")"
 
@@ -122,8 +116,6 @@ if [[ "$CURRENT_VERSION" == "$NEW_VERSION" ]]; then
   exit 0
 fi
 
-# ---------- update files ----------------------------------------------------
-
 for rel_path in "${PACKAGE_FILES[@]}"; do
   abs_path="$ROOT_DIR/$rel_path"
   if [[ ! -f "$abs_path" ]]; then
@@ -134,7 +126,6 @@ for rel_path in "${PACKAGE_FILES[@]}"; do
   if $DRY_RUN; then
     echo "  [dry-run] would update $rel_path"
   else
-    # Use node to do a safe in-place JSON update (preserves formatting)
     node --input-type=module <<EOF
 import { readFileSync, writeFileSync } from 'fs';
 const file = '$abs_path';
@@ -145,8 +136,6 @@ console.log('  [updated] $rel_path');
 EOF
   fi
 done
-
-# ---------- git commit ------------------------------------------------------
 
 if $DRY_RUN; then
   echo ""
@@ -159,12 +148,11 @@ fi
 
 cd "$ROOT_DIR"
 
-# Stage only the version files
 for rel_path in "${PACKAGE_FILES[@]}"; do
   [[ -f "$rel_path" ]] && git add "$rel_path"
 done
 
-COMMIT_MSG="${CUSTOM_MESSAGE:-"chore: bump version $CURRENT_VERSION → $NEW_VERSION"}"
+COMMIT_MSG="${CUSTOM_MESSAGE:-"chore: bump version $CURRENT_VERSION to $NEW_VERSION"}"
 
 git commit -m "$COMMIT_MSG"
 
