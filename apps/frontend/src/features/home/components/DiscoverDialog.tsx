@@ -18,7 +18,12 @@ import { useFollowUser } from "../hooks/useFollowUser";
 
 const handleRegex = /^@?([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
-const DiscoverDialog = () => {
+interface DiscoverDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+const DiscoverDialog = ({ open, onOpenChange }: DiscoverDialogProps = {}) => {
   const [handle, setHandle] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
@@ -60,22 +65,25 @@ const DiscoverDialog = () => {
     });
   };
 
-  const onOpenChange = (open: boolean) => {
-    if (!open) {
+  const handleOpenChange = (openState: boolean) => {
+    if (!openState) {
       setHandle("");
       setUser(null);
     }
+    onOpenChange?.(openState);
   };
 
   return (
-    <Dialog onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <SearchIcon className="size-4" />
-          Search
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="min-w-md max-h-[80vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      {open === undefined && (
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <SearchIcon className="size-4" />
+            Search
+          </Button>
+        </DialogTrigger>
+      )}
+      <DialogContent className="sm:min-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Search for a user to follow</DialogTitle>
         </DialogHeader>

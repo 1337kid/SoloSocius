@@ -137,7 +137,7 @@ export function EditProfileDialog() {
     .toUpperCase();
 
   return (
-    <DialogContent className="max-w-lg p-0 overflow-hidden gap-0">
+    <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0">
       <DialogHeader className="sr-only">
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogDescription>Edit your profile information.</DialogDescription>
@@ -193,7 +193,6 @@ export function EditProfileDialog() {
           />
         </div>
 
-        {/* Avatar overlaid on banner bottom-left */}
         <div className="absolute -bottom-10 left-5">
           <div
             className="relative group cursor-pointer"
@@ -239,7 +238,6 @@ export function EditProfileDialog() {
         </div>
       </div>
 
-      {/* Padding to clear avatar overhang */}
       <div className="px-5 pt-14 pb-2">
         <p className="text-xs text-muted-foreground">
           Click the banner or avatar to change them. Changes upload when you save.
@@ -288,12 +286,12 @@ export function EditProfileDialog() {
           )}
         />
 
-        <DialogFooter className="pt-2 border-t-0 bg-transparent p-0">
-          <DialogClose asChild>
+        <DialogFooter className="pt-2 border-t-0 bg-transparent">
+          {/* <DialogClose asChild>
             <Button variant="outline" type="button" disabled={isSaving}>
               Cancel
             </Button>
-          </DialogClose>
+          </DialogClose> */}
           <Button type="submit" disabled={isSaving} className="gap-2">
             {isSaving && <Loader2 className="size-4 animate-spin" />}
             {isSaving ? "Saving…" : "Save"}
