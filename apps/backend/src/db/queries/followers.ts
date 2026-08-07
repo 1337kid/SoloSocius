@@ -55,6 +55,16 @@ export const getFollowerByActivityId = async (activityId: string) => {
   )[0];
 };
 
+export const getFollowerByActorUri = async (actorUri: string) => {
+  return (
+    await db
+      .select({ actorUri: followers.followerActorUri })
+      .from(followers)
+      .where(eq(followers.followerActorUri, actorUri))
+      .limit(1)
+  )[0];
+};
+
 export const getUserFollowersCount = async () => {
   const [totalResult] = await db.select({ value: count() }).from(followers);
 
