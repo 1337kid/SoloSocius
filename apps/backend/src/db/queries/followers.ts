@@ -66,7 +66,10 @@ export const getFollowerByActorUri = async (actorUri: string) => {
 };
 
 export const getUserFollowersCount = async () => {
-  const [totalResult] = await db.select({ value: count() }).from(followers);
+  const [totalResult] = await db
+    .select({ value: count() })
+    .from(followers)
+    .where(eq(followers.accepted, true));
 
   return totalResult?.value || 0;
 };
@@ -84,6 +87,7 @@ export const getFollowersByOffset = async (offset: number, limit: number) => {
   return await db
     .select({ followerActorUri: followers.followerActorUri })
     .from(followers)
+    .where(eq(followers.accepted, true))
     .offset(offset)
     .limit(limit)
     .then((rows) => rows.map((row) => row.followerActorUri));
@@ -108,6 +112,7 @@ export const getFollowersDetailsByOffset = async (
         },
       },
     },
+    where: eq(followers.accepted, true),
     orderBy: [desc(followers.createdAt)],
     offset,
     limit,
