@@ -13,6 +13,7 @@ import { actorLookupMiddleware } from "../middlewares/actorLookup.js";
 import {
   getAllFollowRequests,
   handleApproveFollowRequest,
+  handleRejectFollow,
 } from "../controllers/followers.controller.js";
 
 export async function UserRoutes(fastify: FastifyInstance) {
@@ -30,6 +31,7 @@ export async function UserRoutes(fastify: FastifyInstance) {
   fastify.get("/follow-requests", getAllFollowRequests);
   fastify.post("/follow-requests/toggle", toggleManuallyApprovesFollowers);
   fastify.post("/follow-requests/:id/approve", handleApproveFollowRequest);
+  fastify.delete("/follow-requests/:id", handleRejectFollow);
 
   // Profile
   fastify.put("/profile", updateProfileData);

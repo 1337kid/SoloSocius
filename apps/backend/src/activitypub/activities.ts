@@ -1,6 +1,9 @@
 import { userEndpoints } from "../activitypub/actor.js";
 import { OutboxActivity } from "../types/index.js";
-import { generateProfileUpdateActivityId } from "../utils/activityId.js";
+import {
+  generateAcceptActivityId,
+  generateProfileUpdateActivityId,
+} from "../utils/activityId.js";
 import { InstanceActorObject } from "../types/index.js";
 import { generateActorObject } from "./actor.js";
 import {
@@ -199,7 +202,7 @@ export const createDeleteActorActivity = () => {
     type: "Delete",
     actor: actorUri,
     to: ["https://www.w3.org/ns/activitystreams#Public"],
-    object: actorUri
+    object: actorUri,
   };
 };
 
@@ -224,4 +227,28 @@ export const createInteractionActivity = (
   }
 
   return activity;
+};
+
+export const createAcceptFollowActivity = (
+  followActivityId: string,
+  actorUri: string,
+) => {
+  return createActivity(generateAcceptActivityId(), "Accept", {
+    type: "Follow",
+    id: followActivityId,
+    actor: actorUri,
+    object: userEndpoints.actorUri,
+  });
+};
+
+export const createRejectFollowActivity = (
+  followActivityId: string,
+  actorUri: string,
+) => {
+  return createActivity(`${followActivityId}#reject`, "Reject", {
+    type: "Follow",
+    id: followActivityId,
+    actor: actorUri,
+    object: userEndpoints.actorUri,
+  });
 };

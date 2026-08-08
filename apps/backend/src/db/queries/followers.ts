@@ -170,3 +170,18 @@ export const approveFollowRequest = async (id: string) => {
     },
   });
 };
+
+export const getFollowerById = async (id: string) => {
+  return await db.query.followers.findFirst({
+    columns: {
+      id: true,
+      incomingFollowActivityId: true,
+    },
+    where: eq(followers.id, id),
+    with: {
+      actor: {
+        columns: { inboxUrl: true, actorUri: true },
+      },
+    },
+  });
+};

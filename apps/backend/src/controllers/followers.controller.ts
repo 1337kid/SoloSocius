@@ -1,10 +1,12 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import {
   approveFollowRequest,
+  getFollowerById,
   getFollowersByOffset,
   getFollowersDetailsByOffset,
   getFollowRequestsByOffset,
   getUserFollowersCount,
+  removeFollowerEntry,
 } from "../db/queries/followers.js";
 import {
   createOrderedCollection,
@@ -12,8 +14,10 @@ import {
 } from "../activitypub/collections.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { deliverActivity } from "../utils/activitypub.js";
-import { createActivity } from "../activitypub/activities.js";
-import { generateAcceptActivityId } from "../utils/activityId.js";
+import {
+  createAcceptFollowActivity,
+  createRejectFollowActivity,
+} from "../activitypub/activities.js";
 
 const PAGE_SIZE = 20;
 
@@ -145,15 +149,9 @@ export const handleApproveFollowRequest = async (
       return reply.status(404).send({ error: "Follow request not found" });
     }
 
-    const acceptActivity = createActivity(
-      generateAcceptActivityId(),
-      "Accept",
-      {
-        type: "Follow",
-        id: followRequest?.incomingFollowActivityId,
-        actor: followRequest.actor.actorUri,
-        object: userEndpoints.actorUri,
-      },
+    const acceptActivity = createAcceptFollowActivity(
+      followRequest?.incomingFollowActivityId,
+      followRequest.actor.actorUri,
     );
 
     console.log("acceptActivity", acceptActivity);
@@ -168,6 +166,38 @@ export const handleApproveFollowRequest = async (
       .send({ message: "Follow request approved successfully." });
   } catch (error) {
     console.error("Failed approving follow request:", error);
+    return reply.status(500).send({ error: "Internal Server Error." });
+  }
+};
+
+export const handleRejectFollow = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { id } = request.params as { id: string };
+
+  try {
+    const follower = await getFollowerById(id);
+
+    if (!follower) {
+      return reply.status(404).send({ error: "Follower not found" });
+    }
+
+    await removeFollowerEntry(follower.actor.actorUri);
+
+    const rejectActivity = createRejectFollowActivity(
+      follower.incomingFollowActivityId,
+      follower.actor.actorUri,
+    );
+
+    await deliverActivity({
+      inboxUrl: follower.actor.inboxUrl,
+      activity: rejectActivity,
+    });
+
+    return reply.status(200).send({ message: "Follow rejected successfully." });
+  } catch (error) {
+    console.error("Failed rejecting follow request:", error);
     return reply.status(500).send({ error: "Internal Server Error." });
   }
 };
