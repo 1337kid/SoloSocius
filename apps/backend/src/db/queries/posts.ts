@@ -1,4 +1,4 @@
-import { posts } from "../schema.js";
+import { actors, interactions, posts } from "../schema.js";
 import { eq, desc, count, inArray, and, sql } from "drizzle-orm";
 import { RemotePostInput } from "../../types/index.js";
 import { db } from "../index.js";
@@ -7,6 +7,7 @@ import type { MediaItem } from "../schema.js";
 import { getCache, setCache } from "../../cache/redis.js";
 import { CacheKeys, TTL } from "../../cache/keys.js";
 import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
+import { alias } from "drizzle-orm/pg-core";
 
 export const storeRemotePost = async (data: RemotePostInput) => {
   const [post] = await db
@@ -177,4 +178,105 @@ export const incrementPostReplyCount = async (postUri: string) => {
       replyCount: sql`${posts.replyCount} + 1`,
     })
     .where(eq(posts.idUri, postUri));
+};
+
+const myLike = alias(interactions, "my_like");
+const myBoost = alias(interactions, "my_boost");
+const replyMyLike = alias(interactions, "reply_my_like");
+const replyMyBoost = alias(interactions, "reply_my_boost");
+
+export const getPostWithRepliesByPostId = async (id: string) => {
+  const mainPostResult = await db
+    .select({
+      id: posts.id,
+      idUri: posts.idUri,
+      content: posts.content,
+      createdAt: posts.createdAt,
+      inReplyTo: posts.inReplyTo,
+      mediaItems: posts.mediaItems,
+      url: posts.url,
+      isLocal: posts.isLocal,
+      likeCount: posts.likeCount,
+      boostCount: posts.boostCount,
+      replyCount: posts.replyCount,
+      liked: sql<boolean>`${myLike.id} IS NOT NULL`,
+      boosted: sql<boolean>`${myBoost.id} IS NOT NULL`,
+      actor: {
+        actorUri: actors.actorUri,
+        displayName: actors.displayName,
+        username: actors.username,
+        domain: actors.domain,
+        avatarUrl: actors.avatarUrl,
+      },
+    })
+    .from(posts)
+    .innerJoin(actors, eq(actors.actorUri, posts.actorUri))
+    .leftJoin(
+      myLike,
+      and(
+        eq(myLike.postUri, posts.idUri),
+        eq(myLike.actorUri, userEndpoints.actorUri),
+        eq(myLike.type, "like"),
+      ),
+    )
+    .leftJoin(
+      myBoost,
+      and(
+        eq(myBoost.postUri, posts.idUri),
+        eq(myBoost.actorUri, userEndpoints.actorUri),
+        eq(myBoost.type, "boost"),
+      ),
+    )
+    .where(eq(posts.id, id))
+    .limit(1);
+
+  if (!mainPostResult[0]) {
+    return null;
+  }
+
+  const mainPost = mainPostResult[0];
+
+  const repliesResult = await db
+    .select({
+      id: posts.id,
+      idUri: posts.idUri,
+      content: posts.content,
+      createdAt: posts.createdAt,
+      mediaItems: posts.mediaItems,
+      url: posts.url,
+      liked: sql<boolean>`${replyMyLike.id} IS NOT NULL`,
+      boosted: sql<boolean>`${replyMyBoost.id} IS NOT NULL`,
+      actor: {
+        actorUri: actors.actorUri,
+        displayName: actors.displayName,
+        username: actors.username,
+        domain: actors.domain,
+        avatarUrl: actors.avatarUrl,
+      },
+    })
+    .from(posts)
+    .innerJoin(actors, eq(actors.actorUri, posts.actorUri))
+    .leftJoin(
+      replyMyLike,
+      and(
+        eq(replyMyLike.postUri, posts.idUri),
+        eq(replyMyLike.actorUri, userEndpoints.actorUri),
+        eq(replyMyLike.type, "like"),
+      ),
+    )
+    .leftJoin(
+      replyMyBoost,
+      and(
+        eq(replyMyBoost.postUri, posts.idUri),
+        eq(replyMyBoost.actorUri, userEndpoints.actorUri),
+        eq(replyMyBoost.type, "boost"),
+      ),
+    )
+    .where(eq(posts.inReplyTo, mainPost.idUri))
+    .orderBy(desc(posts.createdAt));
+
+  return {
+    ...mainPost,
+    replies: repliesResult,
+  };
 };

@@ -4,7 +4,7 @@ import {
   createUserPost,
   deletePostById,
   getPostById,
-  getPostsByActorUris,
+  getPostWithRepliesByPostId,
   updatePostContent,
   updateUserPostUri,
 } from "../db/queries/posts.js";
@@ -154,6 +154,25 @@ export const deletePost = async (
     return reply.status(200).send({ message: "Post deleted successfully" });
   } catch (error) {
     console.log("Error while deleting post: ", error);
+    return reply.status(500).send({ error: "Internal Sever Error" });
+  }
+};
+
+export const getPostWithReplies = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { id } = request.params as { id: string };
+
+  try {
+    const post = await getPostWithRepliesByPostId(id);
+    if (!post) {
+      return reply.status(404).send({ error: "Post not found" });
+    }
+
+    return reply.status(200).send(post);
+  } catch (error) {
+    console.log("Error while getting post with replies: ", error);
     return reply.status(500).send({ error: "Internal Sever Error" });
   }
 };

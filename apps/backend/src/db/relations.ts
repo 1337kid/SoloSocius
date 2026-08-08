@@ -43,6 +43,11 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   inReplyTo: one(posts, {
     fields: [posts.inReplyTo],
     references: [posts.idUri],
+    relationName: "postReplies",
+  }),
+
+  replies: many(posts, {
+    relationName: "postReplies",
   }),
 }));
 
