@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useUnfollowRemoteUser } from "../hooks/useUnfollowRemoteUser";
+import { useFollowRequests } from "../hooks/useFollowRequests";
 
 const FollowersPage = ({
   data,
@@ -34,8 +35,15 @@ const FollowersPage = ({
     variables,
   } = useUnfollowRemoteUser();
 
+  const { rejectRequest, isRejectingRequest, rejectingRequestId } =
+    useFollowRequests();
+
   const handleUnfollow = (actorUri: string) => {
     unfollowRemoteUser(actorUri);
+  };
+
+  const handleRemoveFollower = (id: string) => {
+    rejectRequest(id);
   };
 
   return (
@@ -103,6 +111,17 @@ const FollowersPage = ({
                       </p>
                     </div>
                   </div>
+                  {auth.data?.username && type === "Follower" && (
+                    <Button
+                      variant="outline"
+                      disabled={isRejectingRequest}
+                      onClick={() => handleRemoveFollower(item.id)}
+                    >
+                      {isRejectingRequest && rejectingRequestId === item.id
+                        ? "Removing..."
+                        : "Remove"}
+                    </Button>
+                  )}
                   {auth.data?.username && type === "Following" && (
                     <Button
                       variant="outline"

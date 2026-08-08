@@ -17,6 +17,9 @@ const FollowRequests = () => {
     approveRequest,
     isApprovingRequest,
     approvingRequestId,
+    rejectRequest,
+    isRejectingRequest,
+    rejectingRequestId,
   } = useFollowRequests();
 
   const { ref, inView } = useInView();
@@ -27,7 +30,8 @@ const FollowRequests = () => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const followRequests = data?.pages.flatMap((page) => page.followRequests) ?? [];
+  const followRequests =
+    data?.pages.flatMap((page) => page.followRequests) ?? [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,8 +43,11 @@ const FollowRequests = () => {
         isError={isError}
         isFetchingNextPage={isFetchingNextPage}
         onApproveRequest={approveRequest}
+        onRejectRequest={rejectRequest}
         isApprovingRequest={isApprovingRequest}
         approvingRequestId={approvingRequestId}
+        isRejectingRequest={isRejectingRequest}
+        rejectingRequestId={rejectingRequestId}
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
       />
     </div>

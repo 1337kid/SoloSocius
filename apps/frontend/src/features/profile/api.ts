@@ -123,6 +123,17 @@ export const approveFollowRequest = async (
   return data;
 };
 
+export const rejectFollowRequest = async (
+  id: string,
+): Promise<{ message: string }> => {
+  const { data } = await api.delete(`/follow-requests/${id}`);
+  
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  return data;
+};
+
 export const toggleManuallyApprovesFollowers = async (): Promise<{ manuallyApprovesFollowers: boolean }> => {
   const { data } = await api.post("/follow-requests/toggle");
   

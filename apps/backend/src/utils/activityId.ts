@@ -9,6 +9,10 @@ export const generateAcceptActivityId = () => {
   return `${userEndpoints.actorUri}/accept/${uuidv7()}`;
 };
 
+export const generateRejectActivityId = () => {
+  return `${userEndpoints.actorUri}/reject/${uuidv7()}`;
+};
+
 export const generateInteractionActivityId = (type: string) => {
   return `${userEndpoints.activities}/${type}/${uuidv7()}`;
 };

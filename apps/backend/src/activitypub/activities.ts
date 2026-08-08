@@ -3,6 +3,7 @@ import { OutboxActivity } from "../types/index.js";
 import {
   generateAcceptActivityId,
   generateProfileUpdateActivityId,
+  generateRejectActivityId,
 } from "../utils/activityId.js";
 import { InstanceActorObject } from "../types/index.js";
 import { generateActorObject } from "./actor.js";
@@ -245,7 +246,7 @@ export const createRejectFollowActivity = (
   followActivityId: string,
   actorUri: string,
 ) => {
-  return createActivity(`${followActivityId}#reject`, "Reject", {
+  return createActivity(generateRejectActivityId(), "Reject", {
     type: "Follow",
     id: followActivityId,
     actor: actorUri,

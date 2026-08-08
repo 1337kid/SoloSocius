@@ -15,6 +15,9 @@ const FollowRequestsPage = ({
   onApproveRequest,
   isApprovingRequest,
   approvingRequestId,
+  onRejectRequest,
+  isRejectingRequest,
+  rejectingRequestId,
   ref,
 }: {
   data: FollowRequestData[];
@@ -25,12 +28,19 @@ const FollowRequestsPage = ({
   onApproveRequest: (requestId: string) => void;
   isApprovingRequest: boolean;
   approvingRequestId?: string;
+  onRejectRequest: (requestId: string) => void;
+  isRejectingRequest: boolean;
+  rejectingRequestId?: string;
   ref: React.RefObject<HTMLDivElement>;
 }) => {
   const router = useRouter();
 
   const handleApproveRequest = (requestId: string) => {
     onApproveRequest(requestId);
+  };
+
+  const handleRejectRequest = (requestId: string) => {
+    onRejectRequest(requestId);
   };
 
   return (
@@ -44,8 +54,7 @@ const FollowRequestsPage = ({
         <h1 className="text-xl font-semibold">Follow Requests</h1>
         {!isLoading && (
           <span className="text-sm text-muted-foreground ml-auto">
-            {totalCount}{" "}
-            {totalCount === 1 ? "request" : "requests"}
+            {totalCount} {totalCount === 1 ? "request" : "requests"}
           </span>
         )}
       </div>
@@ -107,7 +116,16 @@ const FollowRequestsPage = ({
                         ? "Approving..."
                         : "Accept"}
                     </Button>
-                    {/* todo: reject request */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isRejectingRequest}
+                      onClick={() => handleRejectRequest(item.id)}
+                    >
+                      {isRejectingRequest && rejectingRequestId === item.id
+                        ? "Rejecting..."
+                        : "Reject"}
+                    </Button>
                   </div>
                 </div>
                 <Separator />

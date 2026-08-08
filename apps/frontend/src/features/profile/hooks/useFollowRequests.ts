@@ -1,10 +1,31 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getFollowRequestsData, approveFollowRequest, toggleManuallyApprovesFollowers } from "../api";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  getFollowRequestsData,
+  approveFollowRequest,
+  toggleManuallyApprovesFollowers,
+  rejectFollowRequest,
+} from "../api";
 import { profileQueryKeys } from "../keys";
 import { toast } from "sonner";
 
 export function useFollowRequests() {
   const queryClient = useQueryClient();
+
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({
+      queryKey: profileQueryKeys.followRequestsLists(),
+    });
+    queryClient.invalidateQueries({
+      queryKey: profileQueryKeys.followersLists(),
+    });
+    queryClient.invalidateQueries({
+      queryKey: profileQueryKeys.public,
+    });
+  };
 
   const followRequestsQuery = useInfiniteQuery({
     queryKey: profileQueryKeys.followRequestsLists(),
@@ -16,15 +37,17 @@ export function useFollowRequests() {
   const approveRequestMutation = useMutation({
     mutationFn: approveFollowRequest,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: profileQueryKeys.followRequestsLists(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: profileQueryKeys.followersLists(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: profileQueryKeys.public,
-      });
+      invalidateQueries();
+    },
+  });
+
+  const rejectRequestMutation = useMutation({
+    mutationFn: rejectFollowRequest,
+    onSuccess: () => {
+      invalidateQueries();
+    },
+    onError: () => {
+      toast.error("Failed to reject follow");
     },
   });
 
@@ -37,6 +60,10 @@ export function useFollowRequests() {
       });
     },
   });
+
+  const rejectRequest = (requestId: string) => {
+    rejectRequestMutation.mutate(requestId);
+  };
 
   const approveRequest = (requestId: string) => {
     approveRequestMutation.mutate(requestId);
@@ -65,16 +92,18 @@ export function useFollowRequests() {
     hasNextPage: followRequestsQuery.hasNextPage,
     isFetchingNextPage: followRequestsQuery.isFetchingNextPage,
     fetchNextPage: followRequestsQuery.fetchNextPage,
-    
+
     // Mutation states
     isApprovingRequest: approveRequestMutation.isPending,
     approvingRequestId: approveRequestMutation.variables,
     isTogglingManualApproval: toggleManualApprovalMutation.isPending,
-    
+    isRejectingRequest: rejectRequestMutation.isPending,
+    rejectingRequestId: rejectRequestMutation.variables,
     // Child functions
     approveRequest,
     toggleManualApproval,
     refetchRequests,
     invalidateRequests,
+    rejectRequest,
   };
 }

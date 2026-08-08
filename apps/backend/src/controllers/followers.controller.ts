@@ -190,6 +190,8 @@ export const handleRejectFollow = async (
       follower.actor.actorUri,
     );
 
+    console.log("rejectActivity", rejectActivity);
+
     await deliverActivity({
       inboxUrl: follower.actor.inboxUrl,
       activity: rejectActivity,
