@@ -8,6 +8,7 @@ import { handleLikeActivity } from "./like.js";
 import { handleDeleteActivity } from "./delete.js";
 import { handleAnnounceActivity } from "./announce.js";
 import { handleUpdateActivity } from "./update.js";
+import { handleRejectActivity } from "./reject.js";
 
 export const handleIncomingInbox = async (
   request: FastifyRequest,
@@ -70,6 +71,11 @@ export const handleIncomingInbox = async (
 
       case "Update": {
         await handleUpdateActivity(activity);
+        break;
+      }
+
+      case "Reject": {
+        await handleRejectActivity(activity);
         break;
       }
 
