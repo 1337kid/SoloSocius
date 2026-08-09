@@ -13,6 +13,12 @@ import { RepliesList } from "./RepliesList";
 import { PostMediaGrid } from "./PostMediaGrid";
 import type { PostWithReplies } from "../api";
 import Link from "next/link";
+import {
+  Alert,
+  AlertAction,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 
 function PostDetailSkeleton() {
   return (
@@ -114,14 +120,17 @@ function PostDetailContent({ post }: { post: PostWithReplies }) {
       <RepliesList replies={post.replies} />
 
       {post.isLocal === false && (
-        <div className="my-4 max-sm:mb-16 max-sm:mt-3 mx-auto w-full flex justify-center">
-          <Button variant="link" asChild>
-            <Link href={post.url || post.idUri} target="_blank">
-              View post on {post.actor.domain}
-              <ExternalLink className="size-4 ml-2" />
-            </Link>
-          </Button>
-        </div>
+        <Alert className="w-full max-w-sm my-4 max-sm:mb-16 max-sm:mt-3 mx-auto">
+          <AlertDescription className="flex items-center justify-center flex-col">
+            This post is not local. Some replies may be missing.
+            <Button variant="link" asChild>
+              <Link href={post.url || post.idUri} target="_blank">
+                View post on {post.actor.domain}
+                <ExternalLink className="size-4 ml-2" />
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );
