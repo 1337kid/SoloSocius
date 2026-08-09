@@ -60,6 +60,48 @@ export interface TimelineResponse {
   items: TimelineItem[];
 }
 
+export interface PostReply {
+  id: string;
+  idUri: string;
+  content: string;
+  createdAt: string;
+  mediaItems: MediaItem[];
+  url: string;
+  liked: boolean;
+  boosted: boolean;
+  actor: {
+    actorUri: string;
+    displayName: string;
+    domain: string;
+    username: string;
+    avatarUrl: string;
+  };
+}
+
+export interface PostWithReplies {
+  id: string;
+  idUri: string;
+  content: string;
+  createdAt: string;
+  inReplyTo: string | null;
+  mediaItems: MediaItem[];
+  url: string;
+  isLocal: boolean;
+  likeCount: number;
+  boostCount: number;
+  replyCount: number;
+  liked: boolean;
+  boosted: boolean;
+  actor: {
+    actorUri: string;
+    displayName: string;
+    domain: string;
+    username: string;
+    avatarUrl: string;
+  };
+  replies: PostReply[];
+}
+
 export async function getPublicTimeline(
   page: number = 1,
 ): Promise<TimelineResponse> {
@@ -95,5 +137,10 @@ export const deletePostApi = async (id: string) => {
 
 export const updatePostApi = async (id: string, content: string) => {
   const { data } = await api.put(`/posts/${id}`, { content });
+  return data;
+};
+
+export const getPost = async (id: string): Promise<PostWithReplies> => {
+  const { data } = await api.get<PostWithReplies>(`/posts/${id}`);
   return data;
 };

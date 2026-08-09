@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import Navbar from "@/components/Navbar";
 import { useFollowRequests } from "@/features/profile/hooks/useFollowRequests";
 import FollowRequestsPage from "@/features/profile/components/FollowRequestsPage";
 
@@ -34,23 +33,20 @@ const FollowRequests = () => {
     data?.pages.flatMap((page) => page.followRequests) ?? [];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <FollowRequestsPage
-        data={followRequests}
-        totalCount={followRequests.length}
-        isLoading={isLoading}
-        isError={isError}
-        isFetchingNextPage={isFetchingNextPage}
-        onApproveRequest={approveRequest}
-        onRejectRequest={rejectRequest}
-        isApprovingRequest={isApprovingRequest}
-        approvingRequestId={approvingRequestId}
-        isRejectingRequest={isRejectingRequest}
-        rejectingRequestId={rejectingRequestId}
-        ref={ref as unknown as React.RefObject<HTMLDivElement>}
-      />
-    </div>
+    <FollowRequestsPage
+      data={followRequests}
+      totalCount={followRequests.length}
+      isLoading={isLoading}
+      isError={isError}
+      isFetchingNextPage={isFetchingNextPage}
+      onApproveRequest={approveRequest}
+      onRejectRequest={rejectRequest}
+      isApprovingRequest={isApprovingRequest}
+      approvingRequestId={approvingRequestId}
+      isRejectingRequest={isRejectingRequest}
+      rejectingRequestId={rejectingRequestId}
+      ref={ref as unknown as React.RefObject<HTMLDivElement>}
+    />
   );
 };
 

@@ -55,6 +55,7 @@ export const useInteraction = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.details() });
       queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
     },
   });
@@ -65,6 +66,7 @@ export const useInteraction = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.details() });
       queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
     },
   });
@@ -75,6 +77,7 @@ export const useInteraction = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.details() });
       queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
     },
   });

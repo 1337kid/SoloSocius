@@ -9,6 +9,7 @@ import type { TimelineActor, TimelineItem } from "../api";
 import PostStat from "./PostStat";
 import { useInteraction } from "../hooks/useInteraction";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -24,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import ShowMoreActions from "./ShowMoreActions";
 import { useProfileData } from "@/features/profile/hooks/useProfileData";
 import { PostMediaGrid } from "./PostMediaGrid";
+import { routes } from "@/lib/routes";
 
 function ActorAvatar({
   actor,
@@ -63,6 +65,7 @@ export function TimelineItem({
   entry: TimelineItem;
   onPostStatsButtonClick: () => void;
 }) {
+  const router = useRouter();
   const { interactWithPost, undoInteractWithPost } = useInteraction();
   const { data: profileData } = useProfileData();
   const [liked, setLiked] = useState(entry.post.liked);
@@ -232,7 +235,10 @@ export function TimelineItem({
         )}
 
         {/* Post content */}
-        <div className="text-sm leading-relaxed sm:pl-[52px] min-w-0">
+        <div 
+          className="text-sm leading-relaxed sm:pl-[52px] min-w-0 cursor-pointer"
+          onClick={() => router.push(routes.post(entry.post.id))}
+        >
           <div
             className="
                 prose prose-sm max-w-none min-w-0

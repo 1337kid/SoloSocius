@@ -6,6 +6,7 @@ export const routes = {
   followers: "/followers",
   following: "/following",
   followRequests: "/followrequests",
+  post: (id: string) => `/posts/${id}`,
 } as const;
 
 export const authRoutes = [routes.login, routes.setup] as const;
