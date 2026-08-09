@@ -1,9 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivityToFollowers } from "../utils/activitypub.js";
+import {
+  deliverActivity,
+  deliverActivityToFollowers,
+} from "../utils/activitypub.js";
 import {
   createUserPost,
   deletePostById,
   getPostById,
+  getPostFromDB,
   getPostWithRepliesByPostId,
   updatePostContent,
   updateUserPostUri,
@@ -33,6 +37,14 @@ export const createPost = async (
   }
 
   try {
+    let replyPost: any = null;
+    if (inReplyTo) {
+      replyPost = await getPostFromDB(inReplyTo);
+      if (!replyPost) {
+        return reply.status(404).send({ error: "Reply post not found." });
+      }
+    }
+
     const newPost = await createUserPost({
       content,
       inReplyTo,
@@ -56,6 +68,13 @@ export const createPost = async (
       postUri: postUri,
       type: "post",
     });
+
+    if (newPost.inReplyTo && replyPost.isLocal === false) {
+      await deliverActivity({
+        inboxUrl: replyPost.actor.inboxUrl,
+        activity: activityPayload,
+      });
+    }
 
     await deliverActivityToFollowers(activityPayload);
 

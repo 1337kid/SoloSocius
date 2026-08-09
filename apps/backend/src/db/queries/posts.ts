@@ -35,12 +35,13 @@ export const storeRemotePost = async (data: RemotePostInput) => {
 };
 
 export const getPostFromDB = async (idUri: string) => {
-  const post = await db
-    .select()
-    .from(posts)
-    .where(eq(posts.idUri, idUri))
-    .limit(1);
-  return post[0];
+  const post = await db.query.posts.findFirst({
+    where: eq(posts.idUri, idUri),
+    with: {
+      actor: true,
+    },
+  });
+  return post;
 };
 
 export const getPostById = async (id: string) => {
