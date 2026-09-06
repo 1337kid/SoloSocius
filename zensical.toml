@@ -1,5 +1,5 @@
 [project]
-site_url = "https://www.example.com/"
+site_url = "https://solosocius.767364.xyz/"
 site_name = "SoloSocius"
 site_description = "SoloSocius is an experimental ActivityPub implementation focused on simplicity. It allows a single user to publish posts, interact with the Fediverse (Decentralised social network), and host their own social presence without the complexity of a multi-user platform."
 site_author = "1337kid"

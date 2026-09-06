@@ -2,12 +2,17 @@ name: Documentation
 on:
   push:
     branches:
-      - master
       - main
+    paths:
+      - "docs/**"
+      - "zensical.toml"
+      - ".github/workflows/docs.yml"
+
 permissions:
   contents: read
   pages: write
   id-token: write
+  
 jobs:
   deploy:
     environment:
