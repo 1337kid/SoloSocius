@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/logo.png" width="200px" alt="logo" /><br/>
+    <img src="/.github/images/logo.png" width="200px" alt="logo" /><br/>
     🔥 A lightweight, single-user ActivityPub server built for self-hosting. 🙋
 </p>
 
@@ -8,10 +8,9 @@
 SoloSocius is an experimental ActivityPub implementation focused on simplicity. It allows a single user to publish posts, interact with the [Fediverse](https://en.wikipedia.org/wiki/Fediverse) (Decentralised social network), and host their own social presence without the complexity of a multi-user platform.
 
 <p align="center">
-  <img src="docs/desktop.png" alt="Desktop" width="74%">
-  <img src="docs/mobile.png" alt="Mobile" width="20%">
+  <img src="/.github/images/desktop.png" alt="Desktop" width="74%">
+  <img src="/.github/images/mobile.png" alt="Mobile" width="20%">
 </p>
-
 
 ---
 
@@ -19,6 +18,7 @@ SoloSocius is an experimental ActivityPub implementation focused on simplicity. 
 > This project is still in development. SoloSocius is experimental software and should not yet be considered production ready.
 
 # Features
+
 - Single-user ActivityPub server
 - Publish public posts
 - Follow remote users on Mastodon, Misskey and other ActivityPub servers
@@ -46,7 +46,9 @@ docker compose up -d
 ```
 
 # Tech Stack
+
 Built with:
+
 - Next.js
 - Node.js
 - Fastify
