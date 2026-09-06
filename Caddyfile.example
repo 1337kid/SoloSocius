@@ -4,30 +4,30 @@ example.com { # change exmaple.com  with your domain name
     }
 
     handle @wants_activity {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
 
     handle /api/* {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
     handle /outbox* {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
     handle /inbox* {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
     handle /.well-known/* {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
     handle /actor* {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
 
     handle /media/* {
-        reverse_proxy backend:4000
+        reverse_proxy app:4000
     }
 
     handle {
-        reverse_proxy frontend:3000
+        reverse_proxy app:3000
     }
 }
