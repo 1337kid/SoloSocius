@@ -12,6 +12,15 @@ repo_name = "1337kid/SoloSocius"
 
 nav = [
   { "Home" = "index.md" },
+  { "Docs" = [
+    { "Getting Started" = [
+      { "Overview" = "docs/index.md" },
+      { "Installation" = [
+        { "Building using Docker Compose" = "docs/installation/docker.md" },
+        { "Manual Installation " = "docs/installation/manual.md" },
+      ] },
+    ] },
+  ] },
 ]
 
 
@@ -57,9 +66,9 @@ logo = "assets/logo.png"
 # [project.theme.icon]
 # logo = "lucide/smile"
 
-# [project.theme.font]
-# text = "Inter"
-# code = "Jetbrains Mono"
+[project.theme.font]
+text = "Inter"
+code = "JetBrains Mono"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme)"
