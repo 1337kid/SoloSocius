@@ -10,6 +10,20 @@ import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
 import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
 import type { MediaItem } from "../db/schema.js";
 
+type SignatureParams = {
+  url: string;
+  method: "GET" | "POST";
+  body?: string;
+  keyId: string;
+};
+
+type SignatureResult = {
+  host: string;
+  date: string;
+  digest?: string;
+  signature: string;
+};
+
 const axiosClient = axios.create({ timeout: 10000 });
 
 axiosRetry(axiosClient, {
@@ -31,13 +45,24 @@ axiosRetry(axiosClient, {
 });
 
 export const remoteFetch = async (destination: string, accept?: string) => {
-  return await fetch(destination, {
-    headers: accept
-      ? { Accept: accept }
-      : { Accept: "application/activity+json" },
+  const keyId = `${userEndpoints.actorUri}#main-key`;
+
+  const signatureParams = await generateSignature({
+    url: destination,
+    method: "GET",
+    keyId,
+  });
+
+  return fetch(destination, {
+    method: "GET",
+    headers: {
+      Accept: accept || "application/activity+json",
+      Host: signatureParams.host,
+      Date: signatureParams.date,
+      Signature: signatureParams.signature,
+    },
   });
 };
-
 export const webfingerLookup = async (domain: string, handle: string) => {
   return await remoteFetch(
     `https://${domain}/.well-known/webfinger?resource=acct:${handle}`,
@@ -49,7 +74,9 @@ export const remoteActorLookup = async (actorUri: string) => {
   const actor = await getActorFromDB(actorUri);
   if (actor) return actor;
 
-  const remoteActor = await remoteFetch(actorUri);
+  const remoteActor = await remoteFetch(actorUri, "application/json");
+  console.log("remoteActor", remoteActor);
+
   if (!remoteActor.ok)
     throw new Error("Could not discover target remote profile path.");
 
@@ -85,7 +112,7 @@ export const parseMediaItems = (attachment: any) => {
 
 export const remotePostLookup = async (postUri: string) => {
   const post = await getPostFromDB(postUri);
-  console.log("post", post);
+
   if (post) return post;
 
   const lookup = await remoteFetch(postUri);
@@ -123,40 +150,75 @@ export const remotePostLookup = async (postUri: string) => {
   return newPost;
 };
 
-export const deliverActivity = async (params: DeliverParams) => {
-  const { inboxUrl, activity } = params;
+const generateSignature = async ({
+  url,
+  method,
+  body,
+  keyId,
+}: SignatureParams): Promise<SignatureResult> => {
+  const urlObj = new URL(url);
   const privateKeyPem = await getUserPrivateKey();
-
-  const keyId = `${userEndpoints.actorUri}#main-key`;
-
-  const urlObj = new URL(inboxUrl);
   const targetPath = urlObj.pathname + urlObj.search;
   const targetHost = urlObj.host;
-
-  const bodyString = JSON.stringify(activity);
-  const digestHash = createHash("sha256").update(bodyString).digest("base64");
-  const digestHeader = `SHA-256=${digestHash}`;
   const dateHeader = new Date().toUTCString();
 
-  const signField = [
-    `(request-target): post ${targetPath}`,
+  const signFields = [
+    `(request-target): ${method.toLowerCase()} ${targetPath}`,
     `host: ${targetHost}`,
     `date: ${dateHeader}`,
-    `digest: ${digestHeader}`,
   ];
 
-  const comparisonString = signField.join("\n");
+  let digestHeader: string | undefined;
 
+  if (body !== undefined) {
+    const digestHash = createHash("sha256").update(body).digest("base64");
+    digestHeader = `SHA-256=${digestHash}`;
+    signFields.push(`digest: ${digestHeader}`);
+  }
+
+  const comparisonString = signFields.join("\n");
   const signatureString = createSignature(comparisonString, privateKeyPem);
-  const signatureHeader = `keyId="${keyId}",algorithm="rsa-sha256",headers="(request-target) host date digest",signature="${signatureString}"`;
+
+  const signedHeaders = [
+    "(request-target)",
+    "host",
+    "date",
+    ...(digestHeader ? ["digest"] : []),
+  ];
+
+  const signatureHeader =
+    `keyId="${keyId}",` +
+    `algorithm="rsa-sha256",` +
+    `headers="${signedHeaders.join(" ")}",` +
+    `signature="${signatureString}"`;
+
+  return {
+    host: targetHost,
+    date: dateHeader,
+    ...(digestHeader && { digest: digestHeader }),
+    signature: signatureHeader,
+  };
+};
+
+export const deliverActivity = async (params: DeliverParams) => {
+  const { inboxUrl, activity } = params;
+  const keyId = `${userEndpoints.actorUri}#main-key`;
+  const bodyString = JSON.stringify(activity);
+
+  const signatureParams = await generateSignature({
+    url: inboxUrl,
+    method: "POST",
+    body: bodyString,
+    keyId,
+  });
 
   try {
     const response = await axiosClient.post(inboxUrl, bodyString, {
       headers: {
-        Host: targetHost,
-        Date: dateHeader,
-        Digest: digestHeader,
-        Signature: signatureHeader,
+        Host: signatureParams.host,
+        Date: signatureParams.date,
+        Digest: signatureParams.digest,
+        Signature: signatureParams.signature,
         "Content-Type": "application/activity+json",
         Accept: "application/activity+json",
       },
