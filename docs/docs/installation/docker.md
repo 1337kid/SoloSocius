@@ -39,4 +39,12 @@ You can launch SoloSocius using the below command.
 sudo docker compose up -d
 ```
 
+## Updating SoloSocius
+
+```bash
+git pull
+sudo docker compose build
+sudo docker compose stop && sudo docker compose up -d
+```
+
 Enjoy your single user Fediverse instance.... :3
