@@ -8,6 +8,7 @@ import { handleWebFinger } from "../controllers/webfinger.controller.js";
 import { handleFollowingCollectionRequest } from "../controllers/following.controller.js";
 import { handleFollowersCollectionRequest } from "../controllers/followers.controller.js";
 import { getMedia } from "../controllers/media.controller.js";
+import { nodeinfoRoutes, getNodeInfo } from "../controllers/nodeinfo.controller.js";
 
 export async function activityPubRoutes(fastify: FastifyInstance) {
   fastify.get("/media/*", getMedia);
@@ -24,4 +25,8 @@ export async function activityPubRoutes(fastify: FastifyInstance) {
   fastify.get("/posts/:id", getPostActivity);
   fastify.get("/following", handleFollowingCollectionRequest);
   fastify.get("/followers", handleFollowersCollectionRequest);
+
+  // NodeInfo routes
+  fastify.get("/nodeinfo/2.0", getNodeInfo);
+  fastify.get("/.well-known/nodeinfo", nodeinfoRoutes);
 }

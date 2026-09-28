@@ -37,3 +37,6 @@ export const S3_SECRET_KEY = process.env.S3_SECRET_KEY!;
 export const STORAGE_PUBLIC_MEDIA_URL = process.env.STORAGE_PUBLIC_MEDIA_URL!;
 
 export const REDIS_URL = process.env.REDIS_URL!;
+
+export const SOFTWARE_NAME = "solosocius";
+export const SOFTWARE_VERSION = "0.6.0";
