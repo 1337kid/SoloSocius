@@ -167,3 +167,16 @@ export const media = pgTable("media", {
     .default("post")
     .$type<"post" | "avatar" | "banner">(),
 });
+
+export const jobs = pgTable("jobs", {
+  id: uuid('id').defaultRandom().primaryKey(),
+  type: text('type').notNull(),
+  payload: jsonb('payload').notNull(), // JSON holding target inbox, activity body, keys
+  status: text('status').default('pending').notNull(),
+  attempts: integer('attempts').default(0).notNull(),
+  maxAttempts: integer('max_attempts').default(5).notNull(),
+  lastError: text('last_error'),
+  runAt: timestamp('run_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
