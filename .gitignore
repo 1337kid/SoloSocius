@@ -73,7 +73,5 @@ node_modules/
 
 .pnpm-store
 
-Makefile
-
 # Zensical
 site/
