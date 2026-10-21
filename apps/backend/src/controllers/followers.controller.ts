@@ -13,11 +13,11 @@ import {
   createOrderedCollectionPage,
 } from "../activitypub/collections.js";
 import { userEndpoints } from "../activitypub/actor.js";
-import { deliverActivity } from "../utils/activitypub.js";
 import {
   createAcceptFollowActivity,
   createRejectFollowActivity,
 } from "../activitypub/activities.js";
+import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 
 const PAGE_SIZE = 20;
 
@@ -154,9 +154,7 @@ export const handleApproveFollowRequest = async (
       followRequest.actor.actorUri,
     );
 
-    console.log("acceptActivity", acceptActivity);
-
-    await deliverActivity({
+    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: followRequest.actor.inboxUrl,
       activity: acceptActivity,
     });
@@ -192,7 +190,7 @@ export const handleRejectFollow = async (
 
     console.log("rejectActivity", rejectActivity);
 
-    await deliverActivity({
+    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: follower.actor.inboxUrl,
       activity: rejectActivity,
     });

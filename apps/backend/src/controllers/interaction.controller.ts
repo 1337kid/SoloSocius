@@ -1,11 +1,9 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import {
-  deliverActivity,
   deliverActivityToFollowers,
   remoteActorLookup,
   remotePostLookup,
 } from "../utils/activitypub.js";
-import { getPostFromDB } from "../db/queries/posts.js";
 import {
   createActivity,
   createInteractionActivity,
@@ -21,6 +19,7 @@ import {
   createTimelineEntry,
   removeTimelineBoostEntry,
 } from "../db/queries/timeline.js";
+import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 
 export const handleOutboundPostInteraction = async (
   request: FastifyRequest,
@@ -64,7 +63,7 @@ export const handleOutboundPostInteraction = async (
       }
 
       const remoteInbox = actorLookup.inboxUrl;
-      await deliverActivity({
+      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
         inboxUrl: remoteInbox,
         activity: interactionActivity,
       });
@@ -124,7 +123,7 @@ export const handleUndoPostInteraction = async (
     const actor = interaction.post.actor;
 
     if (!actor.isLocal) {
-      await deliverActivity({
+      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
         inboxUrl: actor.inboxUrl,
         activity: undoActivity,
       });

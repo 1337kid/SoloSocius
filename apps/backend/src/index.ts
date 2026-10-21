@@ -11,6 +11,7 @@ import contentTypeParser from "./plugins/contentTypeParser.js";
 import requestBodyLogger from "./plugins/requestBodyLogger.js";
 import { PrivateRoutes } from "./routes/private.router.js";
 import { initializeRedis } from "./cache/redis.js";
+import jobWorker from "./jobs/index.js";
 
 const fastify = Fastify({ logger: loggerConfig });
 
@@ -34,6 +35,7 @@ const start = async () => {
     const port = PORT;
     await fastify.listen({ port, host: "0.0.0.0" });
     await initializeRedis();
+    jobWorker.start();
     console.log(`SoloSocius Server spinning on port ${port}`);
   } catch (err) {
     fastify.log.error(err);

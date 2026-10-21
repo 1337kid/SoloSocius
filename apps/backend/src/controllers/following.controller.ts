@@ -1,9 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import {
-  deliverActivity,
-  remoteActorLookup,
-  webfingerLookup,
-} from "../utils/activitypub.js";
+import { remoteActorLookup } from "../utils/activitypub.js";
 import {
   checkIfLocalActorIsFollowing,
   createFollowingUserEntry,
@@ -19,13 +15,14 @@ import {
   createOrderedCollectionPage,
 } from "../activitypub/collections.js";
 import { userEndpoints } from "../activitypub/actor.js";
+import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 
 export const handleFollowRemoteUser = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
   const { actorUri } = request.body as { actorUri: string };
-  
+
   try {
     const remoteActor = await remoteActorLookup(actorUri);
 
@@ -53,16 +50,10 @@ export const handleFollowRemoteUser = async (
 
     console.log(followActivity);
 
-    const success = await deliverActivity({
+    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: remoteInbox,
       activity: followActivity,
     });
-
-    if (!success) {
-      return reply.status(502).send({
-        error: "Delivery to remote inbox failed.",
-      });
-    }
 
     return reply.status(200).send({
       message: "Follow activity delivered",
@@ -97,7 +88,7 @@ export const handleUnfollowRemoteUser = async (
       following.followActivityId,
     );
 
-    await deliverActivity({
+    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: following.actor.inboxUrl,
       activity: unfollowActivity,
     });

@@ -2,8 +2,9 @@ import { createActivity } from "../../activitypub/activities.js";
 import { createFollowerEntry } from "../../db/queries/followers.js";
 import { InboxActivity } from "../../types/index.js";
 import { generateAcceptActivityId } from "../../utils/activityId.js";
-import { deliverActivity, remoteActorLookup } from "../../utils/activitypub.js";
+import { remoteActorLookup } from "../../utils/activitypub.js";
 import { isManuallyApprovingFollowers } from "../../db/queries/actor.js";
+import jobWorker, { JOB_TYPES } from "../../jobs/index.js";
 
 export const handleFollowActivity = async (activity: InboxActivity) => {
   const actorToFollow = activity.actor;
@@ -22,7 +23,7 @@ export const handleFollowActivity = async (activity: InboxActivity) => {
     const activityId = generateAcceptActivityId();
     const acceptActivity = createActivity(activityId, "Accept", activity);
 
-    await deliverActivity({
+    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: actorLookup.inboxUrl,
       activity: acceptActivity,
     });

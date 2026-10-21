@@ -9,6 +9,7 @@ import { userEndpoints } from "../activitypub/actor.js";
 import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
 import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
 import type { MediaItem } from "../db/schema.js";
+import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 
 type SignatureParams = {
   url: string;
@@ -242,19 +243,12 @@ export const deliverActivityToFollowers = async (activityPayload: any) => {
       );
     }
 
-    Promise.allSettled(
-      Array.from(uniqueDeliveryInboxes).map((inboxUrl) => {
-        deliverActivity({
-          inboxUrl,
-          activity: activityPayload,
-        });
-      }),
-    ).then((results) => {
-      const deliveredCount = results.filter(
-        (r) => r.status === "fulfilled",
-      ).length;
-      console.log("Status", deliveredCount);
-    });
+    for (const inboxUrl of uniqueDeliveryInboxes) {
+      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
+        inboxUrl,
+        activity: activityPayload,
+      });
+    }
   }
 };
 

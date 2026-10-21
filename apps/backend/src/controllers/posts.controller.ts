@@ -1,8 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import {
-  deliverActivity,
-  deliverActivityToFollowers,
-} from "../utils/activitypub.js";
+import { deliverActivityToFollowers } from "../utils/activitypub.js";
 import {
   createUserPost,
   deletePostById,
@@ -21,6 +18,7 @@ import {
 import { userEndpoints } from "../activitypub/actor.js";
 import { createTimelineEntry } from "../db/queries/timeline.js";
 import type { MediaItem } from "../db/schema.js";
+import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 
 export const createPost = async (
   request: FastifyRequest,
@@ -70,7 +68,7 @@ export const createPost = async (
     });
 
     if (newPost.inReplyTo && replyPost.isLocal === false) {
-      await deliverActivity({
+      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
         inboxUrl: replyPost.actor.inboxUrl,
         activity: activityPayload,
       });
