@@ -17,18 +17,14 @@ import {
 } from "../activitypub/activities.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { createTimelineEntry } from "../db/queries/timeline.js";
-import type { MediaItem } from "../db/schema.js";
+import type { CreatePostRequest } from "@solosocius/api-types";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 
 export const createPost = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { content, inReplyTo, mediaItems } = request.body as {
-    content: string;
-    inReplyTo?: string;
-    mediaItems?: MediaItem[];
-  };
+  const { content, inReplyTo, mediaItems } = request.body as CreatePostRequest;
 
   if (!content || content.trim() === "") {
     return reply.status(400).send({ error: "Post content cannot be empty." });
@@ -76,7 +72,11 @@ export const createPost = async (
 
     await deliverActivityToFollowers(activityPayload);
 
-    return reply.status(201).send({ ...newPost, idUri: postUri, url: postUri });
+    return reply.status(201).send({
+      ...newPost,
+      idUri: postUri,
+      url: postUri,
+    });
   } catch (error) {
     console.error("Error in post creation:", error);
     return reply.status(500).send({ error: "Internal Server Error" });

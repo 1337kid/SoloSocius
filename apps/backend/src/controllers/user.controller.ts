@@ -1,3 +1,8 @@
+import type {
+  ProfileData,
+  UpdateProfileRequest,
+  UpdateProfileResponse,
+} from "@solosocius/api-types";
 import { FastifyRequest, FastifyReply } from "fastify";
 import {
   getLocalActorProfileData,
@@ -34,12 +39,12 @@ export const updateProfileData = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { displayName, summary } = request.body as {
-    displayName: string;
-    summary: string;
-  };
+  const { displayName, summary } = request.body as UpdateProfileRequest;
 
-  const actor = await updateLocalActorProfileData({ displayName, summary });
+  const actor = await updateLocalActorProfileData({
+    displayName,
+    summary: summary ?? "",
+  });
 
   await broadcastProfileUpdate(actor);
 

@@ -180,11 +180,14 @@ export function TimelineItem({
         </div>
 
         {/* Reply-to context */}
-        {entry.post.inReplyTo && (
+        {entry.post.inReplyTo && (() => {
+          const parent = entry.post.inReplyTo;
+          const parentActor = parent.actor;
+          return (
           <a
             href={
-              entry.post.inReplyTo.url ||
-              entry.post.inReplyTo.idUri ||
+              parent.url ||
+              parent.idUri ||
               entry.post.url ||
               "#"
             }
@@ -197,12 +200,13 @@ export function TimelineItem({
                 <div className="flex items-start gap-2">
                   <Avatar className="size-6">
                     <AvatarImage
-                      src={entry.post.inReplyTo.actor.avatarUrl || undefined}
+                      src={parentActor?.avatarUrl ?? undefined}
                     />
                     <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
                       {(
-                        entry.post.inReplyTo.actor.displayName ||
-                        entry.post.inReplyTo.actor.username
+                        parentActor?.displayName ||
+                        parentActor?.username ||
+                        "?"
                       )
                         .charAt(0)
                         .toUpperCase()}
@@ -213,18 +217,21 @@ export function TimelineItem({
                       <Reply className="size-4 text-primary inline mb-1" />
                       Replying to{" "}
                       <span className="font-medium text-foreground">
-                        {entry.post.inReplyTo.actor.displayName ||
-                          entry.post.inReplyTo.actor.username}
+                        {parentActor?.displayName ||
+                          parentActor?.username ||
+                          "Unknown"}
                       </span>
+                      {parentActor && (
                       <span className="font-medium text-primary">
-                        @{entry.post.inReplyTo.actor.username}@
-                        {entry.post.inReplyTo.actor.domain}
+                        @{parentActor.username}@
+                        {parentActor.domain}
                       </span>
+                      )}
                     </p>
                     <div
                       className="mt-0.5 text-xs text-muted-foreground line-clamp-1 prose prose-sm dark:prose-invert max-w-none"
                       dangerouslySetInnerHTML={{
-                        __html: purify.sanitize(entry.post.inReplyTo.content),
+                        __html: purify.sanitize(parent.content),
                       }}
                     />
                   </div>
@@ -232,7 +239,8 @@ export function TimelineItem({
               </CardContent>
             </Card>
           </a>
-        )}
+          );
+        })()}
 
         {/* Post content */}
         <div 

@@ -57,6 +57,7 @@ Caddyfile
 coverage/
 *.tgz
 *.zip
+*.tsbuildinfo
 
 # Express related
 npm-debug.log

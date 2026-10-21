@@ -1,59 +1,61 @@
+import type {
+  FollowersData,
+  FollowRequestData,
+  MessageResponse,
+  ProfileData,
+  ToggleManuallyApprovesFollowersResponse,
+  UpdateProfileRequest,
+  UpdateProfileResponse,
+  UploadedMediaResponse,
+} from "@solosocius/api-types";
 import { api } from "@/lib/api/axios";
 
-export interface ProfileData {
-  bannerUrl: string | null;
-  username: string;
-  avatarUrl: string | null;
-  displayName: string | null;
-  summary: string | null;
-  domain: string;
-  followersCount: number;
-  followingCount: number;
-  postsCount: number;
-  manuallyApprovesFollowers: boolean;
-}
+export type {
+  FollowersData,
+  FollowRequestData,
+  ProfileData,
+  UpdateProfileRequest as Profile,
+} from "@solosocius/api-types";
 
-export interface Profile {
-  displayName: string;
-  summary?: string;
-}
-
-export interface FollowersData {
-  id: string;
-  actor: {
-    actorUri: string;
-    displayName: string;
-    username: string;
-    domain: string;
-    avatarUrl: string;
-  };
-}
-
-export const getProfileData = async () => {
+export const getProfileData = async (): Promise<ProfileData> => {
   const { data } = await api.get<ProfileData>("/profile");
   return data;
 };
 
-export const updateProfile = async (profile: Profile): Promise<ProfileData> => {
-  const { data } = await api.put<ProfileData>("/profile", profile);
+export const updateProfile = async (
+  profile: UpdateProfileRequest,
+): Promise<UpdateProfileResponse> => {
+  const { data } = await api.put<UpdateProfileResponse>("/profile", profile);
   return data;
 };
 
-export const uploadProfileAvatar = async (file: File): Promise<{ url: string }> => {
+export const uploadProfileAvatar = async (
+  file: File,
+): Promise<UploadedMediaResponse> => {
   const form = new FormData();
   form.append("file", file);
-  const { data } = await api.post<{ url: string }>("/media/avatar", form, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const { data } = await api.post<UploadedMediaResponse>(
+    "/media/avatar",
+    form,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
   return data;
 };
 
-export const uploadProfileBanner = async (file: File): Promise<{ url: string }> => {
+export const uploadProfileBanner = async (
+  file: File,
+): Promise<UploadedMediaResponse> => {
   const form = new FormData();
   form.append("file", file);
-  const { data } = await api.post<{ url: string }>("/media/banner", form, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const { data } = await api.post<UploadedMediaResponse>(
+    "/media/banner",
+    form,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
   return data;
 };
 
@@ -75,16 +77,13 @@ export const getFollowingData = async (page: number) => {
 
 export const unfollowRemoteUser = async (
   actorUri: string,
-): Promise<{ message: string }> => {
-  const { data } = await api.delete(`/follow`, {
+): Promise<MessageResponse> => {
+  const { data } = await api.delete<MessageResponse>(`/follow`, {
     data: {
       actorUri,
     },
   });
 
-  if (data.error) {
-    throw new Error(data.error);
-  }
   return data;
 };
 
@@ -92,20 +91,10 @@ export const deleteAccount = async (password: string): Promise<void> => {
   await api.delete("/account", { data: { password } });
 };
 
-export interface FollowRequestData {
-  id: string;
-  actor: {
-    actorUri: string;
-    displayName: string;
-    username: string;
-    domain: string;
-    avatarUrl: string;
-  };
-  incomingFollowActivityId: string;
-}
-
 export const getFollowRequestsData = async (page: number) => {
-  const { data } = await api.get<FollowRequestData[]>(`/follow-requests?page=${page}`);
+  const { data } = await api.get<FollowRequestData[]>(
+    `/follow-requests?page=${page}`,
+  );
   return {
     followRequests: data,
     nextPage: data.length > 0 ? page + 1 : undefined,
@@ -114,31 +103,29 @@ export const getFollowRequestsData = async (page: number) => {
 
 export const approveFollowRequest = async (
   id: string,
-): Promise<{ message: string }> => {
-  const { data } = await api.post(`/follow-requests/${id}/approve`);
-  
-  if (data.error) {
-    throw new Error(data.error);
-  }
+): Promise<MessageResponse> => {
+  const { data } = await api.post<MessageResponse>(
+    `/follow-requests/${id}/approve`,
+  );
+
   return data;
 };
 
 export const rejectFollowRequest = async (
   id: string,
-): Promise<{ message: string }> => {
-  const { data } = await api.delete(`/follow-requests/${id}`);
-  
-  if (data.error) {
-    throw new Error(data.error);
-  }
+): Promise<MessageResponse> => {
+  const { data } = await api.delete<MessageResponse>(
+    `/follow-requests/${id}`,
+  );
+
   return data;
 };
 
-export const toggleManuallyApprovesFollowers = async (): Promise<{ manuallyApprovesFollowers: boolean }> => {
-  const { data } = await api.post("/follow-requests/toggle");
-  
-  if (data.error) {
-    throw new Error(data.error);
-  }
-  return data;
-};
+export const toggleManuallyApprovesFollowers =
+  async (): Promise<ToggleManuallyApprovesFollowersResponse> => {
+    const { data } = await api.post<ToggleManuallyApprovesFollowersResponse>(
+      "/follow-requests/toggle",
+    );
+
+    return data;
+  };

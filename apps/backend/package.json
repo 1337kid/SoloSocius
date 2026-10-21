@@ -16,6 +16,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@solosocius/api-types": "workspace:*",
     "@aws-sdk/client-s3": "^3.1094.0",
     "@aws-sdk/lib-storage": "^3.1094.0",
     "@fastify/cookie": "^11.0.2",

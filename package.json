@@ -10,6 +10,8 @@
     "dev:backend": "npm run dev -w apps/backend",
     "dev:frontend": "npm run dev -w apps/frontend",
     "dev": "concurrently --kill-others --names BACKEND,FRONTEND --prefix \"[{name}]\" --prefix-colors cyan,magenta \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "pnpm --filter @solosocius/api-types build && pnpm --filter backend --filter frontend build",
+    "build:api-types": "pnpm --filter @solosocius/api-types build",
     "bump": "bash scripts/bump-version.sh",
     "bump:patch": "bash scripts/bump-version.sh patch",
     "bump:minor": "bash scripts/bump-version.sh minor",

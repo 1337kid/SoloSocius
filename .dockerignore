@@ -5,6 +5,8 @@
 
 **/dist
 **/.next
+**/tsconfig.tsbuildinfo
+**/*.tsbuildinfo
 
 *.log
 npm-debug.log*

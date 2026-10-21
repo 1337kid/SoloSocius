@@ -90,7 +90,7 @@ const FollowRequestsPage = ({
                   <div className="flex items-center gap-3">
                     <Avatar size="lg">
                       <AvatarImage
-                        src={item.actor.avatarUrl}
+                        src={item.actor.avatarUrl ?? undefined}
                         alt={item.actor.displayName || item.actor.username}
                       />
                       <AvatarFallback>{initials}</AvatarFallback>

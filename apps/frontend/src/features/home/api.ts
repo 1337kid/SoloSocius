@@ -1,26 +1,30 @@
+import type {
+  CreatePostRequest,
+  CreatedPostResponse,
+  FollowResponse,
+  SearchUserResponse,
+  TimelineResponse,
+  UploadedMediaResponse,
+} from "@solosocius/api-types";
 import { api } from "@/lib/api/axios";
-import type { TimelineResponse, MediaItem } from "@/features/timeline/api";
 
-export interface CreatePostRequest {
-  content: string;
-  inReplyTo?: string;
-  mediaItems?: MediaItem[];
-}
+export type {
+  CreatePostRequest,
+  UploadedMediaResponse as UploadedAttachment,
+} from "@solosocius/api-types";
 
-export interface UploadedAttachment {
-  key: string;
-  url: string;
-  width: number;
-  height: number;
-  mimeType: string;
-}
-
-export const uploadAttachment = async (file: File): Promise<UploadedAttachment> => {
+export const uploadAttachment = async (
+  file: File,
+): Promise<UploadedMediaResponse> => {
   const form = new FormData();
   form.append("file", file);
-  const { data } = await api.post<UploadedAttachment>("/media/attachment", form, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const { data } = await api.post<UploadedMediaResponse>(
+    "/media/attachment",
+    form,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
   return data;
 };
 
@@ -35,17 +39,25 @@ export async function getHomeFeed(page: number = 1): Promise<TimelineResponse> {
   return data;
 }
 
-export const createPost = async (post: CreatePostRequest) => {
-  const { data } = await api.post("/posts", post);
+export const createPost = async (
+  post: CreatePostRequest,
+): Promise<CreatedPostResponse> => {
+  const { data } = await api.post<CreatedPostResponse>("/posts", post);
   return data;
 };
 
-export const searchRemoteUser = async (handle: string) => {
-  const { data } = await api.post("/search-user", { handle });
+export const searchRemoteUser = async (
+  handle: string,
+): Promise<SearchUserResponse> => {
+  const { data } = await api.post<SearchUserResponse>("/search-user", {
+    handle,
+  });
   return data;
 };
 
-export const followRemoteUser = async (actorUri: string) => {
-  const { data } = await api.post("/follow", { actorUri });
+export const followRemoteUser = async (
+  actorUri: string,
+): Promise<FollowResponse> => {
+  const { data } = await api.post<FollowResponse>("/follow", { actorUri });
   return data;
 };

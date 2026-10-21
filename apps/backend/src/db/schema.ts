@@ -10,10 +10,9 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 
-export type MediaItem = {
-  url: string;
-  mimeType: string;
-};
+import type { MediaItem } from "@solosocius/api-types";
+
+export type { MediaItem };
 
 export const actors = pgTable("actors", {
   actorUri: text("actor_uri").primaryKey(),

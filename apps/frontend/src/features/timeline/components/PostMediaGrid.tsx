@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useCallback } from "react";
 
 interface PostMediaGridProps {
-  mediaItems: MediaItem[];
+  mediaItems: MediaItem[] | null;
 }
 
 function MediaCarouselDialog({
