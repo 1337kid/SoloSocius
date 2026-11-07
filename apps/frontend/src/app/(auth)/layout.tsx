@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen">
+    <main>
       <AuthRouteGuard>{children}</AuthRouteGuard>
     </main>
   );

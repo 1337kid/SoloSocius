@@ -11,6 +11,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -77,53 +78,54 @@ export default function ShowMoreActions({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Ellipsis className="size-4 text-primary" />
+          <Button variant="action" size="icon" aria-label="More">
+            <Ellipsis />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-60">
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={() => {
-              navigator.clipboard.writeText(postUri);
-              toast.success("Link copied to clipboard");
-            }}
-          >
-            <LinkIcon className="size-4" />
-            Copy link to post
-          </DropdownMenuItem>
-
-          {!isLocal && (
+        <DropdownMenuContent align="end" size="wide">
+          <DropdownMenuGroup>
             <DropdownMenuItem
-              className="cursor-pointer"
               onClick={() => {
-                window.open(postUri, "_blank");
+                navigator.clipboard.writeText(postUri);
+                toast.success("Link copied to clipboard");
               }}
             >
-              <ExternalLinkIcon className="size-4" />
-              View post on remote instance
+              <LinkIcon />
+              Copy link to post
             </DropdownMenuItem>
-          )}
+
+            {!isLocal && (
+              <DropdownMenuItem
+                onClick={() => {
+                  window.open(postUri, "_blank");
+                }}
+              >
+                <ExternalLinkIcon />
+                View post on remote instance
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuGroup>
           {isLocal && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => {
-                  setEditedContent(postContent);
-                  setEditOpen(true);
-                }}
-              >
-                <PencilIcon className="size-4" />
-                Edit Post
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-red-500 cursor-pointer"
-                onClick={() => setDeleteOpen(true)}
-              >
-                <TrashIcon className="size-4" />
-                Delete Post
-              </DropdownMenuItem>
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditedContent(postContent);
+                    setEditOpen(true);
+                  }}
+                >
+                  <PencilIcon />
+                  Edit Post
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <TrashIcon />
+                  Delete Post
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </>
           )}
         </DropdownMenuContent>
@@ -142,7 +144,6 @@ export default function ShowMoreActions({
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
             rows={5}
-            className="resize-none"
           />
           <DialogFooter showCloseButton>
             <Button
@@ -169,8 +170,7 @@ export default function ShowMoreActions({
             <Button
               onClick={handleDelete}
               disabled={deletePost.isPending}
-              variant="outline"
-              className="text-red-500 border-red-500 hover:text-red-600 hover:bg-red-500"
+              variant="destructive"
             >
               {deletePost.isPending ? "Deleting…" : "Delete post"}
             </Button>

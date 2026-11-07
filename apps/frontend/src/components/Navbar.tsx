@@ -1,90 +1,70 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { HomeIcon, Loader2, LogIn, LogOut } from "lucide-react";
-import { toast } from "sonner";
+import Link from "next/link"
+import { HomeIcon, LogIn, LogOut } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useLogout } from "@/features/auth/hooks/useLogout";
-import { useSession } from "@/features/auth/hooks/useSession";
-import { routes } from "@/lib/routes";
-import Image from "next/image";
-import logo from "@/assets/logo.png";
-import { useRouter } from "next/navigation";
-
-function Logo() {
-  return (
-    <Link href="/" className="flex items-center gap-2.5 group">
-      <Image
-        src={logo}
-        alt="Logo"
-        width={36}
-        height={36}
-        className="rounded-sm"
-      />
-      <span className="font-semibold text-sm tracking-tight text-foreground group-hover:text-primary transition-colors">
-        SoloSocius
-      </span>
-    </Link>
-  );
-}
+import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
+import { useAuth } from "@/features/auth/hooks/useAuth"
+import { useLogout } from "@/features/auth/hooks/useLogout"
+import { useSession } from "@/features/auth/hooks/useSession"
+import Logo from "@/features/home/components/Logo"
+import { routes } from "@/lib/routes"
 
 const Navbar = () => {
-  const { isAuthenticated, isPending } = useAuth();
-  const { endSession } = useSession();
-  const logout = useLogout();
-  const router = useRouter();
+  const { isAuthenticated, isPending } = useAuth()
+  const { endSession } = useSession()
+  const logout = useLogout()
+  const router = useRouter()
 
   async function handleLogout() {
     try {
-      await logout.mutateAsync();
-      endSession();
+      await logout.mutateAsync()
+      endSession()
     } catch {
-      toast.error("Unable to logout.");
+      toast.error("Unable to logout.")
     }
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-primary/50 bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-        <Logo />
-
-        <div className="flex items-center gap-2">
-          {isPending ? (
-            <Loader2 className="size-4 animate-spin text-muted-foreground" />
-          ) : isAuthenticated ? (
-            <>
-              <Button variant="ghost" onClick={() => router.push(routes.dash)}>
-                <HomeIcon className="size-4" />
-                Dashboard
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleLogout}
-                disabled={logout.isPending}
-                className="justify-start bg-transparent! hover:bg-destructive/10! gap-2"
-                >
-                {logout.isPending ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <LogOut className="size-4" />
-                )}
-                Logout
-              </Button>
-            </>
-          ) : (
-            <Button asChild className="gap-2">
-              <Link href={routes.login}>
-                <LogIn className="size-4" />
-                Login
-              </Link>
+    <header data-slot="topbar">
+      <Logo />
+      <div data-slot="topbar-actions">
+        {isPending ? (
+          <Spinner />
+        ) : isAuthenticated ? (
+          <>
+            <Button variant="ghost" onClick={() => router.push(routes.dash)}>
+              <HomeIcon data-icon="inline-start" />
+              Dashboard
             </Button>
-          )}
-        </div>
+            <Button
+              variant="nav-danger"
+              size="default"
+              onClick={handleLogout}
+              disabled={logout.isPending}
+            >
+              {logout.isPending ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <LogOut data-icon="inline-start" />
+              )}
+              Logout
+            </Button>
+          </>
+        ) : (
+          <Button asChild>
+            <Link href={routes.login}>
+              <LogIn data-icon="inline-start" />
+              Login
+            </Link>
+          </Button>
+        )}
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

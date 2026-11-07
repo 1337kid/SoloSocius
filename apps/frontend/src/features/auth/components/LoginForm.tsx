@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { routes } from "@/lib/routes";
 
 import { useLogin } from "../hooks/useLogin";
@@ -38,11 +39,8 @@ const LoginForm = () => {
   }
 
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-6"
-    >
+    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <FieldGroup>
       <Controller
         control={form.control}
         name="username"
@@ -81,9 +79,11 @@ const LoginForm = () => {
         )}
       />
 
-      <Button className="w-full" disabled={login.isPending}>
+      <Button disabled={login.isPending}>
+        {login.isPending ? <Spinner data-icon="inline-start" /> : null}
         {login.isPending ? "Signing in..." : "Sign in"}
       </Button>
+      </FieldGroup>
     </form>
   );
 };

@@ -1,202 +1,173 @@
-"use client";
-import { useState } from "react";
+"use client"
+
+import { useState } from "react"
+import {
+  BellIcon,
+  HomeIcon,
+  LogOut,
+  Pencil,
+  Rss,
+  Settings,
+  UserIcon,
+  UserPlus,
+  Users,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import {
-  HomeIcon,
-  BellIcon,
-  UserIcon,
-  Settings,
-  LogOut,
-  Rss,
-  Users,
-  Edit,
-  UserPlus,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { routes } from "@/lib/routes";
-import { useSession } from "@/features/auth/hooks/useSession";
-import { useLogout } from "@/features/auth/hooks/useLogout";
-import { toast } from "sonner";
-import { useProfileData } from "@/features/profile/hooks/useProfileData";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog";
-import { SettingsDialog } from "@/features/home/components/SettingsDialog";
+} from "@/components/ui/sheet"
+import { Spinner } from "@/components/ui/spinner"
+import { useLogout } from "@/features/auth/hooks/useLogout"
+import { useSession } from "@/features/auth/hooks/useSession"
+import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog"
+import { useProfileData } from "@/features/profile/hooks/useProfileData"
+import ProfileStat from "@/features/timeline/components/ProfileStat"
+import { routes } from "@/lib/routes"
+
+import { SettingsDialog } from "../SettingsDialog"
 
 interface MobileProfileSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function MobileProfileSheet({
   open,
   onOpenChange,
 }: MobileProfileSheetProps) {
-  const router = useRouter();
-  const { data: profileData } = useProfileData();
-  const { endSession } = useSession();
-  const logout = useLogout();
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const router = useRouter()
+  const { data: profileData } = useProfileData()
+  const { endSession } = useSession()
+  const logout = useLogout()
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const name = profileData?.displayName || profileData?.username || ""
 
   async function handleLogout() {
     try {
-      await logout.mutateAsync();
-      endSession();
-      onOpenChange(false);
+      await logout.mutateAsync()
+      endSession()
+      onOpenChange(false)
     } catch {
-      toast.error("Unable to logout.");
+      toast.error("Unable to logout.")
     }
   }
 
-  const handleNavigation = (route: string) => {
-    router.push(route);
-    onOpenChange(false);
-  };
+  const go = (route: string) => {
+    router.push(route)
+    onOpenChange(false)
+  }
 
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent
-          side="bottom"
-          className="h-[85vh] rounded-t-xl border-t-2"
-        >
-          <div className="flex flex-col h-full">
-            <SheetHeader className="pb-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  {profileData?.avatarUrl && (
-                    <AvatarImage src={profileData.avatarUrl} />
-                  )}
-                  <AvatarFallback>
-                    {profileData?.displayName?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <SheetTitle className="text-left text-lg">
-                    {profileData?.displayName}
-                  </SheetTitle>
-                  <p className="text-sm text-muted-foreground">
-                    {profileData?.username}@{profileData?.domain}
-                  </p>
-                  <div className="flex gap-4 mt-2 text-sm">
-                    <span>
-                      <strong>{profileData?.postsCount || 0}</strong> posts
-                    </span>
-                    <span>
-                      <strong>{profileData?.followersCount || 0}</strong>{" "}
-                      followers
-                    </span>
-                    <span>
-                      <strong>{profileData?.followingCount || 0}</strong>{" "}
-                      following
-                    </span>
-                  </div>
-                </div>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <EditProfileDialog />
-                </Dialog>
+        <SheetContent side="bottom" size="tall">
+          <SheetHeader>
+            <div data-slot="profile-identity">
+              <Avatar size="lg">
+                {profileData?.avatarUrl ? (
+                  <AvatarImage src={profileData.avatarUrl} alt={name} />
+                ) : null}
+                <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <SheetTitle>{name}</SheetTitle>
+                <p data-slot="post-handle">
+                  @{profileData?.username}@{profileData?.domain}
+                </p>
               </div>
-            </SheetHeader>
-
-            <Separator />
-
-            <div className="flex-1 py-4 space-y-2 px-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12"
-                onClick={() => handleNavigation(routes.dash)}
-              >
-                <HomeIcon className="h-5 w-5 mr-3" />
-                Home
-              </Button>
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12"
-                onClick={() => {}}
-              >
-                <BellIcon className="h-5 w-5 mr-3" />
-                Notifications
-              </Button>
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12"
-                onClick={() => handleNavigation(routes.home)}
-              >
-                <UserIcon className="h-5 w-5 mr-3" />
-                Your Profile
-              </Button>
-
-              {profileData?.manuallyApprovesFollowers && (
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start h-12"
-                  onClick={() => handleNavigation(routes.followRequests)}
-                >
-                  <UserPlus className="h-5 w-5 mr-3" />
-                  Follow Requests
-                </Button>
-              )}
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12"
-                onClick={() => handleNavigation(routes.followers)}
-              >
-                <Users className="h-5 w-5 mr-3" />
-                Followers
-              </Button>
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12"
-                onClick={() => handleNavigation(routes.following)}
-              >
-                <Rss className="h-5 w-5 mr-3" />
-                Following
-              </Button>
-
-              <Separator className="my-4" />
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12"
-                onClick={() => {
-                  setSettingsOpen(true);
-                  onOpenChange(false);
-                }}
-              >
-                <Settings className="h-5 w-5 mr-3" />
-                Settings
-              </Button>
-
-              <Button
-                onClick={handleLogout}
-                disabled={logout.isPending}
-                className="w-full justify-start h-12 bg-transparent hover:bg-destructive/10 text-destructive"
-              >
-                <LogOut className="h-5 w-5 mr-3" />
-                Log Out
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Edit profile">
+                    <Pencil />
+                  </Button>
+                </DialogTrigger>
+                <EditProfileDialog />
+              </Dialog>
             </div>
+            <div data-slot="stat-row">
+              <ProfileStat text="Posts" value={profileData?.postsCount ?? 0} />
+              <ProfileStat
+                text="Followers"
+                value={profileData?.followersCount ?? 0}
+                href={routes.followers}
+              />
+              <ProfileStat
+                text="Following"
+                value={profileData?.followingCount ?? 0}
+                href={routes.following}
+              />
+            </div>
+          </SheetHeader>
+          <Separator />
+          <div data-slot="sheet-body">
+            <Button variant="nav" size="lg" onClick={() => go(routes.dash)}>
+              <HomeIcon data-icon="inline-start" />
+              Home
+            </Button>
+            <Button variant="nav" size="lg">
+              <BellIcon data-icon="inline-start" />
+              Notifications
+            </Button>
+            <Button variant="nav" size="lg" onClick={() => go(routes.home)}>
+              <UserIcon data-icon="inline-start" />
+              Profile
+            </Button>
+            {profileData?.manuallyApprovesFollowers ? (
+              <Button
+                variant="nav"
+                size="lg"
+                onClick={() => go(routes.followRequests)}
+              >
+                <UserPlus data-icon="inline-start" />
+                Follow requests
+              </Button>
+            ) : null}
+            <Button variant="nav" size="lg" onClick={() => go(routes.followers)}>
+              <Users data-icon="inline-start" />
+              Followers
+            </Button>
+            <Button variant="nav" size="lg" onClick={() => go(routes.following)}>
+              <Rss data-icon="inline-start" />
+              Following
+            </Button>
+            <Separator />
+            <Button
+              variant="nav"
+              size="lg"
+              onClick={() => {
+                setSettingsOpen(true)
+                onOpenChange(false)
+              }}
+            >
+              <Settings data-icon="inline-start" />
+              Settings
+            </Button>
+            <Button
+              variant="nav-danger"
+              size="lg"
+              onClick={handleLogout}
+              disabled={logout.isPending}
+            >
+              {logout.isPending ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <LogOut data-icon="inline-start" />
+              )}
+              Log out
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
-
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
-  );
+  )
 }

@@ -137,7 +137,7 @@ export function EditProfileDialog() {
     .toUpperCase();
 
   return (
-    <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0">
+    <DialogContent size="lg">
       <DialogHeader className="sr-only">
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogDescription>Edit your profile information.</DialogDescription>

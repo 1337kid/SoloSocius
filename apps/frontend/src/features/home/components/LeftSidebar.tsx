@@ -1,78 +1,67 @@
-"use client";
-import { Separator } from "@/components/ui/separator";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
-import { AvatarImage } from "@/components/ui/avatar";
-import { AvatarFallback } from "@/components/ui/avatar";
-import { useProfileData } from "@/features/profile/hooks/useProfileData";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
-import { EditProfileDialog } from "../../profile/components/EditProfileDialog";
-import DiscoverDialog from "./DiscoverDialog";
-import { PostComposer } from "./PostComposer";
+"use client"
+
+import { Pencil } from "lucide-react"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog"
+import { useProfileData } from "@/features/profile/hooks/useProfileData"
+import { routes } from "@/lib/routes"
+
+import DiscoverDialog from "./DiscoverDialog"
+import ProfileStat from "@/features/timeline/components/ProfileStat"
 
 const LeftSidebar = () => {
-  const { data: profile } = useProfileData();
+  const { data: profile } = useProfileData()
+  const name = profile?.displayName || profile?.username || ""
+
   return (
-    <div className="flex flex-col gap-4">
-      <Card className="mb-auto min-w-3/12 bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
-        <CardHeader className="flex flex-row items-center gap-2">
-          <Avatar className="size-16">
-            {profile?.avatarUrl && <AvatarImage src={profile.avatarUrl} />}
-            <AvatarFallback>{profile?.displayName?.charAt(0)}</AvatarFallback>
+    <>
+      <section data-slot="rail-card">
+        <div data-slot="profile-identity">
+          <Avatar size="lg">
+            {profile?.avatarUrl ? (
+              <AvatarImage src={profile.avatarUrl} alt={name} />
+            ) : null}
+            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col">
-            <CardTitle>{profile?.displayName}</CardTitle>
-            <CardDescription>
-              {profile?.username}@{profile?.domain}
-            </CardDescription>
+          <div>
+            <p data-slot="post-name">{profile?.displayName}</p>
+            <p data-slot="post-handle">
+              @{profile?.username}@{profile?.domain}
+            </p>
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="ml-auto">
-                <Edit className="size-4" />
+              <Button variant="outline" size="icon" aria-label="Edit profile">
+                <Pencil data-icon="inline-start" />
               </Button>
             </DialogTrigger>
             <EditProfileDialog />
           </Dialog>
-        </CardHeader>
-        <Separator />
-        <CardContent className="space-y-2">
-          <div className="flex gap-2 justify-evenly">
-            <p className="flex flex-col items-center gap-1 text-muted-foreground">
-              {profile?.postsCount} <span className="text-primary">posts</span>
-            </p>
-            <p className="flex flex-col items-center gap-1 text-muted-foreground">
-              {profile?.followersCount}{" "}
-              <span className="text-primary">followers</span>
-            </p>
-            <p className="flex flex-col items-center gap-1 text-muted-foreground">
-              {profile?.followingCount}{" "}
-              <span className="text-primary">following</span>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-      <Card className="mb-auto min-w-3/12 bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
-        <CardHeader className="flex flex-row items-center gap-2 justify-between">
-          <div>
-            <CardTitle>Discover People</CardTitle>
-            <CardDescription>Find new people to follow</CardDescription>
-          </div>
-          <DiscoverDialog />
-        </CardHeader>
-      </Card>
-      {/* Create Post Form */}
-      <PostComposer />
-    </div>
-  );
-};
+        </div>
+        <div data-slot="stat-row">
+          <ProfileStat text="Posts" value={profile?.postsCount ?? 0} />
+          <ProfileStat
+            text="Followers"
+            value={profile?.followersCount ?? 0}
+            href={routes.followers}
+          />
+          <ProfileStat
+            text="Following"
+            value={profile?.followingCount ?? 0}
+            href={routes.following}
+          />
+        </div>
+      </section>
+      <section data-slot="rail-card">
+        <h2 data-slot="rail-title">Discover</h2>
+        <p data-slot="post-handle">Find people to follow</p>
+        <DiscoverDialog />
+      </section>
+    </>
+  )
+}
 
-export default LeftSidebar;
+export default LeftSidebar
