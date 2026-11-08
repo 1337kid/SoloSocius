@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import { Pencil } from "lucide-react"
+import { Pencil } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog"
-import { useProfileData } from "@/features/profile/hooks/useProfileData"
-import { routes } from "@/lib/routes"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
+import { routes } from "@/lib/routes";
 
-import DiscoverDialog from "./DiscoverDialog"
-import ProfileStat from "@/features/timeline/components/ProfileStat"
+import { ComposeDialog } from "./ComposeDialog";
+import DiscoverDialog from "./DiscoverDialog";
+import ProfileStat from "@/features/timeline/components/ProfileStat";
 
 const LeftSidebar = () => {
-  const { data: profile } = useProfileData()
-  const name = profile?.displayName || profile?.username || ""
+  const { data: profile } = useProfileData();
+  const name = profile?.displayName || profile?.username || "";
 
   return (
     <>
@@ -60,8 +61,11 @@ const LeftSidebar = () => {
         <p data-slot="post-handle">Find people to follow</p>
         <DiscoverDialog />
       </section>
+      <section data-slot="rail-card">
+        <ComposeDialog />
+      </section>
     </>
-  )
-}
+  );
+};
 
-export default LeftSidebar
+export default LeftSidebar;

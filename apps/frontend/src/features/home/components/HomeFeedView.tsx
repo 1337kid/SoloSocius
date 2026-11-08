@@ -14,7 +14,6 @@ import {
 import { TimelineItem } from "@/features/timeline/components/TimelineItem"
 
 import { useHomeFeed } from "../hooks/useHomeFeed"
-import { PostComposer } from "./PostComposer"
 
 export function HomeFeedView() {
   const {
@@ -41,7 +40,6 @@ export function HomeFeedView() {
       <ColumnHeader>
         <h1>Home</h1>
       </ColumnHeader>
-      <PostComposer />
       {isLoading ? (
         <div data-slot="feed">
           {Array.from({ length: 5 }).map((_, i) => (
