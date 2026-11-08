@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   BellIcon,
   HomeIcon,
@@ -12,7 +11,7 @@ import {
   UserPlus,
   Users,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -30,10 +29,9 @@ import { useLogout } from "@/features/auth/hooks/useLogout"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog"
 import { useProfileData } from "@/features/profile/hooks/useProfileData"
+import { isSettingsItemActive, settingsNav } from "@/features/settings/nav"
 import ProfileStat from "@/features/timeline/components/ProfileStat"
 import { routes } from "@/lib/routes"
-
-import { SettingsDialog } from "../SettingsDialog"
 
 interface MobileProfileSheetProps {
   open: boolean
@@ -45,10 +43,10 @@ export function MobileProfileSheet({
   onOpenChange,
 }: MobileProfileSheetProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const { data: profileData } = useProfileData()
   const { endSession } = useSession()
   const logout = useLogout()
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const name = profileData?.displayName || profileData?.username || ""
 
   async function handleLogout() {
@@ -140,17 +138,23 @@ export function MobileProfileSheet({
               Following
             </Button>
             <Separator />
-            <Button
-              variant="nav"
-              size="lg"
-              onClick={() => {
-                setSettingsOpen(true)
-                onOpenChange(false)
-              }}
-            >
+            <Button variant="nav" size="lg" onClick={() => go(routes.settings)}>
               <Settings data-icon="inline-start" />
               Settings
             </Button>
+            <div data-slot="nav-children">
+              {settingsNav.map((item) => (
+                <Button
+                  key={item.href}
+                  variant="nav-child"
+                  size="sm"
+                  data-active={isSettingsItemActive(pathname, item.href) || undefined}
+                  onClick={() => go(item.href)}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </div>
             <Button
               variant="nav-danger"
               size="lg"
@@ -167,7 +171,6 @@ export function MobileProfileSheet({
           </div>
         </SheetContent>
       </Sheet>
-      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
   )
 }

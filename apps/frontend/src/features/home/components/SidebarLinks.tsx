@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   BellIcon,
   HomeIcon,
@@ -10,6 +9,7 @@ import {
   UserIcon,
   Users,
 } from "lucide-react"
+import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { toast } from "sonner"
 
@@ -19,9 +19,8 @@ import { Spinner } from "@/components/ui/spinner"
 import { useLogout } from "@/features/auth/hooks/useLogout"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useProfileData } from "@/features/profile/hooks/useProfileData"
+import { isSettingsItemActive, settingsNav } from "@/features/settings/nav"
 import { routes } from "@/lib/routes"
-
-import { SettingsDialog } from "./SettingsDialog"
 
 function isCurrent(pathname: string, href: string) {
   if (href === "/") return pathname === "/"
@@ -34,7 +33,7 @@ const SidebarLinks = () => {
   const { data: profileData } = useProfileData()
   const { endSession } = useSession()
   const logout = useLogout()
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const inSettings = isCurrent(pathname, routes.settings)
 
   async function handleLogout() {
     try {
@@ -74,10 +73,37 @@ const SidebarLinks = () => {
         </Button>
       ))}
       <Separator />
-      <Button variant="nav" size="lg" onClick={() => setSettingsOpen(true)}>
-        <Settings data-icon="inline-start" />
-        Settings
+      <Button
+        variant="nav"
+        size="lg"
+        asChild
+        data-active={inSettings || undefined}
+        aria-current={inSettings ? "page" : undefined}
+      >
+        <Link href={routes.settings}>
+          <Settings data-icon="inline-start" />
+          Settings
+        </Link>
       </Button>
+      {inSettings ? (
+        <div data-slot="nav-children">
+          {settingsNav.map((item) => {
+            const active = isSettingsItemActive(pathname, item.href)
+            return (
+              <Button
+                key={item.href}
+                variant="nav-child"
+                size="sm"
+                asChild
+                data-active={active || undefined}
+                aria-current={active ? "page" : undefined}
+              >
+                <Link href={item.href}>{item.label}</Link>
+              </Button>
+            )
+          })}
+        </div>
+      ) : null}
       <Button
         variant="nav-danger"
         size="lg"
@@ -91,7 +117,6 @@ const SidebarLinks = () => {
         )}
         Log out
       </Button>
-      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
   )
 }

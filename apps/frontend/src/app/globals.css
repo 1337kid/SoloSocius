@@ -820,6 +820,27 @@
     overflow: auto;
   }
 
+  [data-slot="nav-children"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding-left: 0.85rem;
+  }
+
+  [data-slot="nav-children"] [data-slot="button"] {
+    width: 100%;
+    height: 2.15rem;
+    font-size: 0.85rem;
+  }
+
+  [data-slot="settings-panel"] {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: min(36rem, 100%);
+    padding: 1rem;
+  }
+
   @media (min-width: 1024px) {
     [data-slot="shell-mobile-bar"],
     [data-slot="mobile-nav"] {
