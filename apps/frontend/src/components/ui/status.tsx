@@ -39,7 +39,7 @@ function Status({
     <article data-slot="post" data-variant={variant}>
       {boost}
       <div data-slot="post-top">
-        <Avatar size={variant === "detail" ? "lg" : "default"}>
+        <Avatar size="lg">
           {avatarUrl ? <AvatarImage src={avatarUrl} alt={name} /> : null}
           <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>

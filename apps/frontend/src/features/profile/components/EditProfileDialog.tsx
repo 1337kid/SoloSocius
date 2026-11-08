@@ -164,7 +164,7 @@ export function EditProfileDialog() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted-foreground/10">
+            <div className="flex h-full w-full items-center justify-center bg-muted">
               <ImagePlus className="size-7 text-muted-foreground/40" />
             </div>
           )}

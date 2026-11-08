@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button"
-import Navbar from "@/components/Navbar"
-import { PublicColumn, PublicFrame } from "@/components/ui/shell"
-import { Spinner } from "@/components/ui/spinner"
-import { ProfileData } from "@/features/profile/api"
-import { useProfileData } from "@/features/profile/hooks/useProfileData"
-import { ProfileCard } from "@/features/timeline/components/ProfileCard"
-import { PublicTimelineView } from "@/features/timeline/components/PublicTimelineView"
-import { ApiError } from "@/lib/api/axios"
-import { routes } from "@/lib/routes"
+import { Button } from "@/components/ui/button";
+import Navbar from "@/components/Navbar";
+import { PublicColumn, PublicFrame } from "@/components/ui/shell";
+import { Spinner } from "@/components/ui/spinner";
+import { ProfileData } from "@/features/profile/api";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
+import { ProfileCard } from "@/features/timeline/components/ProfileCard";
+import { PublicTimelineView } from "@/features/timeline/components/PublicTimelineView";
+import { ApiError } from "@/lib/api/axios";
+import { routes } from "@/lib/routes";
 
 export default function PublicTimeline() {
-  const { data: profile, error, isLoading } = useProfileData()
+  const { data: profile, error, isLoading } = useProfileData();
 
   if (isLoading) {
     return (
@@ -23,7 +23,7 @@ export default function PublicTimeline() {
           <Spinner />
         </div>
       </PublicFrame>
-    )
+    );
   }
 
   if (error instanceof ApiError && error.status === 404) {
@@ -37,7 +37,7 @@ export default function PublicTimeline() {
           </Button>
         </div>
       </PublicFrame>
-    )
+    );
   }
 
   if (error) {
@@ -47,7 +47,7 @@ export default function PublicTimeline() {
           <p>{error.message}</p>
         </div>
       </PublicFrame>
-    )
+    );
   }
 
   return (
@@ -58,5 +58,5 @@ export default function PublicTimeline() {
         <PublicTimelineView />
       </PublicColumn>
     </PublicFrame>
-  )
+  );
 }

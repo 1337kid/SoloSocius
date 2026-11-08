@@ -30,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html className={cn("font-sans dark", "font-sans", inter.variable)}>
-      <body className="bg-background text-foreground antialiased">
+      <body className="text-foreground antialiased">
         <Providers>
           <TooltipProvider>
             {children}
