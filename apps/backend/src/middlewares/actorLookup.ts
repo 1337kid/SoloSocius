@@ -1,18 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { remoteActorLookup } from "../utils/activitypub.js";
 import { webfingerLookup } from "../utils/activitypub.js";
+import type { SearchUserBody } from "../validations/social.val.js";
 
 export const actorLookupMiddleware = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: SearchUserBody }>,
   reply: FastifyReply,
 ) => {
-  const { handle } = request.body as { handle: string };
-
-  if (!handle || !handle.includes("@")) {
-    return reply.status(400).send({
-      error: "Valid federated handle target required (user@domain.com).",
-    });
-  }
+  const { handle } = request.body;
 
   const cleanHandle = handle.startsWith("@") ? handle.slice(1) : handle;
   const [, remoteDomain] = cleanHandle.split("@");

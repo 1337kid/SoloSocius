@@ -18,20 +18,25 @@ import {
   createRejectFollowActivity,
 } from "../activitypub/activities.js";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
+import type { IdParams } from "../validations/common.val.js";
+import type {
+  DefaultPageQuery,
+  OptionalPageQuery,
+} from "../validations/pagination.val.js";
 
 const PAGE_SIZE = 20;
 
 export const handleFollowersCollectionRequest = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Querystring: OptionalPageQuery }>,
   reply: FastifyReply,
 ) => {
-  const { page } = request.query as { page?: string };
+  const { page } = request.query;
 
   try {
     const totalItems = await getUserFollowersCount();
 
     // return metadata if no page query
-    if (!page) {
+    if (page === undefined) {
       const collectionWrapper = createOrderedCollection(
         userEndpoints.followers,
         {
@@ -46,22 +51,15 @@ export const handleFollowersCollectionRequest = async (
         .send(collectionWrapper);
     }
 
-    const pageNumber = parseInt(page, 10);
-    if (isNaN(pageNumber) || pageNumber < 1) {
-      return reply
-        .status(400)
-        .send({ error: "Invalid outbox page identifier specification." });
-    }
-
-    const offsetValue = (pageNumber - 1) * PAGE_SIZE;
+    const offsetValue = (page - 1) * PAGE_SIZE;
 
     const followersEntries = await getFollowersByOffset(offsetValue, PAGE_SIZE);
 
-    const hasMoreItems = totalItems > pageNumber * PAGE_SIZE;
+    const hasMoreItems = totalItems > page * PAGE_SIZE;
 
     const collectionPage = createOrderedCollectionPage(
       userEndpoints.followers,
-      pageNumber,
+      page,
       totalItems,
       followersEntries,
       hasMoreItems,
@@ -77,20 +75,13 @@ export const handleFollowersCollectionRequest = async (
 };
 
 export const handleGetAllFollowers = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Querystring: DefaultPageQuery }>,
   reply: FastifyReply,
 ) => {
-  const { page } = request.query as { page?: string };
+  const { page } = request.query;
 
   try {
-    const pageNumber = parseInt(page ?? "1", 10);
-    if (isNaN(pageNumber) || pageNumber < 1) {
-      return reply
-        .status(400)
-        .send({ error: "Invalid outbox page identifier specification." });
-    }
-
-    const offsetValue = (pageNumber - 1) * PAGE_SIZE;
+    const offsetValue = (page - 1) * PAGE_SIZE;
 
     const followersDetails = await getFollowersDetailsByOffset(
       offsetValue,
@@ -107,20 +98,13 @@ export const handleGetAllFollowers = async (
 };
 
 export const getAllFollowRequests = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Querystring: DefaultPageQuery }>,
   reply: FastifyReply,
 ) => {
-  const { page } = request.query as { page?: string };
+  const { page } = request.query;
 
   try {
-    const pageNumber = parseInt(page ?? "1", 10);
-    if (isNaN(pageNumber) || pageNumber < 1) {
-      return reply
-        .status(400)
-        .send({ error: "Invalid outbox page identifier specification." });
-    }
-
-    const offsetValue = (pageNumber - 1) * PAGE_SIZE;
+    const offsetValue = (page - 1) * PAGE_SIZE;
 
     const followRequests = await getFollowRequestsByOffset(
       offsetValue,
@@ -137,10 +121,10 @@ export const getAllFollowRequests = async (
 };
 
 export const handleApproveFollowRequest = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ) => {
-  const { id } = request.params as { id: string };
+  const { id } = request.params;
 
   try {
     const followRequest = await approveFollowRequest(id);
@@ -169,10 +153,10 @@ export const handleApproveFollowRequest = async (
 };
 
 export const handleRejectFollow = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ) => {
-  const { id } = request.params as { id: string };
+  const { id } = request.params;
 
   try {
     const follower = await getFollowerById(id);

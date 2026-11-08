@@ -15,25 +15,51 @@ import {
   handleApproveFollowRequest,
   handleRejectFollow,
 } from "../controllers/followers.controller.js";
+import { defaultPageRouteSchema } from "../validations/pagination.val.js";
+import {
+  actorUriRouteSchema,
+  followRequestIdRouteSchema,
+  searchUserRouteSchema,
+} from "../validations/social.val.js";
+import {
+  deleteAccountRouteSchema,
+  updateProfileRouteSchema,
+} from "../validations/user.val.js";
 
 export async function UserRoutes(fastify: FastifyInstance) {
   fastify.post(
     "/search-user",
-    { preHandler: [actorLookupMiddleware] },
+    { schema: searchUserRouteSchema, preHandler: [actorLookupMiddleware] },
     handleSearchRemoteUser,
   );
 
   // Follows
-  fastify.post("/follow", handleFollowRemoteUser);
-  fastify.delete("/follow", handleUnfollowRemoteUser);
+  fastify.post("/follow", { schema: actorUriRouteSchema }, handleFollowRemoteUser);
+  fastify.delete(
+    "/follow",
+    { schema: actorUriRouteSchema },
+    handleUnfollowRemoteUser,
+  );
 
   // Follow requests
-  fastify.get("/follow-requests", getAllFollowRequests);
+  fastify.get(
+    "/follow-requests",
+    { schema: defaultPageRouteSchema },
+    getAllFollowRequests,
+  );
   fastify.post("/follow-requests/toggle", toggleManuallyApprovesFollowers);
-  fastify.post("/follow-requests/:id/approve", handleApproveFollowRequest);
-  fastify.delete("/follow-requests/:id", handleRejectFollow);
+  fastify.post(
+    "/follow-requests/:id/approve",
+    { schema: followRequestIdRouteSchema },
+    handleApproveFollowRequest,
+  );
+  fastify.delete(
+    "/follow-requests/:id",
+    { schema: followRequestIdRouteSchema },
+    handleRejectFollow,
+  );
 
   // Profile
-  fastify.put("/profile", updateProfileData);
-  fastify.delete("/account", deleteAccount);
+  fastify.put("/profile", { schema: updateProfileRouteSchema }, updateProfileData);
+  fastify.delete("/account", { schema: deleteAccountRouteSchema }, deleteAccount);
 }

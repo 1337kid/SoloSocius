@@ -1,7 +1,8 @@
-import { FastifyReply } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { userEndpoints } from "../activitypub/actor.js";
 import { getProfileTimeline } from "../db/queries/timeline.js";
 import { getAllAcceptedFollowingActorUri } from "../db/queries/following.js";
+import type { DefaultPageQuery } from "../validations/pagination.val.js";
 
 const TIMELINE_LIMIT = 20;
 
@@ -34,34 +35,47 @@ const buildTimelinePage = (
   items: serializeTimelineItems(feedItems),
 });
 
-export const getHomeFeed = async (request: any, reply: FastifyReply) => {
+const pageWindow = (page: number) => ({
+  pageNumber: page,
+  offsetValue: (page - 1) * TIMELINE_LIMIT,
+});
+
+export const getHomeFeed = async (
+  request: FastifyRequest<{ Querystring: DefaultPageQuery }>,
+  reply: FastifyReply,
+) => {
   try {
     const followedAccounts = await getAllAcceptedFollowingActorUri();
 
     const actorsToShow = [...followedAccounts, userEndpoints.actorUri];
+    const { pageNumber, offsetValue } = pageWindow(request.query.page);
 
     const feedItems = await getProfileTimeline(
       actorsToShow,
       TIMELINE_LIMIT,
-      request.offsetValue,
+      offsetValue,
     );
 
-    return reply.send(buildTimelinePage(request.pageNumber, feedItems));
+    return reply.send(buildTimelinePage(pageNumber, feedItems));
   } catch (error) {
     console.error("Failed assembling feed:", error);
     return reply.status(500).send({ error: "Internal Server Error" });
   }
 };
 
-export const getPublicTimeline = async (request: any, reply: FastifyReply) => {
+export const getPublicTimeline = async (
+  request: FastifyRequest<{ Querystring: DefaultPageQuery }>,
+  reply: FastifyReply,
+) => {
   try {
+    const { pageNumber, offsetValue } = pageWindow(request.query.page);
     const feedItems = await getProfileTimeline(
       [userEndpoints.actorUri],
       TIMELINE_LIMIT,
-      request.offsetValue,
+      offsetValue,
     );
 
-    return reply.send(buildTimelinePage(request.pageNumber, feedItems));
+    return reply.send(buildTimelinePage(pageNumber, feedItems));
   } catch (error) {
     console.error("Failed assembling public timeline:", error);
     return reply.status(500).send({ error: "Internal Server Error" });

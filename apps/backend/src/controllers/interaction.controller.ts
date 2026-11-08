@@ -20,15 +20,13 @@ import {
   removeTimelineBoostEntry,
 } from "../db/queries/timeline.js";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
+import type { InteractionBody } from "../validations/social.val.js";
 
 export const handleOutboundPostInteraction = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: InteractionBody }>,
   reply: FastifyReply,
 ) => {
-  const { action, targetPostUri } = request.body as {
-    action: "like" | "boost";
-    targetPostUri: string;
-  };
+  const { action, targetPostUri } = request.body;
 
   try {
     const targetPost = await remotePostLookup(targetPostUri);
@@ -90,13 +88,10 @@ export const handleOutboundPostInteraction = async (
 };
 
 export const handleUndoPostInteraction = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: InteractionBody }>,
   reply: FastifyReply,
 ) => {
-  const { action, targetPostUri } = request.body as {
-    action: "like" | "boost";
-    targetPostUri: string;
-  };
+  const { action, targetPostUri } = request.body;
 
   try {
     const interaction = await findInteractionByPostAndType(

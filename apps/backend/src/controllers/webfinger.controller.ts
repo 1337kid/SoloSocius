@@ -2,21 +2,16 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { webfingerResponse } from "../activitypub/webfinger.js";
 import { checkActorOnThisInstance } from "../db/queries/actor.js";
 import { DOMAIN } from "../config/env.js";
+import type { WebFingerQuery } from "../validations/webfinger.val.js";
 
 export const handleWebFinger = async (
-  req: FastifyRequest,
+  req: FastifyRequest<{ Querystring: WebFingerQuery }>,
   reply: FastifyReply,
 ) => {
-  const { resource } = req.query as { resource?: string };
+  const { resource } = req.query;
 
   try {
-    if (!resource || !resource.startsWith("acct:")) {
-      return reply
-        .status(400)
-        .send({ error: "Missing or invalid resource query parameter." });
-    }
-
-    const accountTarget = resource?.replace("acct:", "");
+    const accountTarget = resource.replace("acct:", "");
     const [username, userDomain] = accountTarget.split("@");
 
     if (userDomain !== DOMAIN)

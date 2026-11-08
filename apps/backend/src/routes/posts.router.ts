@@ -6,15 +6,19 @@ import {
   deletePost,
   getPostWithReplies,
 } from "../controllers/posts.controller.js";
-import { validatePagination } from "../middlewares/validatePagination.js";
 import { getHomeFeed } from "../controllers/timeline.controller.js";
+import { defaultPageRouteSchema } from "../validations/pagination.val.js";
+import {
+  createPostRouteSchema,
+  postIdRouteSchema,
+  updatePostRouteSchema,
+} from "../validations/posts.val.js";
 
 export async function PostsRoutes(fastify: FastifyInstance) {
-  fastify.post("/posts", createPost);
-  fastify.put("/posts/:id", updatePost);
-  fastify.delete("/posts/:id", deletePost);
-  fastify.get("/posts/:id", getPostWithReplies);
+  fastify.post("/posts", { schema: createPostRouteSchema }, createPost);
+  fastify.put("/posts/:id", { schema: updatePostRouteSchema }, updatePost);
+  fastify.delete("/posts/:id", { schema: postIdRouteSchema }, deletePost);
+  fastify.get("/posts/:id", { schema: postIdRouteSchema }, getPostWithReplies);
 
-  // social
-  fastify.get("/feed", { preHandler: [validatePagination] }, getHomeFeed);
+  fastify.get("/feed", { schema: defaultPageRouteSchema }, getHomeFeed);
 }

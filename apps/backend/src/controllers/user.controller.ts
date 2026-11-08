@@ -1,8 +1,3 @@
-import type {
-  ProfileData,
-  UpdateProfileRequest,
-  UpdateProfileResponse,
-} from "@solosocius/api-types";
 import { FastifyRequest, FastifyReply } from "fastify";
 import {
   getLocalActorProfileData,
@@ -19,6 +14,10 @@ import { deliverActivity } from "../utils/activitypub.js";
 import { getAllFollowersInbox } from "../db/queries/followers.js";
 import bcrypt from "bcryptjs";
 import { getAllFollowingInbox } from "../db/queries/following.js";
+import type {
+  DeleteAccountBody,
+  UpdateProfileBody,
+} from "../validations/user.val.js";
 
 export const getProfileData = async (
   request: FastifyRequest,
@@ -36,10 +35,10 @@ export const getProfileData = async (
 };
 
 export const updateProfileData = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: UpdateProfileBody }>,
   reply: FastifyReply,
 ) => {
-  const { displayName, summary } = request.body as UpdateProfileRequest;
+  const { displayName, summary } = request.body;
 
   const actor = await updateLocalActorProfileData({
     displayName,
@@ -54,14 +53,10 @@ export const updateProfileData = async (
 };
 
 export const deleteAccount = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: DeleteAccountBody }>,
   reply: FastifyReply,
 ) => {
-  const { password } = request.body as { password: string };
-
-  if (!password) {
-    return reply.status(400).send({ error: "Password is required." });
-  }
+  const { password } = request.body;
 
   const user = await getUserCredentials();
   if (!user) {

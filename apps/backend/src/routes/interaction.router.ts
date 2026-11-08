@@ -4,11 +4,17 @@ import {
   handleOutboundPostInteraction,
   handleUndoPostInteraction,
 } from "../controllers/interaction.controller.js";
-import { validateInteraction } from "../middlewares/validateInteraction.js";
+import { interactionRouteSchema } from "../validations/social.val.js";
 
 export async function InteractionRoutes(fastify: FastifyInstance) {
-  fastify.addHook("preHandler", validateInteraction);
-
-  fastify.post("/interact", handleOutboundPostInteraction);
-  fastify.delete("/interact", handleUndoPostInteraction);
+  fastify.post(
+    "/interact",
+    { schema: interactionRouteSchema },
+    handleOutboundPostInteraction,
+  );
+  fastify.delete(
+    "/interact",
+    { schema: interactionRouteSchema },
+    handleUndoPostInteraction,
+  );
 }

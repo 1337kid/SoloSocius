@@ -6,20 +6,21 @@ import {
 } from "../activitypub/collections.js";
 import { createOutboxActivity } from "../activitypub/activities.js";
 import { userEndpoints } from "../activitypub/actor.js";
+import type { OptionalPageQuery } from "../validations/pagination.val.js";
 
 const PAGE_SIZE = 20;
 
 export const handleOutboxRequest = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Querystring: OptionalPageQuery }>,
   reply: FastifyReply,
 ) => {
-  const { page } = request.query as { page?: string };
+  const { page } = request.query;
 
   try {
     const totalItems = await getUserPostsCount();
 
     // return metadata if no page query
-    if (!page) {
+    if (page === undefined) {
       const collectionWrapper = createOrderedCollection(userEndpoints.outbox, {
         totalItems,
         first: "1",
@@ -31,14 +32,7 @@ export const handleOutboxRequest = async (
         .send(collectionWrapper);
     }
 
-    const pageNumber = parseInt(page, 10);
-    if (isNaN(pageNumber) || pageNumber < 1) {
-      return reply
-        .status(400)
-        .send({ error: "Invalid outbox page identifier specification." });
-    }
-
-    const offsetValue = (pageNumber - 1) * PAGE_SIZE;
+    const offsetValue = (page - 1) * PAGE_SIZE;
     const localPosts = await getUserPosts(offsetValue, PAGE_SIZE);
 
     const orderedItems = localPosts.map((post) =>
@@ -53,11 +47,11 @@ export const handleOutboxRequest = async (
       }),
     );
 
-    const hasMoreItems = totalItems > pageNumber * PAGE_SIZE;
+    const hasMoreItems = totalItems > page * PAGE_SIZE;
 
     const collectionPage = createOrderedCollectionPage(
       userEndpoints.outbox,
-      pageNumber,
+      page,
       totalItems,
       orderedItems,
       hasMoreItems,

@@ -6,10 +6,11 @@ import {
   handleStatus,
 } from "../controllers/auth.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { authCredentialsRouteSchema } from "../validations/auth.val.js";
 
 export async function AuthRoutes(fastify: FastifyInstance) {
-  fastify.post("/setup", handleSetup);
-  fastify.post("/login", handleLogin);
+  fastify.post("/setup", { schema: authCredentialsRouteSchema }, handleSetup);
+  fastify.post("/login", { schema: authCredentialsRouteSchema }, handleLogin);
   fastify.post("/logout", handleLogout);
   fastify.get("/status", handleStatus);
 

@@ -17,18 +17,18 @@ import {
 } from "../activitypub/activities.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { createTimelineEntry } from "../db/queries/timeline.js";
-import type { CreatePostRequest } from "@solosocius/api-types";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
+import type { IdParams } from "../validations/common.val.js";
+import type {
+  CreatePostBody,
+  UpdatePostBody,
+} from "../validations/posts.val.js";
 
 export const createPost = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: CreatePostBody }>,
   reply: FastifyReply,
 ) => {
-  const { content, inReplyTo, mediaItems } = request.body as CreatePostRequest;
-
-  if (!content || content.trim() === "") {
-    return reply.status(400).send({ error: "Post content cannot be empty." });
-  }
+  const { content, inReplyTo, mediaItems } = request.body;
 
   try {
     let replyPost: any = null;
@@ -84,10 +84,10 @@ export const createPost = async (
 };
 
 export const getPostActivity = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ) => {
-  const { id } = request.params as { id: string };
+  const { id } = request.params;
 
   try {
     const post = await getPostById(id);
@@ -113,15 +113,11 @@ export const getPostActivity = async (
 };
 
 export const updatePost = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Params: IdParams; Body: UpdatePostBody }>,
   reply: FastifyReply,
 ) => {
-  const { id } = request.params as { id: string };
-  const { content } = request.body as { content: string };
-
-  if (!content || content.trim() === "") {
-    return reply.status(400).send({ error: "Post content cannot be empty." });
-  }
+  const { id } = request.params;
+  const { content } = request.body;
 
   try {
     const existingPost = await getPostById(id);
@@ -151,10 +147,10 @@ export const updatePost = async (
 };
 
 export const deletePost = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ) => {
-  const { id } = request.params as { id: string };
+  const { id } = request.params;
 
   try {
     const existingPost = await getPostById(id);
@@ -176,10 +172,10 @@ export const deletePost = async (
 };
 
 export const getPostWithReplies = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ) => {
-  const { id } = request.params as { id: string };
+  const { id } = request.params;
 
   try {
     const post = await getPostWithRepliesByPostId(id);

@@ -12,8 +12,11 @@ import requestBodyLogger from "./plugins/requestBodyLogger.js";
 import { PrivateRoutes } from "./routes/private.router.js";
 import { initializeRedis } from "./cache/redis.js";
 import jobWorker from "./jobs/index.js";
+import { registerValidationErrorHandler } from "./plugins/validationError.js";
 
 const fastify = Fastify({ logger: loggerConfig });
+
+registerValidationErrorHandler(fastify);
 
 await fastify.register(requestBodyLogger);
 await fastify.register(authPlugin);

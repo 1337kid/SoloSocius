@@ -3,24 +3,19 @@ import { getUserCredentials } from "../db/queries/users.js";
 import bcrypt from "bcryptjs";
 import { NODE_ENV } from "../config/env.js";
 import { setupAdminUser } from "../utils/user.js";
+import type { AuthCredentialsBody } from "../validations/auth.val.js";
 
 export const handleLogin = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: AuthCredentialsBody }>,
   reply: FastifyReply,
 ) => {
-  const body = request.body as { username: string; password: string };
-
-  if (!body.username || !body.password) {
-    return reply
-      .status(400)
-      .send({ error: "Username and password are required" });
-  }
+  const { username, password } = request.body;
 
   const user = await getUserCredentials();
 
   if (
-    body.username !== user?.username ||
-    !(await bcrypt.compare(body.password, user?.passwordHash))
+    username !== user?.username ||
+    !(await bcrypt.compare(password, user?.passwordHash))
   ) {
     return reply.status(401).send({
       error: "Invalid credentials",
@@ -29,7 +24,7 @@ export const handleLogin = async (
 
   const token = await reply.jwtSign(
     {
-      username: body.username,
+      username,
     },
     {
       expiresIn: "7d",
@@ -61,13 +56,10 @@ export const handleLogout = async (
 };
 
 export const handleSetup = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{ Body: AuthCredentialsBody }>,
   reply: FastifyReply,
 ) => {
-  const { username, password } = request.body as {
-    username: string;
-    password: string;
-  };
+  const { username, password } = request.body;
 
   const admin = await getUserCredentials();
 
@@ -110,11 +102,4 @@ export const handleStatus = async (
 
   if (user) return reply.status(200).send({ configured: true });
   return reply.status(200).send({ configured: false });
-};
-
-export const handleLookup = async (
-  request: FastifyRequest,
-  reply: FastifyReply,
-) => {
-  return;
 };

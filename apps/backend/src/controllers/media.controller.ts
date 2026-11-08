@@ -18,6 +18,10 @@ import {
   updateLocalActorBanner,
 } from "../db/queries/actor.js";
 import { broadcastProfileUpdate } from "../activitypub/activities.js";
+import type {
+  DeleteAttachmentBody,
+  MediaKeyParams,
+} from "../validations/media.val.js";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_MIME_TYPES = [
@@ -60,16 +64,11 @@ async function readMultipartFile(req: FastifyRequest): Promise<{
   };
 }
 
-export async function getMedia(req: FastifyRequest, res: FastifyReply) {
-  const key = (req.params as { [key: string]: string })["*"];
-
-  if (!key) {
-    return res.code(400).send({ error: "Missing media key" });
-  }
-
-  if (key.includes("..") || key.startsWith("/") || key.startsWith("\\")) {
-    return res.code(400).send({ error: "Invalid media key" });
-  }
+export async function getMedia(
+  req: FastifyRequest<{ Params: MediaKeyParams }>,
+  res: FastifyReply,
+) {
+  const key = req.params["*"];
 
   const url = getPublicMediaUrl(key);
   res.header("Cache-Control", "public, max-age=31536000, immutable");
@@ -189,17 +188,10 @@ export async function uploadAttachmentHandler(
 }
 
 export async function deleteAttachmentHandler(
-  req: FastifyRequest,
+  req: FastifyRequest<{ Body: DeleteAttachmentBody }>,
   res: FastifyReply,
 ) {
-  const { key } = req.body as { key?: string };
-  if (!key) {
-    return res.code(400).send({ error: "Missing key" });
-  }
-
-  if (!key.startsWith("posts/")) {
-    return res.code(403).send({ error: "Can only delete post attachments" });
-  }
+  const { key } = req.body;
 
   await deleteFile(key);
   await deleteMediaRecord(key);
