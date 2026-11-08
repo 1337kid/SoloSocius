@@ -131,8 +131,8 @@
   html.dark {
     background-color: var(--background);
     background-image: linear-gradient(
-      to top,
-      oklch(0.46 0.11 46 / 0.3) 13%,
+      to top left,
+      oklch(37.309% 0.0853 47.097 / 0.301) 3%,
       transparent 80%
     );
 
