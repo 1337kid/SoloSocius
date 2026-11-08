@@ -1,13 +1,21 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import { Skeleton } from "@/components/ui/skeleton";
-import { usePublicTimeline } from "../hooks/usePublicTimeline";
-import { TimelineItem } from "./TimelineItem";
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import { Dialog } from "@/components/ui/dialog";
-import { ShowLoginDialog } from "./ShowLoginDialog";
+import { useEffect, useState } from "react"
+import { useInView } from "react-intersection-observer"
+
+import { Dialog } from "@/components/ui/dialog"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { StatusSkeleton } from "@/components/ui/status"
+import { useAuth } from "@/features/auth/hooks/useAuth"
+
+import { usePublicTimeline } from "../hooks/usePublicTimeline"
+import { ShowLoginDialog } from "./ShowLoginDialog"
+import { TimelineItem } from "./TimelineItem"
 
 export function PublicTimelineView() {
   const {
@@ -17,116 +25,67 @@ export function PublicTimelineView() {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = usePublicTimeline();
+  } = usePublicTimeline()
 
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView()
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+      fetchNextPage()
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const allPosts = data?.pages.flatMap((page) => page.items) ?? [];
-
-  const { isAuthenticated } = useAuth();
-
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const allPosts = data?.pages.flatMap((page) => page.items) ?? []
+  const { isAuthenticated } = useAuth()
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
 
   const handlePostStatsButtonClick = () => {
-    if (isAuthenticated) {
-      return;
-    }
-
-    setIsLoginDialogOpen(true);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3 w-full">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="space-y-3 p-4 border rounded-lg bg-card/70">
-            <div className="flex items-start gap-3">
-              <Skeleton className="size-10 rounded-full shrink-0" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-3 w-24" />
-              </div>
-            </div>
-            <Skeleton
-              className="h-16 w-full ml-[52px]"
-              style={{ width: "calc(100% - 52px)" }}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center space-y-2 p-6 rounded-xl border border-destructive/20 bg-destructive/5">
-          <p className="text-destructive font-semibold">
-            Failed to load timeline
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Please try refreshing the page
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (allPosts.length === 0 && !isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8 w-full">
-        <div className="text-center space-y-2 p-8 rounded-xl border border-border/60 bg-muted/30">
-          <p className="font-semibold text-muted-foreground">No posts yet</p>
-          <p className="text-sm text-muted-foreground">
-            Check back later for new content
-          </p>
-        </div>
-      </div>
-    );
+    if (!isAuthenticated) setIsLoginDialogOpen(true)
   }
 
   return (
-    <div className="space-y-3 w-full">
-      {allPosts.length > 0 &&
-        allPosts.map((entry) => (
-          <TimelineItem
-            key={entry.post.id}
-            entry={entry}
-            onPostStatsButtonClick={handlePostStatsButtonClick}
-          />
-        ))}
-
-      <div ref={ref} className="space-y-3">
-        {isFetchingNextPage && (
-          <>
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="space-y-3 p-4 border border-l-[3px] border-l-primary/20 rounded-lg bg-card/70"
-              >
-                <div className="flex items-start gap-3">
-                  <Skeleton className="size-10 rounded-full shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-                <Skeleton className="h-16 w-full" />
-              </div>
-            ))}
-          </>
-        )}
-      </div>
-
+    <>
+      {isLoading ? (
+        <div data-slot="feed">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <StatusSkeleton key={i} />
+          ))}
+        </div>
+      ) : isError ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>Failed to load timeline</EmptyTitle>
+            <EmptyDescription>Please try refreshing the page</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : allPosts.length === 0 ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>No posts yet</EmptyTitle>
+            <EmptyDescription>Check back later for new content</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div data-slot="feed">
+          {allPosts.map((entry) => (
+            <TimelineItem
+              key={entry.post.id}
+              entry={entry}
+              onPostStatsButtonClick={handlePostStatsButtonClick}
+            />
+          ))}
+          <div ref={ref} data-slot="feed-sentinel">
+            {isFetchingNextPage
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <StatusSkeleton key={i} />
+                ))
+              : null}
+          </div>
+        </div>
+      )}
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
         <ShowLoginDialog />
       </Dialog>
-    </div>
-  );
+    </>
+  )
 }

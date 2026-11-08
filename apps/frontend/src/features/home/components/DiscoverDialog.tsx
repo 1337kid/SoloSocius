@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -8,7 +9,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Loader2, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { searchRemoteUser } from "../api";
 import { useState } from "react";
 import { TimelineActor } from "@/features/timeline/api";
@@ -78,12 +80,12 @@ const DiscoverDialog = ({ open, onOpenChange }: DiscoverDialogProps = {}) => {
       {open === undefined && (
         <DialogTrigger asChild>
           <Button variant="outline">
-            <SearchIcon className="size-4" />
+            <SearchIcon data-icon="inline-start" />
             Search
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:min-w-md max-h-[80vh] overflow-y-auto">
+      <DialogContent size="md">
         <DialogHeader>
           <DialogTitle>Search for a user to follow</DialogTitle>
         </DialogHeader>
@@ -101,17 +103,17 @@ const DiscoverDialog = ({ open, onOpenChange }: DiscoverDialogProps = {}) => {
             disabled={isSearching}
           >
             {isSearching ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Spinner data-icon="inline-start" />
             ) : (
-              <SearchIcon className="size-4" />
+              <SearchIcon data-icon="inline-start" />
             )}
             Search
           </Button>
         </ButtonGroup>
 
         {user && (
-          <div className="flex items-center justify-between gap-3 py-3">
-            <div className="flex items-center gap-3">
+          <div data-slot="person">
+            <div data-slot="person-id">
               <Avatar size="lg">
                 <AvatarImage
                   src={user.avatarUrl ?? ""}
@@ -119,24 +121,25 @@ const DiscoverDialog = ({ open, onOpenChange }: DiscoverDialogProps = {}) => {
                 />
                 <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
               </Avatar>
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate">
+              <div>
+                <p data-slot="post-name">
                   {user.displayName || user.username}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">
+                <p data-slot="post-handle">
                   @{user.username}
                   {user.domain ? `@${user.domain}` : ""}
                 </p>
               </div>
             </div>
             {user?.isFollowing ? (
-              <span>Following</span>
+              <Badge variant="secondary">Following</Badge>
             ) : (
               <Button
                 variant="outline"
                 disabled={isFollowingUser}
                 onClick={handleFollow}
               >
+                {isFollowingUser ? <Spinner data-icon="inline-start" /> : null}
                 {isFollowingUser ? "Following..." : "Follow"}
               </Button>
             )}

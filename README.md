@@ -8,8 +8,7 @@
 SoloSocius is an experimental ActivityPub implementation focused on simplicity. It allows a single user to publish posts, interact with the [Fediverse](https://en.wikipedia.org/wiki/Fediverse) (Decentralised social network), and host their own social presence without the complexity of a multi-user platform.
 
 <p align="center">
-  <img src="/.github/images/desktop.png" alt="Desktop" width="74%">
-  <img src="/.github/images/mobile.png" alt="Mobile" width="20%">
+  <img src=".github/images/desktop2.png" alt="Desktop" width="100%">
 </p>
 
 ---

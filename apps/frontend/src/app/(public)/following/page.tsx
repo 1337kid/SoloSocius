@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import Navbar from "@/components/Navbar";
+import { PublicColumn, PublicFrame } from "@/components/ui/shell";
 import { useFollowing } from "@/features/profile/hooks/useFollowing";
 import FollowersPage from "@/features/profile/components/FollowersPage";
 import { useProfileData } from "@/features/profile/hooks/useProfileData";
@@ -31,8 +32,9 @@ const Following = () => {
   const following = data?.pages.flatMap((page) => page.following) ?? [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <PublicFrame>
       <Navbar />
+      <PublicColumn>
       <FollowersPage
         data={following}
         totalCount={totalCount}
@@ -42,7 +44,8 @@ const Following = () => {
         isFetchingNextPage={isFetchingNextPage}
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
       />
-    </div>
+      </PublicColumn>
+    </PublicFrame>
   );
 };
 

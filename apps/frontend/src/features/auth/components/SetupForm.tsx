@@ -5,9 +5,11 @@ import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { routes } from "@/lib/routes";
 
 import { useSetup } from "../hooks/useSetup";
@@ -44,11 +46,8 @@ const SetupForm = () => {
   }
 
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-6"
-    >
+    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <FieldGroup>
       <Controller
         control={form.control}
         name="username"
@@ -103,15 +102,20 @@ const SetupForm = () => {
         )}
       />
 
-      {setup.isPending && (
-        <div className="flex items-center justify-center">
-          Setting up your account... Will take a few seconds to create RSA keys.
-        </div>
-      )}
+      {setup.isPending ? (
+        <Alert>
+          <Spinner />
+          <AlertDescription>
+            Setting up your account. Creating keys takes a few seconds.
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
-      <Button className="w-full" disabled={setup.isPending}>
+      <Button disabled={setup.isPending}>
+        {setup.isPending ? <Spinner data-icon="inline-start" /> : null}
         {setup.isPending ? "Creating account..." : "Create admin account"}
       </Button>
+      </FieldGroup>
     </form>
   );
 };

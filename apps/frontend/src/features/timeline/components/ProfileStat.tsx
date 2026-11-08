@@ -1,35 +1,30 @@
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import Link from "next/link"
 
 export const ProfileStat = ({
   text,
   value,
-  left,
-  right,
   href,
-  }: {
-  text: string;
-  value: number;
-  href?: string;
-  left?: boolean;
-  right?: boolean;
+}: {
+  text: string
+  value: number
+  href?: string
 }) => {
-  return (
-    <Link href={href ?? "#"}>
-      <div
-        className={cn(
-          "space-y-0.5 py-2 hover:bg-muted/60 transition-colors cursor-default hover:cursor-pointer",
-          left && "rounded-l-lg",
-          right && "rounded-r-lg",
-        )}
-      >
-        <p className="font-bold text-base text-primary">{value}</p>
-        <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
-          {text}
-        </p>
-      </div>
-    </Link>
-  );
-};
+  const content = (
+    <>
+      <strong>{value}</strong>
+      <span>{text}</span>
+    </>
+  )
 
-export default ProfileStat;
+  if (!href) {
+    return <span data-slot="stat">{content}</span>
+  }
+
+  return (
+    <Link href={href} data-slot="stat">
+      {content}
+    </Link>
+  )
+}
+
+export default ProfileStat

@@ -1,12 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { Button } from "@/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import React from "react";
+} from "@/components/ui/tooltip"
 
 const PostStat = ({
   count,
@@ -15,18 +12,19 @@ const PostStat = ({
   label,
   onClick,
 }: {
-  count?: number;
-  active?: boolean;
-  icon: React.ReactNode;
-  label: string;
-  onClick?: () => void;
+  count?: number
+  active?: boolean
+  icon: React.ReactNode
+  label: string
+  onClick?: () => void
 }) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="ghost"
-          className={`flex items-center gap-1 text-muted-foreground text-xs ${active ? "text-primary bg-accent" : ""}`}
+          variant="action"
+          size="sm"
+          data-active={active || undefined}
           onClick={onClick}
         >
           {icon}
@@ -34,11 +32,10 @@ const PostStat = ({
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        {active && "Undo "}
-        {label}
+        {active ? `Undo ${label}` : label}
       </TooltipContent>
     </Tooltip>
-  );
-};
+  )
+}
 
-export default PostStat;
+export default PostStat

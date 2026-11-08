@@ -137,7 +137,7 @@ export function EditProfileDialog() {
     .toUpperCase();
 
   return (
-    <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0">
+    <DialogContent size="lg">
       <DialogHeader className="sr-only">
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogDescription>Edit your profile information.</DialogDescription>
@@ -164,7 +164,7 @@ export function EditProfileDialog() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted-foreground/10">
+            <div className="flex h-full w-full items-center justify-center bg-muted">
               <ImagePlus className="size-7 text-muted-foreground/40" />
             </div>
           )}

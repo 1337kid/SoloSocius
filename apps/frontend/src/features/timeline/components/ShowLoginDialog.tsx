@@ -20,7 +20,7 @@ export function ShowLoginDialog() {
   const router = useRouter();
 
   return (
-    <DialogContent className="sm:max-w-sm">
+    <DialogContent>
       <DialogHeader>
         <DialogTitle>Login to your account</DialogTitle>
         <DialogDescription>

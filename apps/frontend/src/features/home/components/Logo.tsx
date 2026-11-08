@@ -1,19 +1,14 @@
-import logo from "@/assets/logo.png";
-import Image from "next/image";
+import logo from "@/assets/logo.png"
+import Image from "next/image"
+import Link from "next/link"
 
-const Logo = () => {
+const Logo = ({ href = "/" }: { href?: string }) => {
   return (
-    <div className="flex items-center gap-2">
-      <Image
-        src={logo}
-        alt="Logo"
-        width={40}
-        height={40}
-        className="rounded-lg"
-      />
-      <span className="text-xl font-bold text-foreground">SoloSocius</span>
-    </div>
-  );
-};
+    <Link href={href} data-slot="brand">
+      <Image src={logo} alt="SoloSocius" width={32} height={32} />
+      <span>SoloSocius</span>
+    </Link>
+  )
+}
 
-export default Logo;
+export default Logo

@@ -10,10 +10,8 @@ export default function PostPage() {
   return postId ? (
     <PostDetailView postId={postId} />
   ) : (
-    <div className="container max-w-2xl mx-auto p-4">
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">Invalid post ID</p>
-      </div>
+    <div data-slot="center-state">
+      <p>Invalid post ID</p>
     </div>
   );
 }

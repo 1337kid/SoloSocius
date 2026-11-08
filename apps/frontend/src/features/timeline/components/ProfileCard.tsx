@@ -1,63 +1,49 @@
-"use client";
+"use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import ProfileStat from "./ProfileStat";
-import { ProfileData } from "@/features/profile/api";
-import { routes } from "@/lib/routes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ProfileData } from "@/features/profile/api"
+import { routes } from "@/lib/routes"
+
+import ProfileStat from "./ProfileStat"
 
 export function ProfileCard({ profile }: { profile: ProfileData }) {
+  const name = profile.displayName || profile.username
+
   return (
-    <Card className="w-md max-md:mx-auto max-md:w-full mb-auto bg-card/80 backdrop-blur-sm border-border/60 shadow-lg">
-      <CardContent className="p-3 space-y-4">
-        {/* Avatar */}
-        <div className="flex flex-col items-center space-y-3 max-md:space-y-2">
-          <div className="p-0.5 rounded-full bg-linear-to-br from-primary/70 via-accent-foreground/10 to-primary/30 shadow-md">
-            <Avatar className="size-28 border-2 border-card max-md:size-20">
-              {profile?.avatarUrl && (
-                <AvatarImage src={profile.avatarUrl} alt={profile.username} />
-              )}
-              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
-                {profile?.displayName?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-
-          <div className="text-center space-y-1 w-full">
-            <p className="font-bold text-lg tracking-tight">
-              {profile?.displayName}
-            </p>
-            <p className="text-xs text-muted-foreground font-mono">
-              @{profile?.username}@{profile?.domain}
-            </p>
-          </div>
-        </div>
-
-        {/* Bio */}
-        {profile?.summary && (
-          <p className="text-sm text-foreground/70 leading-relaxed italic border-l-2 border-primary/30 pl-3 text-left">
-            {profile.summary}
-          </p>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 divide-x items-center text-center border-t border-border/60 pt-4">
-          <ProfileStat text="Posts" value={profile?.postsCount} left />
-
+    <header data-slot="profile-header">
+      <div data-slot="profile-banner">
+        {profile.bannerUrl ? (
+          <img src={profile.bannerUrl} alt="" />
+        ) : null}
+      </div>
+      <div data-slot="profile-body">
+        <Avatar size="xl">
+          {profile.avatarUrl ? (
+            <AvatarImage src={profile.avatarUrl} alt={name} />
+          ) : null}
+          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <h1 data-slot="profile-name">{profile.displayName}</h1>
+        <p data-slot="post-handle">
+          @{profile.username}@{profile.domain}
+        </p>
+        {profile.summary ? (
+          <p data-slot="profile-bio">{profile.summary}</p>
+        ) : null}
+        <div data-slot="stat-row">
+          <ProfileStat text="Posts" value={profile.postsCount} />
           <ProfileStat
             text="Followers"
-            value={profile?.followersCount}
+            value={profile.followersCount}
             href={routes.followers}
           />
-
           <ProfileStat
             text="Following"
-            value={profile?.followingCount}
-            right
+            value={profile.followingCount}
             href={routes.following}
           />
         </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+    </header>
+  )
 }

@@ -14,12 +14,13 @@ icon: lucide/home
 SoloSocius is an experimental ActivityPub implementation focused on simplicity. It allows a single user to publish posts, interact with the [Fediverse](https://en.wikipedia.org/wiki/Fediverse) (Decentralised social network), and host their own social presence without the complexity of a multi-user platform.
 
 <p align="center">
-  <img src="assets/desktop.png" alt="Desktop">
+  <img src="assets/desktop2.png" alt="Desktop">
 </p>
 
 ---
 
 # Features
+
 - Single-user ActivityPub server
 - Publish public posts
 - Follow remote users on Mastodon, Misskey and other ActivityPub servers

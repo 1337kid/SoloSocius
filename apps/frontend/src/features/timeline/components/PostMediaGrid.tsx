@@ -15,7 +15,11 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useEffect, useCallback } from "react";
 
 interface PostMediaGridProps {
@@ -53,24 +57,22 @@ function MediaCarouselDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="min-w-2xl w-full bg-popover border-none shadow-2xl"
-      >
-        <div className="relative flex items-center justify-center min-h-[300px] max-h-[85vh]">
+      <DialogContent size="lightbox" showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle className="sr-only">Attached media</DialogTitle>
+          <DialogDescription className="sr-only">
+            Image {current + 1} of {mediaItems.length}
+          </DialogDescription>
+        </DialogHeader>
+        <div data-slot="lightbox">
           <Carousel
             setApi={setApi}
             opts={{ startIndex, loop: mediaItems.length > 1 }}
-            className="w-full px-20 py-10"
           >
-            <CarouselContent className="ml-0">
+            <CarouselContent>
               {mediaItems.map((item, i) => (
-                <CarouselItem key={i} className="pl-0 flex items-center justify-center">
-                  <img
-                    src={item.url}
-                    className="max-h-[80vh] max-w-full object-cover rounded-lg"
-                    draggable={false}
-                  />
+                <CarouselItem key={i}>
+                  <img src={item.url} alt="" draggable={false} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -79,47 +81,45 @@ function MediaCarouselDialog({
           {mediaItems.length > 1 && (
             <>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
+                data-slot="lightbox-nav"
+                data-dir="prev"
                 onClick={scrollPrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full size-9"
               >
-                <ChevronLeft className="size-5" />
+                <ChevronLeft />
                 <span className="sr-only">Previous</span>
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
+                data-slot="lightbox-nav"
+                data-dir="next"
                 onClick={scrollNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full size-9"
               >
-                <ChevronRight className="size-5" />
+                <ChevronRight />
                 <span className="sr-only">Next</span>
               </Button>
             </>
           )}
 
           <DialogClose asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full size-8"
-            >
-              <X className="size-4" />
+            <Button variant="outline" size="icon" data-slot="lightbox-close">
+              <X />
               <span className="sr-only">Close</span>
             </Button>
           </DialogClose>
 
           {mediaItems.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            <div data-slot="lightbox-dots">
               {mediaItems.map((_, i) => (
                 <button
                   key={i}
+                  type="button"
+                  data-slot="lightbox-dot"
+                  data-active={i === current || undefined}
                   onClick={() => api?.scrollTo(i)}
-                  className={cn(
-                    "size-1.5 rounded-full transition-all",
-                    i === current ? "bg-white scale-125" : "bg-white/40"
-                  )}
+                  aria-label={`Image ${i + 1}`}
                 />
               ))}
             </div>
@@ -145,50 +145,24 @@ export function PostMediaGrid({ mediaItems }: PostMediaGridProps) {
     setDialogOpen(true);
   };
 
-  const gridClass = cn(
-    "grid gap-1 w-full max-w-[400px] mt-2",
-    count === 1 && "grid-cols-1",
-    count === 2 && "grid-cols-2",
-    count === 3 && "grid-cols-2",
-    count === 4 && "grid-cols-2",
-  );
-
   return (
     <>
-      <div className={gridClass}>
+      <div data-slot="media-grid" data-count={count}>
         {visibleItems.map((item, i) => {
-          const isLast = i === 3;
-          const hasMore = isLast && extraCount > 0;
-
-          const itemClass = cn(
-            "relative overflow-hidden rounded-md cursor-pointer group bg-muted",
-            count === 1 && "aspect-video",
-            count === 2 && "aspect-square",
-            count === 3 && i === 0 && "row-span-2 aspect-auto",
-            count === 3 && i !== 0 && "aspect-square",
-            count === 4 && "aspect-square",
-          );
+          const hasMore = i === 3 && extraCount > 0;
 
           return (
             <button
               key={i}
-              className={itemClass}
+              type="button"
+              data-slot="media-cell"
               onClick={() => openDialog(i)}
               aria-label={`View image ${i + 1}`}
             >
-              <img
-                src={item.url}
-                alt={item.mimeType}
-                className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                draggable={false}
-              />
-              {hasMore && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-md">
-                  <span className="text-white font-semibold text-xl">
-                    +{extraCount + 1}
-                  </span>
-                </div>
-              )}
+              <img src={item.url} alt="" draggable={false} />
+              {hasMore ? (
+                <span data-slot="media-more">+{extraCount + 1}</span>
+              ) : null}
             </button>
           );
         })}

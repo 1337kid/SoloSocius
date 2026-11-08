@@ -119,6 +119,7 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
+        data-slot="carousel"
         className={cn("relative", className)}
         aria-roledescription="carousel"
         {...props}
@@ -135,6 +136,7 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div ref={carouselRef} className="overflow-hidden">
       <div
+        data-slot="carousel-content"
         className={cn(
           "flex",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
@@ -153,6 +155,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
     <div
       role="group"
       aria-roledescription="slide"
+      data-slot="carousel-item"
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
