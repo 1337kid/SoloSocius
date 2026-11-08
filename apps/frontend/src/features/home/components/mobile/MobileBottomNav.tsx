@@ -41,8 +41,11 @@ export function MobileBottomNav({
         <SearchIcon />
         Search
       </Button>
-      <Button variant="default" size="compose" onClick={onComposeClick} aria-label="Compose">
-        <PlusIcon />
+      <Button variant="tab" size="tab" onClick={onComposeClick}>
+        <span data-slot="mobile-nav-compose">
+          <PlusIcon />
+        </span>
+        Post
       </Button>
       <Button variant="tab" size="tab">
         <BellIcon />

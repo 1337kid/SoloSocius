@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   BellIcon,
@@ -10,59 +10,60 @@ import {
   UserIcon,
   UserPlus,
   Users,
-} from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
-import { toast } from "sonner"
+} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Spinner } from "@/components/ui/spinner"
-import { useLogout } from "@/features/auth/hooks/useLogout"
-import { useSession } from "@/features/auth/hooks/useSession"
-import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog"
-import { useProfileData } from "@/features/profile/hooks/useProfileData"
-import { isSettingsItemActive, settingsNav } from "@/features/settings/nav"
-import ProfileStat from "@/features/timeline/components/ProfileStat"
-import { routes } from "@/lib/routes"
+} from "@/components/ui/sheet";
+import { Spinner } from "@/components/ui/spinner";
+import { useLogout } from "@/features/auth/hooks/useLogout";
+import { useSession } from "@/features/auth/hooks/useSession";
+import { EditProfileDialog } from "@/features/profile/components/EditProfileDialog";
+import { useProfileData } from "@/features/profile/hooks/useProfileData";
+import { isSettingsItemActive, settingsNav } from "@/features/settings/nav";
+import ProfileStat from "@/features/timeline/components/ProfileStat";
+import { matchesRoute, routes } from "@/lib/routes";
 
 interface MobileProfileSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function MobileProfileSheet({
   open,
   onOpenChange,
 }: MobileProfileSheetProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { data: profileData } = useProfileData()
-  const { endSession } = useSession()
-  const logout = useLogout()
-  const name = profileData?.displayName || profileData?.username || ""
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: profileData } = useProfileData();
+  const { endSession } = useSession();
+  const logout = useLogout();
+  const name = profileData?.displayName || profileData?.username || "";
+  const inSettings = matchesRoute(pathname, routes.settings);
 
   async function handleLogout() {
     try {
-      await logout.mutateAsync()
-      endSession()
-      onOpenChange(false)
+      await logout.mutateAsync();
+      endSession();
+      onOpenChange(false);
     } catch {
-      toast.error("Unable to logout.")
+      toast.error("Unable to logout.");
     }
   }
 
   const go = (route: string) => {
-    router.push(route)
-    onOpenChange(false)
-  }
+    router.push(route);
+    onOpenChange(false);
+  };
 
   return (
     <>
@@ -84,7 +85,11 @@ export function MobileProfileSheet({
               </div>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Edit profile">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="Edit profile"
+                  >
                     <Pencil />
                   </Button>
                 </DialogTrigger>
@@ -107,7 +112,13 @@ export function MobileProfileSheet({
           </SheetHeader>
           <Separator />
           <div data-slot="sheet-body">
-            <Button variant="nav" size="lg" onClick={() => go(routes.dash)}>
+            <Button
+              variant="nav"
+              size="lg"
+              data-active={matchesRoute(pathname, routes.dash) || undefined}
+              aria-current={matchesRoute(pathname, routes.dash) ? "page" : undefined}
+              onClick={() => go(routes.dash)}
+            >
               <HomeIcon data-icon="inline-start" />
               Home
             </Button>
@@ -115,7 +126,13 @@ export function MobileProfileSheet({
               <BellIcon data-icon="inline-start" />
               Notifications
             </Button>
-            <Button variant="nav" size="lg" onClick={() => go(routes.home)}>
+            <Button
+              variant="nav"
+              size="lg"
+              data-active={matchesRoute(pathname, routes.home) || undefined}
+              aria-current={matchesRoute(pathname, routes.home) ? "page" : undefined}
+              onClick={() => go(routes.home)}
+            >
               <UserIcon data-icon="inline-start" />
               Profile
             </Button>
@@ -123,38 +140,70 @@ export function MobileProfileSheet({
               <Button
                 variant="nav"
                 size="lg"
+                data-active={matchesRoute(pathname, routes.followRequests) || undefined}
+                aria-current={
+                  matchesRoute(pathname, routes.followRequests) ? "page" : undefined
+                }
                 onClick={() => go(routes.followRequests)}
               >
                 <UserPlus data-icon="inline-start" />
                 Follow requests
               </Button>
             ) : null}
-            <Button variant="nav" size="lg" onClick={() => go(routes.followers)}>
+            <Button
+              variant="nav"
+              size="lg"
+              data-active={matchesRoute(pathname, routes.followers) || undefined}
+              aria-current={
+                matchesRoute(pathname, routes.followers) ? "page" : undefined
+              }
+              onClick={() => go(routes.followers)}
+            >
               <Users data-icon="inline-start" />
               Followers
             </Button>
-            <Button variant="nav" size="lg" onClick={() => go(routes.following)}>
+            <Button
+              variant="nav"
+              size="lg"
+              data-active={matchesRoute(pathname, routes.following) || undefined}
+              aria-current={
+                matchesRoute(pathname, routes.following) ? "page" : undefined
+              }
+              onClick={() => go(routes.following)}
+            >
               <Rss data-icon="inline-start" />
               Following
             </Button>
             <Separator />
-            <Button variant="nav" size="lg" onClick={() => go(routes.settings)}>
+            <Button
+              variant="nav"
+              size="lg"
+              data-active={inSettings || undefined}
+              aria-current={inSettings ? "page" : undefined}
+              onClick={() => go(routes.settings)}
+            >
               <Settings data-icon="inline-start" />
               Settings
             </Button>
-            <div data-slot="nav-children">
-              {settingsNav.map((item) => (
-                <Button
-                  key={item.href}
-                  variant="nav-child"
-                  size="sm"
-                  data-active={isSettingsItemActive(pathname, item.href) || undefined}
-                  onClick={() => go(item.href)}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </div>
+            {inSettings ? (
+              <div data-slot="nav-children">
+                {settingsNav.map((item) => {
+                  const active = isSettingsItemActive(pathname, item.href);
+                  return (
+                    <Button
+                      key={item.href}
+                      variant="nav-child"
+                      size="sm"
+                      data-active={active || undefined}
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => go(item.href)}
+                    >
+                      {item.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            ) : null}
             <Button
               variant="nav-danger"
               size="lg"
@@ -172,5 +221,5 @@ export function MobileProfileSheet({
         </SheetContent>
       </Sheet>
     </>
-  )
+  );
 }

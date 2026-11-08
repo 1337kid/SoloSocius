@@ -20,12 +20,7 @@ import { useLogout } from "@/features/auth/hooks/useLogout"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useProfileData } from "@/features/profile/hooks/useProfileData"
 import { isSettingsItemActive, settingsNav } from "@/features/settings/nav"
-import { routes } from "@/lib/routes"
-
-function isCurrent(pathname: string, href: string) {
-  if (href === "/") return pathname === "/"
-  return pathname === href || pathname.startsWith(`${href}/`)
-}
+import { matchesRoute, routes } from "@/lib/routes"
 
 const SidebarLinks = () => {
   const router = useRouter()
@@ -33,7 +28,7 @@ const SidebarLinks = () => {
   const { data: profileData } = useProfileData()
   const { endSession } = useSession()
   const logout = useLogout()
-  const inSettings = isCurrent(pathname, routes.settings)
+  const inSettings = matchesRoute(pathname, routes.settings)
 
   async function handleLogout() {
     try {
@@ -62,8 +57,8 @@ const SidebarLinks = () => {
           key={label}
           variant="nav"
           size="lg"
-          data-active={href ? isCurrent(pathname, href) : undefined}
-          aria-current={href && isCurrent(pathname, href) ? "page" : undefined}
+          data-active={href ? matchesRoute(pathname, href) : undefined}
+          aria-current={href && matchesRoute(pathname, href) ? "page" : undefined}
           onClick={() => {
             if (href) router.push(href)
           }}
