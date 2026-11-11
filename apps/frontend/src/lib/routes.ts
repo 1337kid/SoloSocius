@@ -3,6 +3,7 @@ export const routes = {
   login: "/login",
   setup: "/setup",
   dash: "/dash",
+  federated: "/dash/federated",
   followers: "/followers",
   following: "/following",
   followRequests: "/followrequests",

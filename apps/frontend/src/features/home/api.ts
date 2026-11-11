@@ -39,6 +39,15 @@ export async function getHomeFeed(page: number = 1): Promise<TimelineResponse> {
   return data;
 }
 
+export async function getFederatedFeed(
+  page: number = 1,
+): Promise<TimelineResponse> {
+  const { data } = await api.get<TimelineResponse>("/feed/federated", {
+    params: { page },
+  });
+  return data;
+}
+
 export const createPost = async (
   post: CreatePostRequest,
 ): Promise<CreatedPostResponse> => {

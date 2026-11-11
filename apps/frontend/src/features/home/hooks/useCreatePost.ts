@@ -13,7 +13,7 @@ export function useCreatePost() {
       return createPost({ ...post, content });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       queryClient.invalidateQueries({ queryKey: ["timeline"] });
     },
   });

@@ -10,7 +10,7 @@ import {
 import { usePathname, useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
-import { routes } from "@/lib/routes"
+import { matchesRoute, routes } from "@/lib/routes"
 
 interface MobileBottomNavProps {
   onComposeClick: () => void
@@ -31,7 +31,7 @@ export function MobileBottomNav({
       <Button
         variant="tab"
         size="tab"
-        data-active={pathname === routes.dash || undefined}
+        data-active={matchesRoute(pathname, routes.dash) || undefined}
         onClick={() => router.push(routes.dash)}
       >
         <HomeIcon />
