@@ -9,6 +9,7 @@ export const routes = {
   followRequests: "/followrequests",
   settings: "/settings",
   settingsDelete: "/settings/delete",
+  settingsServer: "/settings/server",
   post: (id: string) => `/posts/${id}`,
 } as const;
 

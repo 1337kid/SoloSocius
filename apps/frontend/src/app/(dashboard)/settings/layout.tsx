@@ -1,4 +1,5 @@
 import { ColumnHeader } from "@/components/ui/shell"
+import { SettingsHeader } from "@/features/settings/components/SettingsHeader"
 
 export default function SettingsLayout({
   children,
@@ -8,10 +9,7 @@ export default function SettingsLayout({
   return (
     <>
       <ColumnHeader>
-        <div>
-          <h1>Settings</h1>
-          <p>Account preferences</p>
-        </div>
+        <SettingsHeader />
       </ColumnHeader>
       {children}
     </>
