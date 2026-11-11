@@ -5,3 +5,4 @@ export * from "./posts.js";
 export * from "./profile.js";
 export * from "./social.js";
 export * from "./media.js";
+export * from "./relay.js";

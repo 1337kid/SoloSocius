@@ -4,6 +4,7 @@ import {
   generateAcceptActivityId,
   generateProfileUpdateActivityId,
   generateRejectActivityId,
+  generateRelayFollowActivityId,
 } from "../utils/activityId.js";
 import { InstanceActorObject } from "../types/index.js";
 import { generateActorObject } from "./actor.js";
@@ -25,6 +26,28 @@ export const createActivity = (
     actor: userEndpoints.actorUri,
     object: object,
     to: ["https://www.w3.org/ns/activitystreams#Public"],
+  };
+};
+
+export const createRelayFollowActivity = (relayId: string) => {
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: generateRelayFollowActivityId(relayId),
+    type: "Follow",
+    actor: userEndpoints.actorUri,
+    object: userEndpoints.actorUri,
+  };
+};
+
+export const createRelayUndoFollowActivity = (relayId: string) => {
+  const followActivity = createRelayFollowActivity(relayId);
+
+  return {
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: `${followActivity.id}#undo`,
+    type: "Undo",
+    actor: userEndpoints.actorUri,
+    object: followActivity,
   };
 };
 

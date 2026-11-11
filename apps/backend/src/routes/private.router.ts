@@ -3,6 +3,7 @@ import { InteractionRoutes } from "./interaction.router.js";
 import { PostsRoutes } from "./posts.router.js";
 import { UserRoutes } from "./user.router.js";
 import { PrivateMediaRoutes } from "./media.router.js";
+import { RelayRoutes } from "./relay.router.js";
 import { authenticate } from "../middlewares/authenticate.js";
 
 export async function PrivateRoutes(fastify: FastifyInstance) {
@@ -11,4 +12,5 @@ export async function PrivateRoutes(fastify: FastifyInstance) {
   fastify.register(PostsRoutes);
   fastify.register(UserRoutes);
   fastify.register(PrivateMediaRoutes);
+  fastify.register(RelayRoutes);
 }

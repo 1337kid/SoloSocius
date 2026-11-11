@@ -4,9 +4,26 @@ import {
   removeFollowingEntry,
   getFollowingByActivityId,
 } from "../../db/queries/following.js";
+import { markRelayRejected } from "../../db/queries/relays.js";
 import { userEndpoints } from "../../activitypub/actor.js";
+import { parseRelayIdFromFollowActivityId } from "../../utils/activityId.js";
+
+const followActivityIdFrom = (object: InboxActivity["object"]) => {
+  if (typeof object === "string") return object;
+  if (object?.type === "Follow") return object.id;
+  return undefined;
+};
 
 export const handleRejectActivity = async (activity: InboxActivity) => {
+  const followActivityId = followActivityIdFrom(activity.object);
+  if (followActivityId) {
+    const relayId = parseRelayIdFromFollowActivityId(followActivityId);
+    if (relayId) {
+      await markRelayRejected(relayId);
+      return;
+    }
+  }
+
   if (typeof activity.object !== "string") {
     switch (activity.object?.type) {
       case "Follow":

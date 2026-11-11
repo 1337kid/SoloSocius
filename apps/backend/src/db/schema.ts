@@ -188,5 +188,8 @@ export const relays = pgTable("relays", {
   id: uuid("id").defaultRandom().primaryKey(),
   relayName: text("relay_name").notNull(),
   inboxUrl: text("inbox_url").notNull(),
-  status: text("status").default("pending").notNull(),
+  status: text("status")
+    .$type<"pending" | "accepted" | "rejected" | "unsubscribed">()
+    .default("pending")
+    .notNull(),
 });
