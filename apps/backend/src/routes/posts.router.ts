@@ -6,7 +6,10 @@ import {
   deletePost,
   getPostWithReplies,
 } from "../controllers/posts.controller.js";
-import { getHomeFeed } from "../controllers/timeline.controller.js";
+import {
+  getFederatedTimeline,
+  getHomeFeed,
+} from "../controllers/timeline.controller.js";
 import { defaultPageRouteSchema } from "../validations/pagination.val.js";
 import {
   createPostRouteSchema,
@@ -21,4 +24,9 @@ export async function PostsRoutes(fastify: FastifyInstance) {
   fastify.get("/posts/:id", { schema: postIdRouteSchema }, getPostWithReplies);
 
   fastify.get("/feed", { schema: defaultPageRouteSchema }, getHomeFeed);
+  fastify.get(
+    "/feed/federated",
+    { schema: defaultPageRouteSchema },
+    getFederatedTimeline,
+  );
 }

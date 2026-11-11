@@ -84,100 +84,103 @@ export const getFeedEvents = async (
   });
 };
 
-
 export const getProfileTimeline = async (
-  actorUris: string[],
+  actorUris: string[] | null,
   limit: number,
   offset: number,
 ) => {
-  return db
-    .select({
-      event: {
-        createdAt: timelineEvents.createdAt,
-        type: timelineEvents.type,
-      },
+  return (
+    db
+      .select({
+        event: {
+          createdAt: timelineEvents.createdAt,
+          type: timelineEvents.type,
+        },
 
-      actor: {
-        avatarUrl: actor.avatarUrl,
-        displayName: actor.displayName,
-        username: actor.username,
-        domain: actor.domain,
-      },
+        actor: {
+          avatarUrl: actor.avatarUrl,
+          displayName: actor.displayName,
+          username: actor.username,
+          domain: actor.domain,
+        },
 
-      post: {
-        id: posts.id,
-        idUri: posts.idUri,
-        url: posts.url || posts.idUri,
-        content: posts.content,
-        createdAt: posts.createdAt,
+        post: {
+          id: posts.id,
+          idUri: posts.idUri,
+          url: posts.url || posts.idUri,
+          content: posts.content,
+          createdAt: posts.createdAt,
 
-        likeCount: posts.likeCount,
-        boostCount: posts.boostCount,
-        replyCount: posts.replyCount,
-        mediaItems: posts.mediaItems,
+          likeCount: posts.likeCount,
+          boostCount: posts.boostCount,
+          replyCount: posts.replyCount,
+          mediaItems: posts.mediaItems,
 
-        liked: sql<boolean>`${myLike.id} IS NOT NULL`,
-        boosted: sql<boolean>`${myBoost.id} IS NOT NULL`,
-      },
+          liked: sql<boolean>`${myLike.id} IS NOT NULL`,
+          boosted: sql<boolean>`${myBoost.id} IS NOT NULL`,
+        },
 
-      postActor: {
-        actorUri: postActor.actorUri,
-        avatarUrl: postActor.avatarUrl,
-        displayName: postActor.displayName,
-        username: postActor.username,
-        domain: postActor.domain,
-      },
+        postActor: {
+          actorUri: postActor.actorUri,
+          avatarUrl: postActor.avatarUrl,
+          displayName: postActor.displayName,
+          username: postActor.username,
+          domain: postActor.domain,
+        },
 
-      parentPost: {
-        idUri: parentPost.idUri,
-        url: parentPost.url || parentPost.idUri,
-        content: parentPost.content,
-      },
+        parentPost: {
+          idUri: parentPost.idUri,
+          url: parentPost.url || parentPost.idUri,
+          content: parentPost.content,
+        },
 
-      parentActor: {
-        avatarUrl: parentActor.avatarUrl,
-        displayName: parentActor.displayName,
-        username: parentActor.username,
-        domain: parentActor.domain,
-      },
-    })
-    .from(timelineEvents)
+        parentActor: {
+          avatarUrl: parentActor.avatarUrl,
+          displayName: parentActor.displayName,
+          username: parentActor.username,
+          domain: parentActor.domain,
+        },
+      })
+      .from(timelineEvents)
 
-    // Event actor
-    .innerJoin(actor, eq(actor.actorUri, timelineEvents.actorUri))
+      // Event actor
+      .innerJoin(actor, eq(actor.actorUri, timelineEvents.actorUri))
 
-    // Timeline post
-    .innerJoin(posts, eq(posts.idUri, timelineEvents.postUri))
+      // Timeline post
+      .innerJoin(posts, eq(posts.idUri, timelineEvents.postUri))
 
-    // Author of the post
-    .innerJoin(postActor, eq(postActor.actorUri, posts.actorUri))
+      // Author of the post
+      .innerJoin(postActor, eq(postActor.actorUri, posts.actorUri))
 
-    // Local user's Like
-    .leftJoin(
-      myLike,
-      and(
-        eq(myLike.postUri, posts.idUri),
-        eq(myLike.actorUri, userEndpoints.actorUri),
-        eq(myLike.type, "like"),
-      ),
-    )
+      // Local user's Like
+      .leftJoin(
+        myLike,
+        and(
+          eq(myLike.postUri, posts.idUri),
+          eq(myLike.actorUri, userEndpoints.actorUri),
+          eq(myLike.type, "like"),
+        ),
+      )
 
-    // Local user's Boost
-    .leftJoin(
-      myBoost,
-      and(
-        eq(myBoost.postUri, posts.idUri),
-        eq(myBoost.actorUri, userEndpoints.actorUri),
-        eq(myBoost.type, "boost"),
-      ),
-    )
+      // Local user's Boost
+      .leftJoin(
+        myBoost,
+        and(
+          eq(myBoost.postUri, posts.idUri),
+          eq(myBoost.actorUri, userEndpoints.actorUri),
+          eq(myBoost.type, "boost"),
+        ),
+      )
 
-    // parent post information
-    .leftJoin(parentPost, eq(parentPost.idUri, posts.inReplyTo))
-    .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri))
+      // parent post information
+      .leftJoin(parentPost, eq(parentPost.idUri, posts.inReplyTo))
+      .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri))
 
-    .where(inArray(timelineEvents.actorUri, actorUris))
-    .orderBy(desc(timelineEvents.createdAt))
-    .limit(limit)
-    .offset(offset);
+      .where(
+        actorUris ? inArray(timelineEvents.actorUri, actorUris) : undefined,
+      )
+      .orderBy(desc(timelineEvents.createdAt))
+      .limit(limit)
+      .offset(offset)
+  );
 };

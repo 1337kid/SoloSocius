@@ -63,6 +63,25 @@ export const getHomeFeed = async (
   }
 };
 
+export const getFederatedTimeline = async (
+  request: FastifyRequest<{ Querystring: DefaultPageQuery }>,
+  reply: FastifyReply,
+) => {
+  try {
+    const { pageNumber, offsetValue } = pageWindow(request.query.page);
+    const feedItems = await getProfileTimeline(
+      null,
+      TIMELINE_LIMIT,
+      offsetValue,
+    );
+
+    return reply.send(buildTimelinePage(pageNumber, feedItems));
+  } catch (error) {
+    console.error("Failed assembling federated timeline:", error);
+    return reply.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
 export const getPublicTimeline = async (
   request: FastifyRequest<{ Querystring: DefaultPageQuery }>,
   reply: FastifyReply,
