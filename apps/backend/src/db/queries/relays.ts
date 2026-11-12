@@ -18,6 +18,16 @@ export const findRelayById = async (id: string) => {
   return relay;
 };
 
+export const findRelayByFollowActivityId = async (followActivityId: string) => {
+  const [relay] = await db
+    .select()
+    .from(relays)
+    .where(eq(relays.followActivityId, followActivityId))
+    .limit(1);
+
+  return relay;
+};
+
 export const findRelayByInboxUrl = async (inboxUrl: string) => {
   const [relay] = await db
     .select()
