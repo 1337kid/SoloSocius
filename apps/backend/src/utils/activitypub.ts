@@ -225,6 +225,8 @@ export const deliverActivity = async (params: DeliverParams) => {
       },
     });
 
+    console.log("[deliverActivity] Status: ", response.status);
+    console.log("[deliverActivity] Data: ", response.data);
     return response.status >= 200 && response.status < 300;
   } catch (error) {
     console.log("Error in sending activity: ", error);
