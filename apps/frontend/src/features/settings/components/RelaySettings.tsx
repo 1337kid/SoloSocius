@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import type { Relay, RelayStatus } from "@solosocius/api-types"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { RadioTower } from "lucide-react"
-import { Controller, useForm } from "react-hook-form"
+import { useState } from "react";
+import type { Relay, RelayStatus } from "@solosocius/api-types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { RadioTower } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,14 +15,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty"
+} from "@/components/ui/empty";
 import {
   Field,
   FieldContent,
@@ -33,26 +33,26 @@ import {
   FieldLegend,
   FieldSet,
   FieldTitle,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 
 import {
   useAddRelay,
   useDeleteRelay,
   useRelays,
   useUnsubscribeRelay,
-} from "../hooks/useRelays"
-import { CreateRelaySchema, type CreateRelaySchemaType } from "../schemas"
+} from "../hooks/useRelays";
+import { CreateRelaySchema, type CreateRelaySchemaType } from "../schemas";
 
 const statusLabel: Record<RelayStatus, string> = {
   pending: "Pending",
   accepted: "Subscribed",
   rejected: "Rejected",
   unsubscribed: "Unsubscribed",
-}
+};
 
 const statusVariant: Record<
   RelayStatus,
@@ -62,17 +62,17 @@ const statusVariant: Record<
   accepted: "default",
   rejected: "destructive",
   unsubscribed: "outline",
-}
+};
 
 const canUnsubscribe = (status: RelayStatus) =>
-  status === "pending" || status === "accepted"
+  status === "pending" || status === "accepted";
 
 export function RelaySettings() {
-  const relays = useRelays()
-  const addRelay = useAddRelay()
-  const unsubscribe = useUnsubscribeRelay()
-  const removeRelay = useDeleteRelay()
-  const [relayToRemove, setRelayToRemove] = useState<Relay | null>(null)
+  const relays = useRelays();
+  const addRelay = useAddRelay();
+  const unsubscribe = useUnsubscribeRelay();
+  const removeRelay = useDeleteRelay();
+  const [relayToRemove, setRelayToRemove] = useState<Relay | null>(null);
 
   const form = useForm({
     resolver: zodResolver(CreateRelaySchema),
@@ -80,19 +80,19 @@ export function RelaySettings() {
       name: "",
       inboxUrl: "",
     },
-  })
+  });
 
   function onSubmit(values: CreateRelaySchemaType) {
     addRelay.mutate(values, {
       onSuccess: () => form.reset(),
-    })
+    });
   }
 
   async function confirmRemove() {
-    if (!relayToRemove) return
+    if (!relayToRemove) return;
     try {
-      await removeRelay.mutateAsync(relayToRemove.id)
-      setRelayToRemove(null)
+      await removeRelay.mutateAsync(relayToRemove.id);
+      setRelayToRemove(null);
     } catch {
       // The mutation hook reports the error.
     }
@@ -120,7 +120,9 @@ export function RelaySettings() {
                     placeholder="Relay name"
                     aria-invalid={fieldState.invalid}
                   />
-                  <FieldError errors={fieldState.error ? [fieldState.error] : []} />
+                  <FieldError
+                    errors={fieldState.error ? [fieldState.error] : []}
+                  />
                 </Field>
               )}
             />
@@ -138,7 +140,9 @@ export function RelaySettings() {
                     placeholder="https://relay.example/inbox"
                     aria-invalid={fieldState.invalid}
                   />
-                  <FieldError errors={fieldState.error ? [fieldState.error] : []} />
+                  <FieldError
+                    errors={fieldState.error ? [fieldState.error] : []}
+                  />
                 </Field>
               )}
             />
@@ -178,9 +182,9 @@ export function RelaySettings() {
           <div className="flex flex-col gap-3">
             {relays.data.map((relay) => {
               const unsubscribing =
-                unsubscribe.isPending && unsubscribe.variables === relay.id
+                unsubscribe.isPending && unsubscribe.variables === relay.id;
               const removing =
-                removeRelay.isPending && removeRelay.variables === relay.id
+                removeRelay.isPending && removeRelay.variables === relay.id;
 
               return (
                 <div key={relay.id} className="flex flex-col gap-3">
@@ -222,7 +226,7 @@ export function RelaySettings() {
                     </Button>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         ) : null}
@@ -231,7 +235,7 @@ export function RelaySettings() {
       <Dialog
         open={relayToRemove !== null}
         onOpenChange={(open) => {
-          if (!open && !removeRelay.isPending) setRelayToRemove(null)
+          if (!open && !removeRelay.isPending) setRelayToRemove(null);
         }}
       >
         <DialogContent>
@@ -258,12 +262,14 @@ export function RelaySettings() {
               disabled={removeRelay.isPending}
               onClick={() => void confirmRemove()}
             >
-              {removeRelay.isPending ? <Spinner data-icon="inline-start" /> : null}
+              {removeRelay.isPending ? (
+                <Spinner data-icon="inline-start" />
+              ) : null}
               Remove
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </section>
-  )
+  );
 }
