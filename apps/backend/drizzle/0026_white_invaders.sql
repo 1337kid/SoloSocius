@@ -1,0 +1,1 @@
+ALTER TABLE "actors" ADD COLUMN "type" text DEFAULT 'user' NOT NULL;

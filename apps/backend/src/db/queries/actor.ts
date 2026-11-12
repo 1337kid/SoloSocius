@@ -194,3 +194,15 @@ export const deleteLocalActor = async () => {
   await db.delete(actors).where(eq(actors.isLocal, true));
   await invalidateLocalActorCache("all");
 };
+
+export const findRelayByActorUri = async (actorUri: string) => {
+  const [relay] = await db
+    .select({
+      type: actors.type,
+    })
+    .from(actors)
+    .where(and(eq(actors.actorUri, actorUri), eq(actors.type, "relay")))
+    .limit(1);
+
+  return relay?.type === "relay";
+};

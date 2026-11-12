@@ -26,6 +26,10 @@ export const actors = pgTable("actors", {
   publicKey: text("public_key").notNull(),
   inboxUrl: text("inbox_url").notNull(),
   sharedInboxUrl: text("shared_inbox_url"),
+  type: text("type")
+    .$type<"user" | "relay" | "bot">()
+    .default("user")
+    .notNull(),
   isLocal: boolean("is_local").default(false).notNull(),
   manuallyApprovesFollowers: boolean("manually_approves_followers")
     .default(false)

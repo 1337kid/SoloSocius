@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "../index.js";
-import { relays } from "../schema.js";
+import { actors, relays } from "../schema.js";
 
 const subscribedStatuses = ["pending", "accepted"] as const;
 
@@ -72,14 +72,21 @@ export const markRelayUnsubscribed = async (id: string) => {
   return relay;
 };
 
-export const markRelayAccepted = async (id: string) => {
-  const [relay] = await db
-    .update(relays)
-    .set({ status: "accepted" })
-    .where(and(eq(relays.id, id), eq(relays.status, "pending")))
-    .returning({ id: relays.id });
+export const markRelayAccepted = async (id: string, actorUri: string) => {
+  db.transaction(async (tx) => {
+    const [relay] = await tx
+      .update(relays)
+      .set({ status: "accepted" })
+      .where(and(eq(relays.id, id), eq(relays.status, "pending")))
+      .returning({ id: relays.id });
 
-  return relay;
+    await tx
+      .update(actors)
+      .set({ type: "relay" })
+      .where(eq(actors.actorUri, actorUri));
+
+    return relay;
+  });
 };
 
 export const markRelayRejected = async (id: string) => {

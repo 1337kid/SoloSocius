@@ -14,7 +14,7 @@ export const handleAcceptActivity = async (activity: InboxActivity) => {
 
   const relay = await findRelayByFollowActivityId(acceptedActivityId);
   if (relay) {
-    await markRelayAccepted(relay.id);
+    await markRelayAccepted(relay.id, activity.actor);
     return;
   }
 
