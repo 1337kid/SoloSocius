@@ -194,6 +194,7 @@ COMMIT_MSG="${CUSTOM_MESSAGE:-"chore: bump version $CURRENT_VERSION to $NEW_VERS
 git commit -m "$COMMIT_MSG"
 
 git tag "$NEW_VERSION"
+git push origin "$NEW_VERSION"
 
 echo ""
 echo "Done. Version bumped to $NEW_VERSION and committed."
