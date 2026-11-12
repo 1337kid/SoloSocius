@@ -13,6 +13,7 @@ import {
   parseAttachmentsForActivity,
 } from "../utils/activitypub.js";
 import { MediaItem, actors } from "../db/schema.js";
+import { ACTIVITYSTREAMS_CONTEXT, PUBLIC_COLLECTION } from "./constants.js";
 
 export const createActivity = (
   activityId: string,
@@ -20,35 +21,27 @@ export const createActivity = (
   object: any,
 ) => {
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: activityId,
     type: type,
     actor: userEndpoints.actorUri,
     object: object,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
   };
 };
 
 export const createRelayFollowActivity = (relayId: string) => {
-  return {
-    "@context": "https://www.w3.org/ns/activitystreams",
-    id: generateRelayFollowActivityId(relayId),
-    type: "Follow",
-    actor: userEndpoints.actorUri,
-    object: userEndpoints.actorUri,
-  };
+  return createActivity(
+    generateRelayFollowActivityId(relayId),
+    "Follow",
+    PUBLIC_COLLECTION,
+  );
 };
 
 export const createRelayUndoFollowActivity = (relayId: string) => {
-  const followActivity = createRelayFollowActivity(relayId);
+  const followActivityId = generateRelayFollowActivityId(relayId);
 
-  return {
-    "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${followActivity.id}#undo`,
-    type: "Undo",
-    actor: userEndpoints.actorUri,
-    object: followActivity,
-  };
+  return createActivity(`${followActivityId}#undo`, "Undo", followActivityId);
 };
 
 export const createProfileUpdateActivity = (params: InstanceActorObject) => {
@@ -92,11 +85,11 @@ export const createNoteActivity = (params: OutboxActivity) => {
   const attachments = parseAttachmentsForActivity(params.attachments || []);
 
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: `${params.idUri}/activity`,
     type: "Create",
     actor: userEndpoints.actorUri,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
     cc: [userEndpoints.followers],
     object: {
       id: params.idUri,
@@ -107,7 +100,7 @@ export const createNoteActivity = (params: OutboxActivity) => {
       url: params.url,
       actor: userEndpoints.actorUri,
       attributedTo: userEndpoints.actorUri,
-      to: ["https://www.w3.org/ns/activitystreams#Public"],
+      to: [PUBLIC_COLLECTION],
       cc: [userEndpoints.followers],
       content: params.content,
       attachment: attachments,
@@ -123,7 +116,7 @@ export const createOutboxActivity = (params: OutboxActivity) => {
     type: "Create",
     actor: userEndpoints.actorUri,
     published: params.createdAt.toISOString(),
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
     cc: [userEndpoints.followers],
     object: {
       id: params.idUri,
@@ -133,7 +126,7 @@ export const createOutboxActivity = (params: OutboxActivity) => {
       published: params.createdAt.toISOString(),
       url: params.url || `${userEndpoints.home}/posts/${params.id}`,
       attributedTo: userEndpoints.actorUri,
-      to: ["https://www.w3.org/ns/activitystreams#Public"],
+      to: [PUBLIC_COLLECTION],
       cc: [userEndpoints.followers],
       content: params.content,
       attachment: attachments,
@@ -155,14 +148,14 @@ export const createNotePayload = ({
   attachments?: MediaItem[];
 }) => {
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: idUri,
     type: "Note",
     published: createdAt.toISOString(),
     url: idUri,
     actor: userEndpoints.actorUri,
     attributedTo: userEndpoints.actorUri,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
     cc: [userEndpoints.followers],
     content: content,
     attachment: parseAttachmentsForActivity(attachments || []),
@@ -192,11 +185,11 @@ export const createNoteUpdatePayload = ({
   (notePayload as any).updated = updatedAt.toISOString();
 
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: `${idUri}/activity/update-${Date.now()}`,
     type: "Update",
     actor: userEndpoints.actorUri,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
     object: {
       ...notePayload,
       attachment: parseAttachmentsForActivity(attachments || []),
@@ -206,11 +199,11 @@ export const createNoteUpdatePayload = ({
 
 export const createDeleteActivity = (idUri: string) => {
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: `${idUri}/activity/delete`,
     type: "Delete",
     actor: userEndpoints.actorUri,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
     object: {
       id: idUri,
       type: "Tombstone",
@@ -221,11 +214,11 @@ export const createDeleteActivity = (idUri: string) => {
 export const createDeleteActorActivity = () => {
   const actorUri = userEndpoints.actorUri;
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: `${actorUri}/activity/delete-${Date.now()}`,
     type: "Delete",
     actor: actorUri,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [PUBLIC_COLLECTION],
     object: actorUri,
   };
 };
@@ -236,7 +229,7 @@ export const createInteractionActivity = (
   targetPostUri: string,
 ) => {
   const activity = {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: activityId,
     type: activityType,
     actor: userEndpoints.actorUri,
@@ -246,7 +239,7 @@ export const createInteractionActivity = (
   if (activityType === "Announce") {
     return {
       ...activity,
-      to: ["https://www.w3.org/ns/activitystreams#Public"],
+      to: [PUBLIC_COLLECTION],
     };
   }
 
