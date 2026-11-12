@@ -15,6 +15,7 @@ import { relays } from "../db/schema.js";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 import type { IdParams } from "../validations/common.val.js";
 import type { CreateRelayBody } from "../validations/relay.val.js";
+import { generateRelayFollowActivityId } from "../utils/activityId.js";
 
 const toRelay = (relay: typeof relays.$inferSelect) => ({
   id: relay.id,
@@ -53,11 +54,13 @@ export const addRelay = async (
         .send({ error: "A relay with this inbox URL already exists." });
     }
 
-    const relay = await insertRelay(name, inboxUrl);
+    const followActivityId = generateRelayFollowActivityId();
+
+    const relay = await insertRelay(name, inboxUrl, followActivityId);
 
     await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: relay.inboxUrl,
-      activity: createRelayFollowActivity(relay.id),
+      activity: createRelayFollowActivity(followActivityId),
     });
 
     return reply.status(201).send(toRelay(relay));
@@ -79,10 +82,10 @@ export const removeRelay = async (
       return reply.status(404).send({ error: "Relay not found." });
     }
 
-    if (isSubscribed(relay.status)) {
+    if (relay.followActivityId && isSubscribed(relay.status)) {
       await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
         inboxUrl: relay.inboxUrl,
-        activity: createRelayUndoFollowActivity(relay.id),
+        activity: createRelayUndoFollowActivity(relay.followActivityId),
       });
     }
 
@@ -107,7 +110,7 @@ export const unsubscribeRelay = async (
       return reply.status(404).send({ error: "Relay not found." });
     }
 
-    if (!isSubscribed(relay.status)) {
+    if (!relay.followActivityId || !isSubscribed(relay.status)) {
       return reply.status(409).send({ error: "Relay is not subscribed." });
     }
 
@@ -118,7 +121,7 @@ export const unsubscribeRelay = async (
 
     await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: updated.inboxUrl,
-      activity: createRelayUndoFollowActivity(updated.id),
+      activity: createRelayUndoFollowActivity(relay.followActivityId),
     });
 
     return reply.status(200).send(toRelay(updated));

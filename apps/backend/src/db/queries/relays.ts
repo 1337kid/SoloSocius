@@ -28,10 +28,14 @@ export const findRelayByInboxUrl = async (inboxUrl: string) => {
   return relay;
 };
 
-export const insertRelay = async (relayName: string, inboxUrl: string) => {
+export const insertRelay = async (
+  relayName: string,
+  inboxUrl: string,
+  followActivityId: string,
+) => {
   const [relay] = await db
     .insert(relays)
-    .values({ relayName, inboxUrl, status: "pending" })
+    .values({ relayName, inboxUrl, followActivityId, status: "pending" })
     .returning();
 
   return relay;

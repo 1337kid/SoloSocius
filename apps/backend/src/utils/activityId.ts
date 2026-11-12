@@ -21,8 +21,8 @@ export const generateProfileUpdateActivityId = () => {
   return `${userEndpoints.actorUri}/profile-update/${uuidv7()}`;
 };
 
-export const generateRelayFollowActivityId = (relayId: string) => {
-  return `${userEndpoints.actorUri}/relays/${relayId}/follow`;
+export const generateRelayFollowActivityId = () => {
+  return `${userEndpoints.actorUri}/relays/${uuidv7()}`;
 };
 
 export const parseRelayIdFromFollowActivityId = (activityId: string) => {

@@ -1,0 +1,1 @@
+ALTER TABLE "relays" ADD COLUMN "follow_activity_id" text;

@@ -30,17 +30,11 @@ export const createActivity = (
   };
 };
 
-export const createRelayFollowActivity = (relayId: string) => {
-  return createActivity(
-    generateRelayFollowActivityId(relayId),
-    "Follow",
-    PUBLIC_COLLECTION,
-  );
+export const createRelayFollowActivity = (followActivityId: string) => {
+  return createActivity(followActivityId, "Follow", PUBLIC_COLLECTION);
 };
 
-export const createRelayUndoFollowActivity = (relayId: string) => {
-  const followActivityId = generateRelayFollowActivityId(relayId);
-
+export const createRelayUndoFollowActivity = (followActivityId: string) => {
   return createActivity(`${followActivityId}#undo`, "Undo", followActivityId);
 };
 
