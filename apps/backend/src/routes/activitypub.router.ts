@@ -8,7 +8,10 @@ import { handleWebFinger } from "../controllers/webfinger.controller.js";
 import { handleFollowingCollectionRequest } from "../controllers/following.controller.js";
 import { handleFollowersCollectionRequest } from "../controllers/followers.controller.js";
 import { getMedia } from "../controllers/media.controller.js";
-import { nodeinfoRoutes, getNodeInfo } from "../controllers/nodeinfo.controller.js";
+import {
+  nodeinfoRoutes,
+  getNodeInfo,
+} from "../controllers/nodeinfo.controller.js";
 import { mediaKeyRouteSchema } from "../validations/media.val.js";
 import { optionalPageRouteSchema } from "../validations/pagination.val.js";
 import { postIdRouteSchema } from "../validations/posts.val.js";
@@ -29,7 +32,11 @@ export async function activityPubRoutes(fastify: FastifyInstance) {
     handleIncomingInbox,
   );
 
-  fastify.get("/outbox", { schema: optionalPageRouteSchema }, handleOutboxRequest);
+  fastify.get(
+    "/outbox",
+    { schema: optionalPageRouteSchema },
+    handleOutboxRequest,
+  );
   fastify.get("/posts/:id", { schema: postIdRouteSchema }, getPostActivity);
   fastify.get(
     "/following",

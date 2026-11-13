@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { count } from "drizzle-orm";
-import { DOMAIN, SOFTWARE_NAME, SOFTWARE_VERSION } from "../config/env.js";
+import { DOMAIN } from "../config/env.js";
 import { getActorOnThisInstance } from "../db/queries/actor.js";
 import { getLocalPostsCount } from "../db/queries/posts.js";
+import instanceConfig from "../config/instance.json" with { type: "json" };
 
 export async function nodeinfoRoutes(
   request: FastifyRequest,
@@ -21,9 +21,12 @@ export async function nodeinfoRoutes(
     });
 }
 
-export async function getNodeInfo(request: FastifyRequest, reply: FastifyReply) {
-    const actor = await getActorOnThisInstance();
-    const localPostsCount = await getLocalPostsCount();
+export async function getNodeInfo(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const actor = await getActorOnThisInstance();
+  const localPostsCount = await getLocalPostsCount();
 
   return reply
     .status(200)
@@ -33,8 +36,8 @@ export async function getNodeInfo(request: FastifyRequest, reply: FastifyReply) 
     .send({
       version: "2.0",
       software: {
-        name: SOFTWARE_NAME,
-        version: SOFTWARE_VERSION,
+        name: instanceConfig.software,
+        version: instanceConfig.version,
       },
       protocols: ["activitypub"],
       services: {
@@ -51,8 +54,8 @@ export async function getNodeInfo(request: FastifyRequest, reply: FastifyReply) 
         localPosts: localPostsCount,
       },
       metadata: {
-        nodeName: "SoloSocius",
-        nodeDescription: "A single-user ActivityPub federated node.",
+        nodeName: instanceConfig.name,
+        nodeDescription: instanceConfig.description,
       },
     });
 }

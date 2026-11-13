@@ -5,9 +5,14 @@ import { getProfileData } from "../controllers/user.controller.js";
 import { handleGetAllFollowers } from "../controllers/followers.controller.js";
 import { handleGetAllFollowing } from "../controllers/following.controller.js";
 import { defaultPageRouteSchema } from "../validations/pagination.val.js";
+import instanceRouter from "./instance.router.js";
 
 export async function PublicRoutes(fastify: FastifyInstance) {
-  fastify.get("/timeline", { schema: defaultPageRouteSchema }, getPublicTimeline);
+  fastify.get(
+    "/timeline",
+    { schema: defaultPageRouteSchema },
+    getPublicTimeline,
+  );
 
   fastify.get("/profile", getProfileData);
   fastify.get(
@@ -20,4 +25,6 @@ export async function PublicRoutes(fastify: FastifyInstance) {
     { schema: defaultPageRouteSchema },
     handleGetAllFollowing,
   );
+
+  fastify.register(instanceRouter);
 }
