@@ -528,7 +528,8 @@
     white-space: pre-wrap !important;
   }
 
-  [data-slot="post-body"] :where(img, video, svg, canvas, iframe, embed, object) {
+  [data-slot="post-body"]
+    :where(img, video, svg, canvas, iframe, embed, object) {
     height: auto !important;
   }
 
@@ -918,6 +919,10 @@
 
     [data-slot="shell-rail"] {
       padding: 0.75rem;
+    }
+
+    [data-slot="settings-panel"] {
+      width: 100%;
     }
 
     [data-slot="shell-feed"] {
