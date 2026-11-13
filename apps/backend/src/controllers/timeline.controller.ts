@@ -3,26 +3,9 @@ import { userEndpoints } from "../activitypub/actor.js";
 import { getProfileTimeline } from "../db/queries/timeline.js";
 import { getAllAcceptedFollowingActorUri } from "../db/queries/following.js";
 import type { DefaultPageQuery } from "../validations/pagination.val.js";
+import { serializeTimelineItems } from "../services/timeline-item.js";
 
 const TIMELINE_LIMIT = 20;
-
-const serializeTimelineItems = (
-  feedItems: Awaited<ReturnType<typeof getProfileTimeline>>,
-) => {
-  return feedItems.map((item) => {
-    return {
-      event: item.event,
-      actor: item.actor,
-      post: {
-        ...item.post,
-        actor: item.postActor,
-        inReplyTo: item.parentPost
-          ? { ...item.parentPost, actor: item.parentActor }
-          : null,
-      },
-    };
-  });
-};
 
 const buildTimelinePage = (
   pageNumber: number,

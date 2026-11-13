@@ -2,6 +2,7 @@ import { addInteractionEntry } from "../../db/queries/interactions.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
 import { findLocalPostByUri } from "../../db/queries/posts.js";
 import { InboxActivity } from "../../types/index.js";
+import { publishTimelineEvent } from "../../services/publish-timeline.js";
 
 export const handleLikeActivity = async (activity: InboxActivity) => {
   try {
@@ -26,6 +27,11 @@ export const handleLikeActivity = async (activity: InboxActivity) => {
       actorUri: activity.actor,
       targetPostUri: post.idUri,
       activityId: activity.id,
+    });
+
+    await publishTimelineEvent({
+      kind: "status.update",
+      postUri: post.idUri,
     });
   } catch (error) {
     console.log(error);

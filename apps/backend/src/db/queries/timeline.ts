@@ -89,15 +89,44 @@ export const getProfileTimeline = async (
   limit: number,
   offset: number,
 ) => {
-  return (
-    db
-      .select({
+  return timelineQuery()
+    .where(actorUris ? inArray(timelineEvents.actorUri, actorUris) : undefined)
+    .orderBy(desc(timelineEvents.createdAt))
+    .limit(limit)
+    .offset(offset);
+};
+
+export const getTimelineItem = async ({
+  postUri,
+  actorUri,
+  type,
+}: {
+  postUri: string;
+  actorUri?: string;
+  type?: "post" | "boost";
+}) => {
+  const filters = [eq(timelineEvents.postUri, postUri)];
+  if (actorUri) filters.push(eq(timelineEvents.actorUri, actorUri));
+  if (type) filters.push(eq(timelineEvents.type, type));
+
+  const rows = await timelineQuery()
+    .where(and(...filters))
+    .orderBy(desc(timelineEvents.createdAt))
+    .limit(1);
+
+  return rows[0] ?? null;
+};
+
+function timelineQuery() {
+  return db
+    .select({
         event: {
           createdAt: timelineEvents.createdAt,
           type: timelineEvents.type,
         },
 
         actor: {
+          actorUri: actor.actorUri,
           avatarUrl: actor.avatarUrl,
           displayName: actor.displayName,
           username: actor.username,
@@ -174,13 +203,5 @@ export const getProfileTimeline = async (
 
       // parent post information
       .leftJoin(parentPost, eq(parentPost.idUri, posts.inReplyTo))
-      .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri))
-
-      .where(
-        actorUris ? inArray(timelineEvents.actorUri, actorUris) : undefined,
-      )
-      .orderBy(desc(timelineEvents.createdAt))
-      .limit(limit)
-      .offset(offset)
-  );
-};
+      .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri));
+}

@@ -1,0 +1,16 @@
+import fp from "fastify-plugin";
+import websocket from "@fastify/websocket";
+
+export default fp(
+  async (fastify) => {
+    await fastify.register(websocket, {
+      options: {
+        maxPayload: 1048576,
+      },
+    });
+  },
+  {
+    name: "websocket",
+    fastify: "5.x",
+  },
+);

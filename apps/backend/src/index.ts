@@ -13,6 +13,8 @@ import { PrivateRoutes } from "./routes/private.router.js";
 import { initializeRedis } from "./cache/redis.js";
 import jobWorker from "./jobs/index.js";
 import { registerValidationErrorHandler } from "./plugins/validationError.js";
+import websocketPlugin from "./plugins/websocket.js";
+import { streamingRoutes } from "./routes/streaming.router.js";
 
 const fastify = Fastify({ logger: loggerConfig });
 
@@ -22,6 +24,7 @@ await fastify.register(requestBodyLogger);
 await fastify.register(authPlugin);
 await fastify.register(contentTypeParser);
 await fastify.register(multipart);
+await fastify.register(websocketPlugin);
 await fastify.register(cors, {
   origin: true,
   credentials: true,
@@ -32,6 +35,7 @@ await fastify.register(activityPubRoutes);
 await fastify.register(AuthRoutes, { prefix: "/api/auth" });
 await fastify.register(PrivateRoutes, { prefix: "/api" });
 await fastify.register(PublicRoutes, { prefix: "/api" });
+await fastify.register(streamingRoutes, { prefix: "/api" });
 
 const start = async () => {
   try {

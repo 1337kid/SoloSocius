@@ -19,6 +19,7 @@ import {
   createTimelineEntry,
   removeTimelineBoostEntry,
 } from "../db/queries/timeline.js";
+import { publishTimelineEvent } from "../services/publish-timeline.js";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 import type { InteractionBody } from "../validations/social.val.js";
 
@@ -50,6 +51,10 @@ export const handleOutboundPostInteraction = async (
       actorUri: userEndpoints.actorUri,
       postUri: targetPost.idUri,
     });
+    await publishTimelineEvent({
+      kind: "status.update",
+      postUri: targetPost.idUri,
+    });
 
     if (!targetPost.isLocal) {
       const actorLookup = await remoteActorLookup(targetPost.actorUri);
@@ -72,6 +77,12 @@ export const handleOutboundPostInteraction = async (
         type: "boost",
         actorUri: userEndpoints.actorUri,
         postUri: targetPost.idUri,
+      });
+      await publishTimelineEvent({
+        kind: "update",
+        postUri: targetPost.idUri,
+        actorUri: userEndpoints.actorUri,
+        type: "boost",
       });
 
       await deliverActivityToFollowers(interactionActivity);
@@ -125,11 +136,24 @@ export const handleUndoPostInteraction = async (
     }
 
     await removeInteractionById(interaction.id);
+    await publishTimelineEvent({
+      kind: "status.update",
+      postUri: targetPostUri,
+    });
 
     if (action === "boost") {
       await deliverActivityToFollowers(undoActivity);
 
       await removeTimelineBoostEntry(targetPostUri, userEndpoints.actorUri);
+      const boostedPost = await remotePostLookup(targetPostUri);
+      if (boostedPost) {
+        await publishTimelineEvent({
+          kind: "delete",
+          postId: boostedPost.id,
+          actorUri: userEndpoints.actorUri,
+          eventType: "boost",
+        });
+      }
     }
 
     return reply.status(200).send({

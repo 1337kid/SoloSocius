@@ -9,6 +9,8 @@ import {
   removeInteractionById,
 } from "../../db/queries/interactions.js";
 import { removeBoostByActivityId } from "../../db/queries/transactions.js";
+import { getPostFromDB } from "../../db/queries/posts.js";
+import { publishTimelineEvent } from "../../services/publish-timeline.js";
 import { userEndpoints } from "../../activitypub/actor.js";
 
 export const handleUndoActivity = async (activity: InboxActivity) => {
@@ -32,12 +34,35 @@ export const handleUndoActivity = async (activity: InboxActivity) => {
 
         if (likeInteraction && likeInteraction.type === "like") {
           await removeInteractionById(likeInteraction.id);
+          await publishTimelineEvent({
+            kind: "status.update",
+            postUri: likeInteraction.postUri,
+          });
         }
         break;
 
-      case "Announce":
+      case "Announce": {
+        const boostInteraction = await findInteractionByActivityId(
+          activity.object.id,
+        );
         await removeBoostByActivityId(activity.object.id);
+        if (!boostInteraction?.postUri) break;
+
+        const boostedPost = await getPostFromDB(boostInteraction.postUri);
+        if (boostedPost) {
+          await publishTimelineEvent({
+            kind: "delete",
+            postId: boostedPost.id,
+            actorUri: activity.actor,
+            eventType: "boost",
+          });
+        }
+        await publishTimelineEvent({
+          kind: "status.update",
+          postUri: boostInteraction.postUri,
+        });
         break;
+      }
 
       default:
         return;

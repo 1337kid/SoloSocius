@@ -6,6 +6,7 @@ import {
   storeRemotePost,
 } from "../../db/queries/posts.js";
 import { createTimelineEntry } from "../../db/queries/timeline.js";
+import { publishTimelineEvent } from "../../services/publish-timeline.js";
 import { InboxActivity } from "../../types/index.js";
 import type { MediaItem } from "../../db/schema.js";
 import { parseMediaItems } from "../../utils/activitypub.js";
@@ -19,7 +20,7 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
     case "Note":
       let mediaItems: MediaItem[] = parseMediaItems(nestedObject.attachment);
       
-      await storeRemotePost({
+      const storedPost = await storeRemotePost({
         actorUri: activity.actor,
         idUri: nestedObject.id,
         content: nestedObject.content || "",
@@ -32,6 +33,12 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
       await createTimelineEntry({
         actorUri: activity.actor,
         postUri: nestedObject.id,
+        type: "post",
+      });
+      await publishTimelineEvent({
+        kind: "update",
+        postUri: storedPost.idUri,
+        actorUri: activity.actor,
         type: "post",
       });
 

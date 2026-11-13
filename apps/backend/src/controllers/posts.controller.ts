@@ -17,6 +17,7 @@ import {
 } from "../activitypub/activities.js";
 import { userEndpoints } from "../activitypub/actor.js";
 import { createTimelineEntry } from "../db/queries/timeline.js";
+import { publishTimelineEvent } from "../services/publish-timeline.js";
 import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 import type { IdParams } from "../validations/common.val.js";
 import type {
@@ -60,6 +61,12 @@ export const createPost = async (
     await createTimelineEntry({
       actorUri: userEndpoints.actorUri,
       postUri: postUri,
+      type: "post",
+    });
+    await publishTimelineEvent({
+      kind: "update",
+      postUri,
+      actorUri: userEndpoints.actorUri,
       type: "post",
     });
 
@@ -138,6 +145,10 @@ export const updatePost = async (
     console.log("noteUpdateActivity: ", noteUpdateActivity);
 
     await deliverActivityToFollowers(noteUpdateActivity);
+    await publishTimelineEvent({
+      kind: "status.update",
+      postUri: updatedPost.idUri,
+    });
 
     return reply.status(200).send(updatedPost);
   } catch (error) {
@@ -161,6 +172,12 @@ export const deletePost = async (
     const deleteActivity = createDeleteActivity(existingPost.idUri);
 
     await deletePostById(id);
+    await publishTimelineEvent({
+      kind: "delete",
+      postId: existingPost.id,
+      actorUri: existingPost.actorUri,
+      eventType: "post",
+    });
 
     await deliverActivityToFollowers(deleteActivity);
 

@@ -5,6 +5,7 @@ import {
 } from "../../db/queries/interactions.js";
 import { createNotificationEntry } from "../../db/queries/notifications.js";
 import { createTimelineEntry } from "../../db/queries/timeline.js";
+import { publishTimelineEvent } from "../../services/publish-timeline.js";
 import { remotePostLookup } from "../../utils/activitypub.js";
 import { checkIfLocalActorIsFollowing } from "../../db/queries/following.js";
 import { findRelayByActorUri } from "../../db/queries/actor.js";
@@ -35,6 +36,12 @@ export const handleAnnounceActivity = async (activity: InboxActivity) => {
         actorUri: post.actorUri,
         postUri: post.idUri,
       });
+      await publishTimelineEvent({
+        kind: "update",
+        postUri: post.idUri,
+        actorUri: post.actorUri,
+        type: "post",
+      });
 
       return;
     }
@@ -53,6 +60,16 @@ export const handleAnnounceActivity = async (activity: InboxActivity) => {
     await createTimelineEntry({
       type: "boost",
       actorUri: activity.actor,
+      postUri: post.idUri,
+    });
+    await publishTimelineEvent({
+      kind: "update",
+      postUri: post.idUri,
+      actorUri: activity.actor,
+      type: "boost",
+    });
+    await publishTimelineEvent({
+      kind: "status.update",
       postUri: post.idUri,
     });
 

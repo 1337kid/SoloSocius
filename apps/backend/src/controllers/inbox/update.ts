@@ -3,6 +3,7 @@ import { addActorToDB } from "../../db/queries/actor.js";
 import { storeRemotePost } from "../../db/queries/posts.js";
 import { MediaItem } from "../../db/schema.js";
 import { parseMediaItems } from "../../utils/activitypub.js";
+import { publishTimelineEvent } from "../../services/publish-timeline.js";
 
 const actorKeysToCheck = [
   "id",
@@ -79,6 +80,10 @@ export const handleUpdateActivity = async (activity: InboxActivity) => {
             url: post.url || null,
             published: post.published,
             mediaItems,
+          });
+          await publishTimelineEvent({
+            kind: "status.update",
+            postUri: post.id,
           });
         } catch (error) {
           console.error("Not updating post because of error:", error);
