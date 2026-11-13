@@ -8,7 +8,6 @@ import {
 import { createPost } from "@/features/home/api";
 import { queryClient } from "@/lib/query/client";
 import { timelineQueryKeys } from "../keys";
-import { feedQueryKeys } from "@/features/home/keys";
 import { activityPubContent } from "@/lib/utils";
 
 export const useInteraction = () => {
@@ -54,9 +53,7 @@ export const useInteraction = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.details() });
-      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
     },
   });
 
@@ -65,9 +62,7 @@ export const useInteraction = () => {
       return deletePostApi(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.details() });
-      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
     },
   });
 
@@ -76,9 +71,7 @@ export const useInteraction = () => {
       return updatePostApi(id, content);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: timelineQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: timelineQueryKeys.details() });
-      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
     },
   });
 

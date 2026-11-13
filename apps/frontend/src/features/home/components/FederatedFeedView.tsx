@@ -2,9 +2,11 @@
 
 import { FeedTimeline } from "./FeedTimeline"
 import { useFederatedFeed } from "../hooks/useFederatedFeed"
+import { useTimelineStream } from "@/features/timeline/hooks/useTimelineStream"
 
 export function FederatedFeedView() {
   const query = useFederatedFeed()
+  useTimelineStream("public")
 
   return (
     <FeedTimeline

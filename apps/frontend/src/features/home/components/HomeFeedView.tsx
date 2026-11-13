@@ -2,9 +2,11 @@
 
 import { FeedTimeline } from "./FeedTimeline"
 import { useHomeFeed } from "../hooks/useHomeFeed"
+import { useTimelineStream } from "@/features/timeline/hooks/useTimelineStream"
 
 export function HomeFeedView() {
   const query = useHomeFeed()
+  useTimelineStream("user")
 
   return (
     <FeedTimeline

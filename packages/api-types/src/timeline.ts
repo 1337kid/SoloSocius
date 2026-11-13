@@ -1,6 +1,7 @@
 import type { MediaItem } from "./common.js";
 
 export interface TimelineActorSnippet {
+  actorUri?: string;
   avatarUrl: string | null;
   displayName: string | null;
   username: string;

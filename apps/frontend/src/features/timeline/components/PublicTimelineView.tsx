@@ -14,6 +14,8 @@ import { StatusSkeleton } from "@/components/ui/status"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 
 import { usePublicTimeline } from "../hooks/usePublicTimeline"
+import { useTimelineStream } from "../hooks/useTimelineStream"
+import { timelineItemKey, uniqueTimelineItems } from "../stream/apply-stream-event"
 import { ShowLoginDialog } from "./ShowLoginDialog"
 import { TimelineItem } from "./TimelineItem"
 
@@ -26,6 +28,7 @@ export function PublicTimelineView() {
     isFetchingNextPage,
     fetchNextPage,
   } = usePublicTimeline()
+  useTimelineStream("public:local")
 
   const { ref, inView } = useInView()
 
@@ -35,7 +38,9 @@ export function PublicTimelineView() {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const allPosts = data?.pages.flatMap((page) => page.items) ?? []
+  const allPosts = uniqueTimelineItems(
+    data?.pages.flatMap((page) => page.items) ?? [],
+  )
   const { isAuthenticated } = useAuth()
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
 
@@ -69,7 +74,7 @@ export function PublicTimelineView() {
         <div data-slot="feed">
           {allPosts.map((entry) => (
             <TimelineItem
-              key={entry.post.id}
+              key={timelineItemKey(entry)}
               entry={entry}
               onPostStatsButtonClick={handlePostStatsButtonClick}
             />

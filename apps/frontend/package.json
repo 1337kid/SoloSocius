@@ -6,13 +6,14 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx --test src/features/timeline/stream/*.test.ts"
   },
   "dependencies": {
-    "@solosocius/api-types": "workspace:*",
     "@hookform/resolvers": "5.2.0",
     "@hugeicons/core-free-icons": "^4.2.1",
     "@hugeicons/react": "^1.1.9",
+    "@solosocius/api-types": "workspace:*",
     "@tanstack/react-query": "^5.101.1",
     "axios": "^1.18.0",
     "class-variance-authority": "^0.7.1",
@@ -44,6 +45,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   }
 }

@@ -13,6 +13,7 @@ import {
 import { StatusSkeleton } from "@/components/ui/status"
 import type { TimelineResponse } from "@/features/timeline/api"
 import { TimelineItem } from "@/features/timeline/components/TimelineItem"
+import { timelineItemKey, uniqueTimelineItems } from "@/features/timeline/stream/apply-stream-event"
 
 type TimelineQuery = UseInfiniteQueryResult<InfiniteData<TimelineResponse>>
 
@@ -44,7 +45,9 @@ export function FeedTimeline({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const allPosts = data?.pages.flatMap((page) => page.items) ?? []
+  const allPosts = uniqueTimelineItems(
+    data?.pages.flatMap((page) => page.items) ?? [],
+  )
 
   if (isLoading) {
     return (
@@ -82,7 +85,7 @@ export function FeedTimeline({
     <div data-slot="feed">
       {allPosts.map((entry) => (
         <TimelineItem
-          key={`${entry.event.createdAt}-${entry.post.idUri}`}
+          key={timelineItemKey(entry)}
           entry={entry}
           onPostStatsButtonClick={() => {}}
         />
