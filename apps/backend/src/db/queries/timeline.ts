@@ -118,8 +118,9 @@ export const getTimelineItem = async ({
 };
 
 function timelineQuery() {
-  return db
-    .select({
+  return (
+    db
+      .select({
         event: {
           createdAt: timelineEvents.createdAt,
           type: timelineEvents.type,
@@ -203,5 +204,6 @@ function timelineQuery() {
 
       // parent post information
       .leftJoin(parentPost, eq(parentPost.idUri, posts.inReplyTo))
-      .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri));
+      .leftJoin(parentActor, eq(parentActor.actorUri, parentPost.actorUri))
+  );
 }

@@ -9,6 +9,7 @@ import { publishTimelineEvent } from "../../services/publish-timeline.js";
 import { remotePostLookup } from "../../utils/activitypub.js";
 import { checkIfLocalActorIsFollowing } from "../../db/queries/following.js";
 import { findRelayByActorUri } from "../../db/queries/actor.js";
+import { createAndPublishTimelineEntry } from "../../utils/timeline.js";
 
 export const handleAnnounceActivity = async (activity: InboxActivity) => {
   try {
@@ -31,17 +32,7 @@ export const handleAnnounceActivity = async (activity: InboxActivity) => {
     if (!post) return;
 
     if (isRelay) {
-      await createTimelineEntry({
-        type: "post",
-        actorUri: post.actorUri,
-        postUri: post.idUri,
-      });
-      await publishTimelineEvent({
-        kind: "update",
-        postUri: post.idUri,
-        actorUri: post.actorUri,
-        type: "post",
-      });
+      await createAndPublishTimelineEntry(post.actorUri, post.idUri, "post");
 
       return;
     }
@@ -57,17 +48,8 @@ export const handleAnnounceActivity = async (activity: InboxActivity) => {
       postUri: post.idUri,
     });
 
-    await createTimelineEntry({
-      type: "boost",
-      actorUri: activity.actor,
-      postUri: post.idUri,
-    });
-    await publishTimelineEvent({
-      kind: "update",
-      postUri: post.idUri,
-      actorUri: activity.actor,
-      type: "boost",
-    });
+    await createAndPublishTimelineEntry(activity.actor, post.idUri, "boost");
+
     await publishTimelineEvent({
       kind: "status.update",
       postUri: post.idUri,

@@ -81,6 +81,7 @@ export const handleUpdateActivity = async (activity: InboxActivity) => {
             published: post.published,
             mediaItems,
           });
+
           await publishTimelineEvent({
             kind: "status.update",
             postUri: post.id,

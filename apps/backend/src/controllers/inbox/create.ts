@@ -5,11 +5,10 @@ import {
   incrementPostReplyCount,
   storeRemotePost,
 } from "../../db/queries/posts.js";
-import { createTimelineEntry } from "../../db/queries/timeline.js";
-import { publishTimelineEvent } from "../../services/publish-timeline.js";
 import { InboxActivity } from "../../types/index.js";
 import type { MediaItem } from "../../db/schema.js";
 import { parseMediaItems } from "../../utils/activitypub.js";
+import { createAndPublishTimelineEntry } from "../../utils/timeline.js";
 
 export const handleCreateActivity = async (activity: InboxActivity) => {
   if (typeof activity.object === "string") return;
@@ -19,7 +18,7 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
   switch (nestedObject.type) {
     case "Note":
       let mediaItems: MediaItem[] = parseMediaItems(nestedObject.attachment);
-      
+
       const storedPost = await storeRemotePost({
         actorUri: activity.actor,
         idUri: nestedObject.id,
@@ -30,17 +29,11 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
         mediaItems,
       });
 
-      await createTimelineEntry({
-        actorUri: activity.actor,
-        postUri: nestedObject.id,
-        type: "post",
-      });
-      await publishTimelineEvent({
-        kind: "update",
-        postUri: storedPost.idUri,
-        actorUri: activity.actor,
-        type: "post",
-      });
+      await createAndPublishTimelineEntry(
+        activity.actor,
+        storedPost.idUri,
+        "post",
+      );
 
       if (nestedObject.inReplyTo) {
         const localParentPost = await getPostFromDB(nestedObject.inReplyTo);
