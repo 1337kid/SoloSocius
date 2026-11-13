@@ -7,5 +7,6 @@ export function useProfileData() {
   return useQuery({
     queryKey: profileQueryKeys.public,
     queryFn: getProfileData,
+    staleTime: Infinity,
   });
 }
