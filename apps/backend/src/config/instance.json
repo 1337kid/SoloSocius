@@ -2,7 +2,7 @@
   "name": "SoloSocius",
   "short_description": "A lightweight, single-user ActivityPub server built for self-hosting",
   "description": "SoloSocius is an ActivityPub implementation focused on simplicity. It allows a single user to publish posts, interact with the Fediverse, and host their own social presence without the complexity of a multi-user platform.",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "language": [
     "en"
   ],
