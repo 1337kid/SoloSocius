@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import { formatDistanceToNow } from "date-fns"
-import purify from "dompurify"
-import { Repeat, Reply } from "lucide-react"
+import { formatDistanceToNow } from "date-fns";
+import purify from "dompurify";
+import { Repeat, Reply } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Status } from "@/components/ui/status"
-import { routes } from "@/lib/routes"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Status } from "@/components/ui/status";
+import { routes } from "@/lib/routes";
 
-import type { TimelineItem as TimelineEntry } from "../api"
-import { PostActions } from "./PostActions"
-import { PostMediaGrid } from "./PostMediaGrid"
+import type { TimelineItem as TimelineEntry } from "../api";
+import { PostActions } from "./PostActions";
+import { PostMediaGrid } from "./PostMediaGrid";
 
 export function TimelineItem({
   entry,
   onPostStatsButtonClick,
 }: {
-  entry: TimelineEntry
-  onPostStatsButtonClick: () => void
+  entry: TimelineEntry;
+  onPostStatsButtonClick: () => void;
 }) {
-  const isBoost = entry.event.type === "boost"
-  const postAuthor = entry.post.actor
-  const booster = isBoost ? entry.actor : null
-  const name = postAuthor.displayName || postAuthor.username
-  const handle = `@${postAuthor.username}@${postAuthor.domain}`
+  const isBoost = entry.event.type === "boost";
+  const postAuthor = entry.post.actor;
+  const booster = isBoost ? entry.actor : null;
+  const name = postAuthor.displayName || postAuthor.username;
+  const handle = `@${postAuthor.username}@${postAuthor.domain}`;
   const postTimeAgo = formatDistanceToNow(new Date(entry.post.createdAt), {
     addSuffix: true,
-  })
+  });
 
-  const parent = entry.post.inReplyTo
-  const parentActor = parent?.actor
+  const parent = entry.post.inReplyTo;
+  const parentActor = parent?.actor;
 
   return (
     <Status
@@ -72,6 +72,7 @@ export function TimelineItem({
             data-slot="post-context"
             href={parent.url || parent.idUri || entry.post.url || "#"}
             target="_blank"
+            className="bg-accent p-2 rounded-md"
             rel="noopener noreferrer"
           >
             <Avatar size="sm">
@@ -117,5 +118,5 @@ export function TimelineItem({
         />
       }
     />
-  )
+  );
 }
