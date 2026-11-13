@@ -1,7 +1,7 @@
-import Link from "next/link"
+import Link from "next/link";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Status({
   name,
@@ -16,24 +16,21 @@ function Status({
   actions,
   variant,
 }: {
-  name: string
-  handle: string
-  time: string
-  avatarUrl?: string | null
-  html: string
-  href?: string
-  media?: React.ReactNode
-  boost?: React.ReactNode
-  context?: React.ReactNode
-  actions?: React.ReactNode
-  variant?: "detail"
+  name: string;
+  handle: string;
+  time: string;
+  avatarUrl?: string | null;
+  html: string;
+  href?: string;
+  media?: React.ReactNode;
+  boost?: React.ReactNode;
+  context?: React.ReactNode;
+  actions?: React.ReactNode;
+  variant?: "detail";
 }) {
   const body = (
-    <div
-      data-slot="post-body"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  )
+    <div data-slot="post-body" dangerouslySetInnerHTML={{ __html: html }} />
+  );
 
   return (
     <article data-slot="post" data-variant={variant}>
@@ -62,7 +59,7 @@ function Status({
         </div>
       </div>
     </article>
-  )
+  );
 }
 
 function StatusSkeleton() {
@@ -76,7 +73,7 @@ function StatusSkeleton() {
         </div>
       </div>
     </article>
-  )
+  );
 }
 
-export { Status, StatusSkeleton }
+export { Status, StatusSkeleton };
