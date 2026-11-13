@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# bump-version.sh — Bump the version across package.json files, env.ts, and commit
+# bump-version.sh — Bump the version across package.json files and commit
 #
 # Usage:
 #   ./scripts/bump-version.sh [major|minor|patch] [--dry-run] [--message "custom msg"]
@@ -20,9 +20,9 @@ PACKAGE_FILES=(
   "package.json"
   "apps/backend/package.json"
   "apps/frontend/package.json"
+  "apps/backend/src/config/instance.json"
+  "packages/api-types/package.json"
 )
-
-ENV_FILE="apps/backend/src/config/env.ts"
 
 usage() {
   echo "Usage: $0 [major|minor|patch|<version>] [--dry-run] [--message <msg>]"
@@ -55,31 +55,6 @@ bump_semver() {
 is_valid_semver() {
   [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][a-zA-Z0-9.]+)?$ ]]
 }
-
-update_env_version() {
-  local file="$1"
-  local version="$2"
-  local tmp updated=false
-
-  tmp="$(mktemp)"
-  while IFS= read -r line || [[ -n "$line" ]]; do
-    if [[ "$line" == 'export const SOFTWARE_VERSION = "'*'"'* ]]; then
-      printf 'export const SOFTWARE_VERSION = "%s";\n' "$version"
-      updated=true
-    else
-      printf '%s\n' "$line"
-    fi
-  done < "$file" > "$tmp"
-
-  if [[ "$updated" != true ]]; then
-    rm -f "$tmp"
-    echo "  [error] SOFTWARE_VERSION not found in $file" >&2
-    exit 1
-  fi
-
-  mv "$tmp" "$file"
-}
-
 
 BUMP_TYPE=""
 EXPLICIT_VERSION=""
@@ -163,20 +138,9 @@ EOF
   fi
 done
 
-env_abs="$ROOT_DIR/$ENV_FILE"
-if [[ ! -f "$env_abs" ]]; then
-  echo "  [error] $ENV_FILE (not found)" >&2
-  exit 1
-elif $DRY_RUN; then
-  echo "  [dry-run] would update $ENV_FILE (SOFTWARE_VERSION)"
-else
-  update_env_version "$env_abs" "$NEW_VERSION"
-  echo "  [updated] $ENV_FILE"
-fi
-
 if $DRY_RUN; then
   echo ""
-  echo "  [dry-run] would run: git add ${PACKAGE_FILES[*]} $ENV_FILE"
+  echo "  [dry-run] would run: git add ${PACKAGE_FILES[*]}"
   echo "  [dry-run] would run: git commit -m \"chore: bump version to $NEW_VERSION\""
   echo ""
   echo "Dry-run complete — no files changed."
@@ -185,7 +149,7 @@ fi
 
 cd "$ROOT_DIR"
 
-for rel_path in "${PACKAGE_FILES[@]}" "$ENV_FILE"; do
+for rel_path in "${PACKAGE_FILES[@]}"; do
   [[ -f "$rel_path" ]] && git add "$rel_path"
 done
 
