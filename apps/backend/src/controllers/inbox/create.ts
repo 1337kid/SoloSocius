@@ -7,7 +7,7 @@ import {
 } from "../../db/queries/posts.js";
 import { InboxActivity } from "../../types/index.js";
 import type { MediaItem } from "../../db/schema.js";
-import { parseMediaItems } from "../../utils/activitypub.js";
+import { parseMediaItems, remotePostLookup } from "../../utils/activitypub.js";
 import { createAndPublishTimelineEntry } from "../../utils/timeline.js";
 
 export const handleCreateActivity = async (activity: InboxActivity) => {
@@ -17,23 +17,11 @@ export const handleCreateActivity = async (activity: InboxActivity) => {
 
   switch (nestedObject.type) {
     case "Note":
-      let mediaItems: MediaItem[] = parseMediaItems(nestedObject.attachment);
+      const post = await remotePostLookup(nestedObject.id);
 
-      const storedPost = await storeRemotePost({
-        actorUri: activity.actor,
-        idUri: nestedObject.id,
-        content: nestedObject.content || "",
-        inReplyTo: nestedObject.inReplyTo || null,
-        url: nestedObject.url || null,
-        published: nestedObject.published,
-        mediaItems,
-      });
+      if (!post) return;
 
-      await createAndPublishTimelineEntry(
-        activity.actor,
-        storedPost.idUri,
-        "post",
-      );
+      await createAndPublishTimelineEntry(activity.actor, post.idUri, "post");
 
       if (nestedObject.inReplyTo) {
         const localParentPost = await getPostFromDB(nestedObject.inReplyTo);
