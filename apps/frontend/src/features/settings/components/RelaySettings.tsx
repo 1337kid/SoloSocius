@@ -191,14 +191,16 @@ export function RelaySettings() {
                   <Separator />
                   <Field orientation="responsive">
                     <FieldContent>
-                      <FieldTitle>{relay.name}</FieldTitle>
+                      <div className="flex items-center justify-between gap-2">
+                        <FieldTitle>{relay.name}</FieldTitle>
+                        <Badge variant={statusVariant[relay.status]}>
+                          {statusLabel[relay.status]}
+                        </Badge>
+                      </div>
                       <FieldDescription className="break-all">
                         {relay.inboxUrl}
                       </FieldDescription>
                     </FieldContent>
-                    <Badge variant={statusVariant[relay.status]}>
-                      {statusLabel[relay.status]}
-                    </Badge>
                   </Field>
                   <div className="flex flex-wrap gap-2">
                     {canUnsubscribe(relay.status) ? (

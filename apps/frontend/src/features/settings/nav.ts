@@ -7,11 +7,6 @@ export const settingsNav = [
     description: "Follow requests and account preferences",
   },
   {
-    label: "Delete account",
-    href: routes.settingsDelete,
-    description: "Permanently remove this account",
-  },
-  {
     label: "Server Management",
     href: routes.settingsServer,
     description: "Manage your SoloSocius Server",
