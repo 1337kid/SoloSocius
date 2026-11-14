@@ -163,7 +163,7 @@ export const updateLocalActorProfileData = async (params: {
   const [actor] = await db
     .update(actors)
     .set(params)
-    .where(eq(actors.isLocal, true))
+    .where(eq(actors.actorUri, userEndpoints.actorUri))
     .returning();
   await invalidateLocalActorCache("profile");
   return actor;
@@ -173,7 +173,7 @@ export const setLocalActorManuallyApprovesFollowers = async () => {
   const [actor] = await db
     .update(actors)
     .set({ manuallyApprovesFollowers: sql`not manually_approves_followers` })
-    .where(eq(actors.isLocal, true))
+    .where(eq(actors.actorUri, userEndpoints.actorUri))
     .returning();
   await invalidateLocalActorCache("profile");
   return actor;
@@ -186,17 +186,23 @@ export const isManuallyApprovingFollowers = async () => {
 };
 
 export const updateLocalActorAvatar = async (avatarUrl: string) => {
-  await db.update(actors).set({ avatarUrl }).where(eq(actors.isLocal, true));
+  await db
+    .update(actors)
+    .set({ avatarUrl })
+    .where(eq(actors.actorUri, userEndpoints.actorUri));
   await invalidateLocalActorCache("profile");
 };
 
 export const updateLocalActorBanner = async (bannerUrl: string) => {
-  await db.update(actors).set({ bannerUrl }).where(eq(actors.isLocal, true));
+  await db
+    .update(actors)
+    .set({ bannerUrl })
+    .where(eq(actors.actorUri, userEndpoints.actorUri));
   await invalidateLocalActorCache("profile");
 };
 
 export const deleteLocalActor = async () => {
-  await db.delete(actors).where(eq(actors.isLocal, true));
+  await db.delete(actors).where(eq(actors.actorUri, userEndpoints.actorUri));
   await invalidateLocalActorCache("all");
 };
 

@@ -1,5 +1,7 @@
 import { users } from "../schema.js";
 import { db } from "../index.js";
+import { SYSTEM_ACTOR_USERNAME } from "../../activitypub/constants.js";
+import { eq, not } from "drizzle-orm";
 
 interface UserType {
   username: string;
@@ -12,7 +14,9 @@ export const getUserPrivateKey = async () => {
   const result = await db
     .select({ privateKey: users.privateKey })
     .from(users)
+    .where(not(eq(users.username, SYSTEM_ACTOR_USERNAME)))
     .limit(1);
+
   const privateKey = result[0].privateKey;
   return privateKey;
 };
@@ -23,6 +27,7 @@ export const getUserCredentials = async () => {
       username: true,
       passwordHash: true,
     },
+    where: not(eq(users.username, SYSTEM_ACTOR_USERNAME)),
   });
 };
 

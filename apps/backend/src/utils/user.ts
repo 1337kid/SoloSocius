@@ -3,7 +3,6 @@ import crypto from "crypto";
 import { generateRSAKeyPair } from "./signature.js";
 import {
   checkActorOnThisInstance,
-  getActorOnThisInstance,
   setupAdminActor,
 } from "../db/queries/actor.js";
 import { createUser } from "../db/queries/users.js";
@@ -27,6 +26,8 @@ export const setupAdminUser = async (username: string, password: string) => {
 
 export const setupSystemUser = async () => {
   const actor = await checkActorOnThisInstance(SYSTEM_ACTOR_USERNAME);
+
+  if (actor) return;
 
   const { publicKey, privateKey } = generateRSAKeyPair();
 
