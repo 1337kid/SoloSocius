@@ -1,4 +1,4 @@
-import { userEndpoints } from "../activitypub/actor.js";
+import { systemUserEndpoints, userEndpoints } from "../activitypub/actor.js";
 import { OutboxActivity } from "../types/index.js";
 import {
   generateAcceptActivityId,
@@ -108,7 +108,7 @@ export const createOutboxActivity = (params: OutboxActivity) => {
   return {
     id: `${params.idUri}/activity`,
     type: "Create",
-    actor: userEndpoints.actorUri,
+    actor: params.actorUri,
     published: params.createdAt.toISOString(),
     to: [PUBLIC_COLLECTION],
     cc: [userEndpoints.followers],

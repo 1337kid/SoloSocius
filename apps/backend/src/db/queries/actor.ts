@@ -34,19 +34,24 @@ export const setupAdminActor = async (username: string, publicKey: string) => {
     .returning();
 };
 
-export const getActorOnThisInstance = async () => {
-  const cached = await getCache<typeof actors.$inferSelect>(
-    CacheKeys.localActor,
-  );
+export const getActorOnThisInstance = async (
+  type: "local" | "system" = "local",
+) => {
+  const endpoints = type === "local" ? userEndpoints : systemUserEndpoints;
+  const cacheKey =
+    type === "local" ? CacheKeys.localActor : CacheKeys.systemActor;
+  const ttl = type === "local" ? TTL.localActor : TTL.systemActor;
+
+  const cached = await getCache<typeof actors.$inferSelect>(cacheKey);
   if (cached) return cached;
 
   const actor = (
     await db
       .select()
       .from(actors)
-      .where(eq(actors.actorUri, userEndpoints.actorUri))
+      .where(eq(actors.actorUri, endpoints.actorUri))
   )[0];
-  if (actor) await setCache(CacheKeys.localActor, actor, TTL.localActor);
+  if (actor) await setCache(cacheKey, actor, ttl);
   return actor;
 };
 

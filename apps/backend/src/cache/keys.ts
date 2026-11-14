@@ -1,5 +1,6 @@
 export const CacheKeys = {
   localActor: "actor:local",
+  systemActor: "actor:system",
   localProfile: "actor:local:profile",
   localFollowersCount: "actor:local:counts:followers",
   localFollowingCount: "actor:local:counts:following",
@@ -10,6 +11,7 @@ export const CacheKeys = {
 
 export const TTL = {
   localActor: 6 * 60 * 60,
+  systemActor: 6 * 60 * 60,
   localProfile: 6 * 60 * 60,
   localCounts: 6 * 60 * 60,
   remoteActor: 30 * 60,

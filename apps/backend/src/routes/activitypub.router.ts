@@ -1,8 +1,14 @@
 import { FastifyInstance } from "fastify";
-import { getActorProfile } from "../controllers/actor.controller.js";
+import {
+  getActorProfile,
+  getSystemActorProfile,
+} from "../controllers/actor.controller.js";
 import { verifyIncomingSignature } from "../middlewares/verifySignature.js";
 import { handleIncomingInbox } from "../controllers/inbox/inbox.controller.js";
-import { handleOutboxRequest } from "../controllers/outbox.controller.js";
+import {
+  handleSystemOutboxRequest,
+  handleUserOutboxRequest,
+} from "../controllers/outbox.controller.js";
 import { getPostActivity } from "../controllers/posts.controller.js";
 import { handleWebFinger } from "../controllers/webfinger.controller.js";
 import { handleFollowingCollectionRequest } from "../controllers/following.controller.js";
@@ -35,7 +41,7 @@ export async function activityPubRoutes(fastify: FastifyInstance) {
   fastify.get(
     "/outbox",
     { schema: optionalPageRouteSchema },
-    handleOutboxRequest,
+    handleUserOutboxRequest,
   );
   fastify.get("/posts/:id", { schema: postIdRouteSchema }, getPostActivity);
   fastify.get(
@@ -52,4 +58,12 @@ export async function activityPubRoutes(fastify: FastifyInstance) {
   // NodeInfo routes
   fastify.get("/nodeinfo/2.0", getNodeInfo);
   fastify.get("/.well-known/nodeinfo", nodeinfoRoutes);
+
+  // System actor routes
+  fastify.get("/actor/system", getSystemActorProfile);
+  fastify.get(
+    "/actor/system/outbox",
+    { schema: optionalPageRouteSchema },
+    handleSystemOutboxRequest,
+  );
 }

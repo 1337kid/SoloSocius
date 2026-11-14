@@ -31,7 +31,7 @@ export interface RemotePostInput {
   content: string;
   inReplyTo?: string | null;
   url?: string | null;
-  published?: string | Date | null; 
+  published?: string | Date | null;
   mediaItems?: MediaItem[] | null;
 }
 
@@ -60,6 +60,7 @@ export interface OrderedCollection {
 }
 
 export interface OutboxActivity {
+  actorUri: string;
   id: string;
   idUri: string;
   createdAt: Date;
