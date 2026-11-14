@@ -19,23 +19,49 @@ export const createActivity = (
   activityId: string,
   type: string,
   object: any,
+  actorUri: string = userEndpoints.actorUri,
 ) => {
   return {
     "@context": ACTIVITYSTREAMS_CONTEXT,
     id: activityId,
     type: type,
-    actor: userEndpoints.actorUri,
+    actor: actorUri,
     object: object,
     to: [PUBLIC_COLLECTION],
   };
 };
 
+export const createAcceptActivity = (object: any) => {
+  const activityId = generateAcceptActivityId();
+  return createActivity(activityId, "Accept", Object);
+};
+
+export const createRelayAcceptActivity = (object: any) => {
+  const activityId = generateAcceptActivityId();
+  return createActivity(
+    activityId,
+    "Accept",
+    object,
+    systemUserEndpoints.actorUri,
+  );
+};
+
 export const createRelayFollowActivity = (followActivityId: string) => {
-  return createActivity(followActivityId, "Follow", PUBLIC_COLLECTION);
+  return createActivity(
+    followActivityId,
+    "Follow",
+    PUBLIC_COLLECTION,
+    systemUserEndpoints.actorUri,
+  );
 };
 
 export const createRelayUndoFollowActivity = (followActivityId: string) => {
-  return createActivity(`${followActivityId}#undo`, "Undo", followActivityId);
+  return createActivity(
+    `${followActivityId}#undo`,
+    "Undo",
+    followActivityId,
+    systemUserEndpoints.actorUri,
+  );
 };
 
 export const createProfileUpdateActivity = (params: InstanceActorObject) => {
