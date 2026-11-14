@@ -11,7 +11,7 @@ import {
 import { removeBoostByActivityId } from "../../db/queries/transactions.js";
 import { getPostFromDB } from "../../db/queries/posts.js";
 import { publishTimelineEvent } from "../../services/publish-timeline.js";
-import { userEndpoints } from "../../activitypub/actor.js";
+import { systemUserEndpoints, userEndpoints } from "../../activitypub/actor.js";
 
 export const handleUndoActivity = async (activity: InboxActivity) => {
   if (typeof activity.object !== "string") {
@@ -20,7 +20,11 @@ export const handleUndoActivity = async (activity: InboxActivity) => {
         let follower = await getFollowerByActivityId(activity.object.id);
 
         // fallback
-        if (!follower && activity.object.object === userEndpoints.actorUri) {
+        if (
+          !follower &&
+          (activity.object.object === userEndpoints.actorUri ||
+            activity.object.object === systemUserEndpoints.actorUri)
+        ) {
           follower = await getFollowerByActorUri(activity.object.actor);
         }
 

@@ -61,6 +61,7 @@ export const addRelay = async (
     await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: relay.inboxUrl,
       activity: createRelayFollowActivity(followActivityId),
+      isSystemActor: true,
     });
 
     return reply.status(201).send(toRelay(relay));
@@ -86,6 +87,7 @@ export const removeRelay = async (
       await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
         inboxUrl: relay.inboxUrl,
         activity: createRelayUndoFollowActivity(relay.followActivityId),
+        isSystemActor: true,
       });
     }
 
@@ -122,6 +124,7 @@ export const unsubscribeRelay = async (
     await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
       inboxUrl: updated.inboxUrl,
       activity: createRelayUndoFollowActivity(relay.followActivityId),
+      isSystemActor: true,
     });
 
     return reply.status(200).send(toRelay(updated));
