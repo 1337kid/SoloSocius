@@ -3,9 +3,12 @@ import { DeliverParams } from "../types/index.js";
 import { createSignature } from "./signature.js";
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import { getUserPrivateKey } from "../db/queries/users.js";
+import {
+  getSystemUserPrivateKey,
+  getUserPrivateKey,
+} from "../db/queries/users.js";
 import { getAllFollowersInbox } from "../db/queries/followers.js";
-import { userEndpoints } from "../activitypub/actor.js";
+import { systemUserEndpoints, userEndpoints } from "../activitypub/actor.js";
 import { addActorToDB, getActorFromDB } from "../db/queries/actor.js";
 import { getPostFromDB, storeRemotePost } from "../db/queries/posts.js";
 import type { MediaItem } from "../db/schema.js";
@@ -15,7 +18,7 @@ type SignatureParams = {
   url: string;
   method: "GET" | "POST";
   body?: string;
-  keyId: string;
+  isSystemActor: boolean;
 };
 
 type SignatureResult = {
@@ -46,12 +49,10 @@ axiosRetry(axiosClient, {
 });
 
 export const remoteFetch = async (destination: string, accept?: string) => {
-  const keyId = `${userEndpoints.actorUri}#main-key`;
-
   const signatureParams = await generateSignature({
     url: destination,
     method: "GET",
-    keyId,
+    isSystemActor: false,
   });
 
   return fetch(destination, {
@@ -152,10 +153,17 @@ const generateSignature = async ({
   url,
   method,
   body,
-  keyId,
+  isSystemActor,
 }: SignatureParams): Promise<SignatureResult> => {
   const urlObj = new URL(url);
-  const privateKeyPem = await getUserPrivateKey();
+  const keyId = isSystemActor
+    ? `${systemUserEndpoints.actorUri}#main-key`
+    : `${userEndpoints.actorUri}#main-key`;
+
+  const privateKeyPem = isSystemActor
+    ? await getSystemUserPrivateKey()
+    : await getUserPrivateKey();
+
   const targetPath = urlObj.pathname + urlObj.search;
   const targetHost = urlObj.host;
   const dateHeader = new Date().toUTCString();
@@ -199,15 +207,14 @@ const generateSignature = async ({
 };
 
 export const deliverActivity = async (params: DeliverParams) => {
-  const { inboxUrl, activity } = params;
-  const keyId = `${userEndpoints.actorUri}#main-key`;
+  const { inboxUrl, activity, isSystemActor } = params;
   const bodyString = JSON.stringify(activity);
 
   const signatureParams = await generateSignature({
     url: inboxUrl,
     method: "POST",
     body: bodyString,
-    keyId,
+    isSystemActor,
   });
 
   try {
@@ -246,6 +253,7 @@ export const deliverActivityToFollowers = async (activityPayload: any) => {
       jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
         inboxUrl,
         activity: activityPayload,
+        isSystemActor: false,
       });
     }
   }

@@ -21,6 +21,16 @@ export const getUserPrivateKey = async () => {
   return privateKey;
 };
 
+export const getSystemUserPrivateKey = async () => {
+  const result = await db
+    .select({ privateKey: users.privateKey })
+    .from(users)
+    .where(eq(users.username, SYSTEM_ACTOR_USERNAME));
+
+  const privateKey = result[0].privateKey;
+  return privateKey;
+};
+
 export const getUserCredentials = async () => {
   return db.query.users.findFirst({
     columns: {

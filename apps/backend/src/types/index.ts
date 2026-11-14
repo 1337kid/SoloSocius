@@ -44,6 +44,7 @@ export interface CreateFollowerInupt {
 export interface DeliverParams {
   inboxUrl: string;
   activity: any;
+  isSystemActor: boolean;
 }
 
 export interface NotificationType {
