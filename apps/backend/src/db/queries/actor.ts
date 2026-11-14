@@ -2,7 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { actors } from "../schema.js";
 import { ActorObject } from "../../types/index.js";
-import { userEndpoints } from "../../activitypub/actor.js";
+import { userEndpoints, systemUserEndpoints } from "../../activitypub/actor.js";
 import { DOMAIN } from "../../config/env.js";
 import { getCache, setCache, deleteCache } from "../../cache/redis.js";
 import { CacheKeys, TTL } from "../../cache/keys.js";
@@ -12,10 +12,12 @@ import { getCachedFollowingCount } from "./following.js";
 import { getCachedLocalPostsCount } from "./posts.js";
 
 export const setupAdminActor = async (username: string, publicKey: string) => {
+  const endpoints = username === "system" ? systemUserEndpoints : userEndpoints;
+
   await db
     .insert(actors)
     .values({
-      actorUri: userEndpoints.actorUri,
+      actorUri: endpoints.actorUri,
       username: username,
       domain: DOMAIN,
       displayName: "User",
@@ -23,9 +25,9 @@ export const setupAdminActor = async (username: string, publicKey: string) => {
       avatarUrl: "",
       bannerUrl: "",
       publicKey: publicKey,
-      publicKeyId: `${userEndpoints.actorUri}#main-key`,
-      inboxUrl: userEndpoints.inbox,
-      sharedInboxUrl: userEndpoints.inbox,
+      publicKeyId: `${endpoints.actorUri}#main-key`,
+      inboxUrl: endpoints.inbox,
+      sharedInboxUrl: endpoints.inbox,
       isLocal: true,
       lastFetchedAt: new Date(),
     })
@@ -39,7 +41,10 @@ export const getActorOnThisInstance = async () => {
   if (cached) return cached;
 
   const actor = (
-    await db.select().from(actors).where(eq(actors.isLocal, true))
+    await db
+      .select()
+      .from(actors)
+      .where(eq(actors.actorUri, userEndpoints.actorUri))
   )[0];
   if (actor) await setCache(CacheKeys.localActor, actor, TTL.localActor);
   return actor;
@@ -48,7 +53,7 @@ export const getActorOnThisInstance = async () => {
 export const checkActorOnThisInstance = async (username: string) => {
   return (
     await db
-      .select()
+      .select({ username: actors.username })
       .from(actors)
       .where(and(eq(actors.isLocal, true), eq(actors.username, username)))
   )[0];
@@ -114,7 +119,7 @@ const getLocalActorIdentity = async (): Promise<
   if (cached) return cached;
 
   const profile = await db.query.actors.findFirst({
-    where: eq(actors.isLocal, true),
+    where: eq(actors.actorUri, userEndpoints.actorUri),
     columns: {
       username: true,
       displayName: true,

@@ -1,11 +1,12 @@
 import { OrderedCollection } from "../types/index.js";
+import { ACTIVITYSTREAMS_CONTEXT } from "./constants.js";
 
 export const createOrderedCollection = (
   id: string,
   data: OrderedCollection,
 ) => {
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: id,
     type: "OrderedCollection",
     totalItems: data.totalItems,
@@ -22,7 +23,7 @@ export const createOrderedCollectionPage = (
   hasMoreItems: boolean,
 ) => {
   let res = {
-    "@context": "https://www.w3.org/ns/activitystreams",
+    "@context": ACTIVITYSTREAMS_CONTEXT,
     id: `${id}?page=${pageNumber}`,
     type: "OrderedCollectionPage",
     partOf: id,

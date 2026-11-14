@@ -15,6 +15,7 @@ import jobWorker from "./jobs/index.js";
 import { registerValidationErrorHandler } from "./plugins/validationError.js";
 import websocketPlugin from "./plugins/websocket.js";
 import { streamingRoutes } from "./routes/streaming.router.js";
+import { setupSystemUser } from "./utils/user.js";
 
 const fastify = Fastify({ logger: loggerConfig });
 
@@ -42,6 +43,7 @@ const start = async () => {
     const port = PORT;
     await fastify.listen({ port, host: "0.0.0.0" });
     await initializeRedis();
+    await setupSystemUser();
     jobWorker.start();
     console.log(`SoloSocius Server spinning on port ${port}`);
   } catch (err) {
