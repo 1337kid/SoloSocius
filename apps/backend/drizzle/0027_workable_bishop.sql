@@ -1,0 +1,1 @@
+ALTER TABLE "relays" ADD CONSTRAINT "relays_inbox_url_unique" UNIQUE("inbox_url");

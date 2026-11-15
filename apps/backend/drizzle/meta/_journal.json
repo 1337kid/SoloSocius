@@ -190,6 +190,13 @@
       "when": 1794482094332,
       "tag": "0026_white_invaders",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794760320049,
+      "tag": "0027_workable_bishop",
+      "breakpoints": true
     }
   ]
 }
