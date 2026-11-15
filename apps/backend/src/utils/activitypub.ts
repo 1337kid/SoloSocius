@@ -79,7 +79,7 @@ export const remoteActorLookup = async (actorUri: string) => {
   const actor = await getActorFromDB(actorUri);
   if (actor) return actor;
 
-  const remoteActor = await remoteFetch(actorUri, "application/json");
+  const remoteActor = await remoteFetch(actorUri);
 
   if (!remoteActor.ok)
     throw new Error("Could not discover target remote profile path.");
