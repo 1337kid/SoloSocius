@@ -24,7 +24,16 @@ export const unsubscribeRelay = async (
   id: string,
 ): Promise<UnsubscribeRelayResponse> => {
   const { data } = await api.patch<UnsubscribeRelayResponse>(
-    `/relays/unsubscribe/${id}`,
+    `/relays/${id}/unsubscribe`,
+  );
+  return data;
+};
+
+export const resubscribeRelay = async (
+  id: string,
+): Promise<CreateRelayResponse> => {
+  const { data } = await api.patch<CreateRelayResponse>(
+    `/relays/${id}/resubscribe`,
   );
   return data;
 };

@@ -43,6 +43,7 @@ import {
   useAddRelay,
   useDeleteRelay,
   useRelays,
+  useResubscribeRelay,
   useUnsubscribeRelay,
 } from "../hooks/useRelays";
 import { CreateRelaySchema, type CreateRelaySchemaType } from "../schemas";
@@ -67,10 +68,14 @@ const statusVariant: Record<
 const canUnsubscribe = (status: RelayStatus) =>
   status === "pending" || status === "accepted";
 
+const canResubscribe = (status: RelayStatus) =>
+  status === "unsubscribed" || status === "rejected";
+
 export function RelaySettings() {
   const relays = useRelays();
   const addRelay = useAddRelay();
   const unsubscribe = useUnsubscribeRelay();
+  const resubscribe = useResubscribeRelay();
   const removeRelay = useDeleteRelay();
   const [relayToRemove, setRelayToRemove] = useState<Relay | null>(null);
 
@@ -183,8 +188,11 @@ export function RelaySettings() {
             {relays.data.map((relay) => {
               const unsubscribing =
                 unsubscribe.isPending && unsubscribe.variables === relay.id;
+              const resubscribing =
+                resubscribe.isPending && resubscribe.variables === relay.id;
               const removing =
                 removeRelay.isPending && removeRelay.variables === relay.id;
+              const busy = unsubscribing || resubscribing || removing;
 
               return (
                 <div key={relay.id} className="flex flex-col gap-3">
@@ -208,7 +216,7 @@ export function RelaySettings() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        disabled={unsubscribing || removing}
+                        disabled={busy}
                         onClick={() => unsubscribe.mutate(relay.id)}
                       >
                         {unsubscribing ? (
@@ -217,11 +225,25 @@ export function RelaySettings() {
                         Unsubscribe
                       </Button>
                     ) : null}
+                    {canResubscribe(relay.status) ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => resubscribe.mutate(relay.id)}
+                      >
+                        {resubscribing ? (
+                          <Spinner data-icon="inline-start" />
+                        ) : null}
+                        Resubscribe
+                      </Button>
+                    ) : null}
                     <Button
                       type="button"
                       variant="destructive"
                       size="sm"
-                      disabled={removing || unsubscribing}
+                      disabled={busy}
                       onClick={() => setRelayToRemove(relay)}
                     >
                       Remove

@@ -3,6 +3,7 @@ import {
   addRelay,
   getRelays,
   removeRelay,
+  resubscribeRelay,
   unsubscribeRelay,
 } from "../controllers/relay.controller.js";
 import {
@@ -14,9 +15,16 @@ export async function RelayRoutes(fastify: FastifyInstance) {
   fastify.get("/relays", getRelays);
   fastify.post("/relays", { schema: createRelayRouteSchema }, addRelay);
   fastify.delete("/relays/:id", { schema: relayIdRouteSchema }, removeRelay);
+
   fastify.patch(
-    "/relays/unsubscribe/:id",
+    "/relays/:id/unsubscribe",
     { schema: relayIdRouteSchema },
     unsubscribeRelay,
+  );
+
+  fastify.patch(
+    "/relays/:id/resubscribe",
+    { schema: relayIdRouteSchema },
+    resubscribeRelay,
   );
 }

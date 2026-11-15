@@ -27,6 +27,20 @@ const toRelay = (relay: typeof relays.$inferSelect) => ({
 const isSubscribed = (status: (typeof relays.$inferSelect)["status"]) =>
   status === "pending" || status === "accepted";
 
+const subscribeRelay = async (name: string, inboxUrl: string) => {
+  const followActivityId = generateRelayFollowActivityId();
+
+  const relay = await insertRelay(name, inboxUrl, followActivityId);
+
+  await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
+    inboxUrl: relay.inboxUrl,
+    activity: createRelayFollowActivity(followActivityId),
+    isSystemActor: true,
+  });
+
+  return relay;
+};
+
 export const getRelays = async (
   request: FastifyRequest,
   reply: FastifyReply,
@@ -54,15 +68,7 @@ export const addRelay = async (
         .send({ error: "A relay with this inbox URL already exists." });
     }
 
-    const followActivityId = generateRelayFollowActivityId();
-
-    const relay = await insertRelay(name, inboxUrl, followActivityId);
-
-    await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: relay.inboxUrl,
-      activity: createRelayFollowActivity(followActivityId),
-      isSystemActor: true,
-    });
+    const relay = await subscribeRelay(name, inboxUrl);
 
     return reply.status(201).send(toRelay(relay));
   } catch (error) {
@@ -130,6 +136,27 @@ export const unsubscribeRelay = async (
     return reply.status(200).send(toRelay(updated));
   } catch (error) {
     console.error("Failed to unsubscribe from relay:", error);
+    return reply.status(500).send({ error: "Internal Server Error." });
+  }
+};
+
+export const resubscribeRelay = async (
+  request: FastifyRequest<{ Params: IdParams }>,
+  reply: FastifyReply,
+) => {
+  const { id } = request.params;
+
+  try {
+    const relay = await findRelayById(id);
+    if (!relay) {
+      return reply.status(404).send({ error: "Relay not found." });
+    }
+
+    const updated = await subscribeRelay(relay.relayName, relay.inboxUrl);
+
+    return reply.status(200).send(toRelay(updated));
+  } catch (error) {
+    console.error("Failed to resubscribe relay:", error);
     return reply.status(500).send({ error: "Internal Server Error." });
   }
 };

@@ -191,7 +191,7 @@ export const jobs = pgTable("jobs", {
 export const relays = pgTable("relays", {
   id: uuid("id").defaultRandom().primaryKey(),
   relayName: text("relay_name").notNull(),
-  inboxUrl: text("inbox_url").notNull(),
+  inboxUrl: text("inbox_url").notNull().unique(),
   followActivityId: text("follow_activity_id"),
   status: text("status")
     .$type<"pending" | "accepted" | "rejected" | "unsubscribed">()

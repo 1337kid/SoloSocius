@@ -46,6 +46,13 @@ export const insertRelay = async (
   const [relay] = await db
     .insert(relays)
     .values({ relayName, inboxUrl, followActivityId, status: "pending" })
+    .onConflictDoUpdate({
+      target: [relays.inboxUrl],
+      set: {
+        followActivityId,
+        status: "pending",
+      },
+    })
     .returning();
 
   return relay;
