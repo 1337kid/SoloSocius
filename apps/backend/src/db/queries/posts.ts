@@ -26,10 +26,24 @@ export const storeRemotePost = async (data: RemotePostInput) => {
       target: posts.idUri,
       set: {
         content: data.content,
-        inReplyTo: data.inReplyTo,
         mediaItems: data.mediaItems,
       },
     })
+    .returning();
+  return post;
+};
+
+export const updateRemotePost = async (
+  idUri: string,
+  data: Partial<RemotePostInput>,
+) => {
+  const [post] = await db
+    .update(posts)
+    .set({
+      content: data.content,
+      mediaItems: data.mediaItems,
+    })
+    .where(eq(posts.idUri, idUri))
     .returning();
   return post;
 };

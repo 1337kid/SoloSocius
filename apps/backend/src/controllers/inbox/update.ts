@@ -1,9 +1,10 @@
 import { ActorObject, InboxActivity } from "../../types/index.js";
 import { addActorToDB } from "../../db/queries/actor.js";
-import { storeRemotePost } from "../../db/queries/posts.js";
+import { getPostFromDB, updateRemotePost } from "../../db/queries/posts.js";
 import { MediaItem } from "../../db/schema.js";
-import { parseMediaItems } from "../../utils/activitypub.js";
+import { parseMediaItems, remotePostLookup } from "../../utils/activitypub.js";
 import { publishTimelineEvent } from "../../services/publish-timeline.js";
+import { createAndPublishTimelineEntry } from "../../utils/timeline.js";
 
 const actorKeysToCheck = [
   "id",
@@ -68,24 +69,34 @@ export const handleUpdateActivity = async (activity: InboxActivity) => {
 
       case "Note":
         try {
-          const post = activity.object;
+          const postObject = activity.object;
 
-          let mediaItems: MediaItem[] = parseMediaItems(post.attachment);
+          const existingPost = await getPostFromDB(postObject.id);
 
-          await storeRemotePost({
-            actorUri: activity.actor,
-            idUri: post.id,
-            content: post.content || "",
-            inReplyTo: post.inReplyTo || null,
-            url: post.url || null,
-            published: post.published,
-            mediaItems,
-          });
+          if (existingPost) {
+            let mediaItems: MediaItem[] = parseMediaItems(
+              postObject.attachment,
+            );
 
-          await publishTimelineEvent({
-            kind: "status.update",
-            postUri: post.id,
-          });
+            await updateRemotePost(existingPost.idUri, {
+              content: postObject.content,
+              mediaItems,
+            });
+
+            await publishTimelineEvent({
+              kind: "status.update",
+              postUri: existingPost.idUri,
+            });
+            return;
+          }
+
+          const post = await remotePostLookup(postObject.id);
+
+          await createAndPublishTimelineEntry(
+            post.actorUri,
+            post.idUri,
+            "post",
+          );
         } catch (error) {
           console.error("Not updating post because of error:", error);
           break;
