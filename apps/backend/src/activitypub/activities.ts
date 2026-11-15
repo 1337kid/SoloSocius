@@ -64,10 +64,13 @@ export const createRelayFollowActivity = (followActivityId: string) => {
 };
 
 export const createRelayUndoFollowActivity = (followActivityId: string) => {
+  let followActivity = createRelayFollowActivity(followActivityId);
+  delete (followActivity as any)["@context"];
+
   return createActivity(
     `${followActivityId}#undo`,
     "Undo",
-    followActivityId,
+    followActivity,
     systemUserEndpoints.actorUri,
     false,
   );
