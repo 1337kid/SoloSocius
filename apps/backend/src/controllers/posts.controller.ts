@@ -1,5 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivityToFollowers } from "../utils/activitypub/index.js";
+import {
+  deliverActivityToFollowers,
+  deliverActivityToRelay,
+} from "../utils/activitypub/index.js";
 import {
   createUserPost,
   deletePostById,
@@ -15,10 +18,9 @@ import {
   createNotePayload,
   createNoteUpdatePayload,
 } from "../activitypub/activities.js";
-import { userEndpoints } from "../activitypub/actor.js";
+import { systemUserEndpoints, userEndpoints } from "../activitypub/actor.js";
 import { createTimelineEntry } from "../db/queries/timeline.js";
 import { publishTimelineEvent } from "../services/publish-timeline.js";
-import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 import type { IdParams } from "../validations/common.val.js";
 import type {
   CreatePostBody,
@@ -77,6 +79,11 @@ export const createPost = async (
     }
 
     await deliverActivityToFollowers(activityPayload);
+
+    let systemActorPayload = activityPayload;
+    systemActorPayload.actor = systemUserEndpoints.actorUri;
+
+    await deliverActivityToRelay(systemActorPayload);
 
     return reply.status(201).send({
       ...newPost,
@@ -144,6 +151,12 @@ export const updatePost = async (
     console.log("noteUpdateActivity: ", noteUpdateActivity);
 
     await deliverActivityToFollowers(noteUpdateActivity);
+
+    let systemActorPayload = noteUpdateActivity;
+    systemActorPayload.actor = systemUserEndpoints.actorUri;
+
+    await deliverActivityToRelay(systemActorPayload);
+
     await publishTimelineEvent({
       kind: "status.update",
       postUri: updatedPost.idUri,
@@ -179,6 +192,11 @@ export const deletePost = async (
     });
 
     await deliverActivityToFollowers(deleteActivity);
+
+    let systemActorPayload = deleteActivity;
+    systemActorPayload.actor = systemUserEndpoints.actorUri;
+
+    await deliverActivityToRelay(systemActorPayload);
 
     return reply.status(200).send({ message: "Post deleted successfully" });
   } catch (error) {
