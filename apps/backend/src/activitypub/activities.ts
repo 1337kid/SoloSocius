@@ -20,15 +20,21 @@ export const createActivity = (
   type: string,
   object: any,
   actorUri: string = userEndpoints.actorUri,
+  appendTo: boolean = true,
 ) => {
-  return {
+  let activity = {
     "@context": ACTIVITYSTREAMS_CONTEXT,
     id: activityId,
     type: type,
     actor: actorUri,
     object: object,
-    to: [PUBLIC_COLLECTION],
   };
+
+  if (appendTo) {
+    (activity as any).to = [PUBLIC_COLLECTION];
+  }
+
+  return activity;
 };
 
 export const createAcceptActivity = (object: any) => {
@@ -43,6 +49,7 @@ export const createRelayAcceptActivity = (object: any) => {
     "Accept",
     object,
     systemUserEndpoints.actorUri,
+    false,
   );
 };
 
@@ -52,6 +59,7 @@ export const createRelayFollowActivity = (followActivityId: string) => {
     "Follow",
     PUBLIC_COLLECTION,
     systemUserEndpoints.actorUri,
+    false,
   );
 };
 
@@ -61,6 +69,7 @@ export const createRelayUndoFollowActivity = (followActivityId: string) => {
     "Undo",
     followActivityId,
     systemUserEndpoints.actorUri,
+    false,
   );
 };
 

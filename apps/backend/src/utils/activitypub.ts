@@ -48,7 +48,10 @@ axiosRetry(axiosClient, {
   },
 });
 
-export const remoteFetch = async (destination: string, accept?: string) => {
+export const remoteFetch = async (
+  destination: string,
+  accept: string = "application/activity+json",
+) => {
   const signatureParams = await generateSignature({
     url: destination,
     method: "GET",
@@ -58,7 +61,7 @@ export const remoteFetch = async (destination: string, accept?: string) => {
   return fetch(destination, {
     method: "GET",
     headers: {
-      Accept: accept || "application/activity+json",
+      Accept: accept,
       Host: signatureParams.host,
       Date: signatureParams.date,
       Signature: signatureParams.signature,

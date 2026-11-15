@@ -59,6 +59,10 @@ export const generateSystemActorObject = (publicKey: string) => {
     inbox: systemUserEndpoints.inbox,
     outbox: systemUserEndpoints.outbox,
 
+    endpoints: {
+      sharedInbox: systemUserEndpoints.inbox,
+    },
+
     publicKey: {
       id: `${systemUserEndpoints.actorUri}#main-key`,
       owner: systemUserEndpoints.actorUri,
