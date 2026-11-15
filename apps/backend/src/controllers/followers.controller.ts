@@ -17,12 +17,12 @@ import {
   createAcceptFollowActivity,
   createRejectFollowActivity,
 } from "../activitypub/activities.js";
-import jobWorker, { JOB_TYPES } from "../jobs/index.js";
 import type { IdParams } from "../validations/common.val.js";
 import type {
   DefaultPageQuery,
   OptionalPageQuery,
 } from "../validations/pagination.val.js";
+import { createUserJob } from "../jobs/create.js";
 
 const PAGE_SIZE = 20;
 
@@ -138,10 +138,7 @@ export const handleApproveFollowRequest = async (
       followRequest.actor.actorUri,
     );
 
-    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: followRequest.actor.inboxUrl,
-      activity: acceptActivity,
-    });
+    createUserJob(followRequest.actor.inboxUrl, acceptActivity);
 
     return reply
       .status(200)
@@ -174,10 +171,7 @@ export const handleRejectFollow = async (
 
     console.log("rejectActivity", rejectActivity);
 
-    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: follower.actor.inboxUrl,
-      activity: rejectActivity,
-    });
+    createUserJob(follower.actor.inboxUrl, rejectActivity);
 
     return reply.status(200).send({ message: "Follow rejected successfully." });
   } catch (error) {

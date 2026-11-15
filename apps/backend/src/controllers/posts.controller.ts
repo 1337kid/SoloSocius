@@ -24,6 +24,7 @@ import type {
   CreatePostBody,
   UpdatePostBody,
 } from "../validations/posts.val.js";
+import { createUserJob } from "../jobs/create.js";
 
 export const createPost = async (
   request: FastifyRequest<{ Body: CreatePostBody }>,
@@ -49,6 +50,7 @@ export const createPost = async (
     const postUri = await updateUserPostUri(newPost.id);
 
     const activityPayload = createNoteActivity({
+      actorUri: userEndpoints.actorUri,
       idUri: postUri,
       inReplyTo: newPost.inReplyTo,
       createdAt: newPost.createdAt,
@@ -71,10 +73,7 @@ export const createPost = async (
     });
 
     if (newPost.inReplyTo && replyPost.isLocal === false) {
-      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-        inboxUrl: replyPost.actor.inboxUrl,
-        activity: activityPayload,
-      });
+      createUserJob(replyPost.actor.inboxUrl, activityPayload);
     }
 
     await deliverActivityToFollowers(activityPayload);

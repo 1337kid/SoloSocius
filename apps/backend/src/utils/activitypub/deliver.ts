@@ -2,9 +2,10 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import { getAllFollowersInbox } from "../../db/queries/followers.js";
 import { listRelays } from "../../db/queries/relays.js";
-import jobWorker, { JOB_TYPES } from "../../jobs/index.js";
 import { DeliverParams } from "../../types/index.js";
 import { generateSignature } from "./httpSignature.js";
+import { createUserJob } from "../../jobs/create.js";
+import { createSystemUserJob } from "../../jobs/create.js";
 
 const axiosClient = axios.create({ timeout: 10000 });
 
@@ -70,11 +71,7 @@ export const deliverActivityToFollowers = async (activityPayload: any) => {
     }
 
     for (const inboxUrl of uniqueDeliveryInboxes) {
-      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-        inboxUrl,
-        activity: activityPayload,
-        isSystemActor: false,
-      });
+      createUserJob(inboxUrl, activityPayload);
     }
   }
 };
@@ -82,9 +79,6 @@ export const deliverActivityToFollowers = async (activityPayload: any) => {
 export const deliverActivityToRelay = async (activityPayload: any) => {
   const relays = await listRelays();
   for (const relay of relays) {
-    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: relay.inboxUrl,
-      activity: activityPayload,
-    });
+    createSystemUserJob(relay.inboxUrl, activityPayload);
   }
 };

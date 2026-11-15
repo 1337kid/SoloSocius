@@ -20,7 +20,7 @@ import {
   removeTimelineBoostEntry,
 } from "../db/queries/timeline.js";
 import { publishTimelineEvent } from "../services/publish-timeline.js";
-import jobWorker, { JOB_TYPES } from "../jobs/index.js";
+import { createUserJob } from "../jobs/create.js";
 import type { InteractionBody } from "../validations/social.val.js";
 
 export const handleOutboundPostInteraction = async (
@@ -66,10 +66,7 @@ export const handleOutboundPostInteraction = async (
       }
 
       const remoteInbox = actorLookup.inboxUrl;
-      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-        inboxUrl: remoteInbox,
-        activity: interactionActivity,
-      });
+      createUserJob(remoteInbox, interactionActivity);
     }
 
     if (action === "boost") {
@@ -129,10 +126,7 @@ export const handleUndoPostInteraction = async (
     const actor = interaction.post.actor;
 
     if (!actor.isLocal) {
-      jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-        inboxUrl: actor.inboxUrl,
-        activity: undoActivity,
-      });
+      createUserJob(actor.inboxUrl, undoActivity);
     }
 
     await removeInteractionById(interaction.id);

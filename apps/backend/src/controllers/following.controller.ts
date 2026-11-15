@@ -15,7 +15,7 @@ import {
   createOrderedCollectionPage,
 } from "../activitypub/collections.js";
 import { userEndpoints } from "../activitypub/actor.js";
-import jobWorker, { JOB_TYPES } from "../jobs/index.js";
+import { createUserJob } from "../jobs/create.js";
 import type {
   DefaultPageQuery,
   OptionalPageQuery,
@@ -55,10 +55,7 @@ export const handleFollowRemoteUser = async (
 
     console.log(followActivity);
 
-    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: remoteInbox,
-      activity: followActivity,
-    });
+    createUserJob(remoteInbox, followActivity);
 
     return reply.status(200).send({
       message: "Follow activity delivered",
@@ -93,10 +90,7 @@ export const handleUnfollowRemoteUser = async (
       following.followActivityId,
     );
 
-    jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: following.actor.inboxUrl,
-      activity: unfollowActivity,
-    });
+    createUserJob(following.actor.inboxUrl, unfollowActivity);
 
     return reply.status(200).send({
       message: "Unfollow successful",

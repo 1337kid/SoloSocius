@@ -12,7 +12,7 @@ import {
   markRelayUnsubscribed,
 } from "../db/queries/relays.js";
 import { relays } from "../db/schema.js";
-import jobWorker, { JOB_TYPES } from "../jobs/index.js";
+import { createSystemUserJob } from "../jobs/create.js";
 import type { IdParams } from "../validations/common.val.js";
 import type { CreateRelayBody } from "../validations/relay.val.js";
 import { generateRelayFollowActivityId } from "../utils/activityId.js";
@@ -32,11 +32,10 @@ const subscribeRelay = async (name: string, inboxUrl: string) => {
 
   const relay = await insertRelay(name, inboxUrl, followActivityId);
 
-  await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-    inboxUrl: relay.inboxUrl,
-    activity: createRelayFollowActivity(followActivityId),
-    isSystemActor: true,
-  });
+  await createSystemUserJob(
+    relay.inboxUrl,
+    createRelayFollowActivity(followActivityId),
+  );
 
   return relay;
 };
@@ -90,11 +89,10 @@ export const removeRelay = async (
     }
 
     if (relay.followActivityId && isSubscribed(relay.status)) {
-      await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-        inboxUrl: relay.inboxUrl,
-        activity: createRelayUndoFollowActivity(relay.followActivityId),
-        isSystemActor: true,
-      });
+      await createSystemUserJob(
+        relay.inboxUrl,
+        createRelayUndoFollowActivity(relay.followActivityId),
+      );
     }
 
     await deleteRelayById(id);
@@ -127,11 +125,10 @@ export const unsubscribeRelay = async (
       return reply.status(409).send({ error: "Relay is not subscribed." });
     }
 
-    await jobWorker.createJob(JOB_TYPES.DELIVER_ACTIVITY, {
-      inboxUrl: updated.inboxUrl,
-      activity: createRelayUndoFollowActivity(relay.followActivityId),
-      isSystemActor: true,
-    });
+    await createSystemUserJob(
+      updated.inboxUrl,
+      createRelayUndoFollowActivity(relay.followActivityId),
+    );
 
     return reply.status(200).send(toRelay(updated));
   } catch (error) {
