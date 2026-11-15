@@ -7,7 +7,7 @@ import {
 } from "../db/queries/jobs.js";
 
 import type { DeliverParams } from "../types/index.js";
-import { deliverActivity } from "../utils/activitypub.js";
+import { deliverActivity } from "../utils/activitypub/deliver.js";
 
 const POLL_INTERVAL_MS = 5000;
 

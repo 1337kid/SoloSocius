@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { handleFollowActivity } from "./follow.js";
 import { handleAcceptActivity } from "./accept.js";
 import { handleUndoActivity } from "./undo.js";
-import { remoteActorLookup } from "../../utils/activitypub.js";
+import { remoteActorLookup } from "../../utils/activitypub/index.js";
 import { handleCreateActivity } from "./create.js";
 import { handleLikeActivity } from "./like.js";
 import { handleDeleteActivity } from "./delete.js";

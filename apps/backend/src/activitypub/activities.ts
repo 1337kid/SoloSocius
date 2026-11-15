@@ -11,7 +11,7 @@ import { generateActorObject } from "./actor.js";
 import {
   deliverActivityToFollowers,
   parseAttachmentsForActivity,
-} from "../utils/activitypub.js";
+} from "../utils/activitypub/index.js";
 import { MediaItem, actors } from "../db/schema.js";
 import { ACTIVITYSTREAMS_CONTEXT, PUBLIC_COLLECTION } from "./constants.js";
 

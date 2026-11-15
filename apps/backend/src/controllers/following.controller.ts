@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { remoteActorLookup } from "../utils/activitypub.js";
+import { remoteActorLookup } from "../utils/activitypub/index.js";
 import {
   checkIfLocalActorIsFollowing,
   createFollowingUserEntry,

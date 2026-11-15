@@ -7,7 +7,7 @@ import {
 } from "../../db/queries/posts.js";
 import { InboxActivity } from "../../types/index.js";
 import type { MediaItem } from "../../db/schema.js";
-import { parseMediaItems, remotePostLookup } from "../../utils/activitypub.js";
+import { parseMediaItems, remotePostLookup } from "../../utils/activitypub/index.js";
 import { createAndPublishTimelineEntry } from "../../utils/timeline.js";
 
 export const handleCreateActivity = async (activity: InboxActivity) => {

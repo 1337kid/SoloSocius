@@ -10,7 +10,7 @@ import {
   broadcastProfileUpdate,
   createDeleteActorActivity,
 } from "../activitypub/activities.js";
-import { deliverActivity } from "../utils/activitypub.js";
+import { deliverActivity } from "../utils/activitypub/index.js";
 import { getAllFollowersInbox } from "../db/queries/followers.js";
 import bcrypt from "bcryptjs";
 import { getAllFollowingInbox } from "../db/queries/following.js";

@@ -4,7 +4,7 @@ import {
 } from "../../activitypub/activities.js";
 import { createFollowerEntry } from "../../db/queries/followers.js";
 import { InboxActivity } from "../../types/index.js";
-import { remoteActorLookup } from "../../utils/activitypub.js";
+import { remoteActorLookup } from "../../utils/activitypub/index.js";
 import { isManuallyApprovingFollowers } from "../../db/queries/actor.js";
 import jobWorker, { JOB_TYPES } from "../../jobs/index.js";
 import { userEndpoints, systemUserEndpoints } from "../../activitypub/actor.js";

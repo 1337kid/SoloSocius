@@ -2,7 +2,7 @@ import { ActorObject, InboxActivity } from "../../types/index.js";
 import { addActorToDB } from "../../db/queries/actor.js";
 import { getPostFromDB, updateRemotePost } from "../../db/queries/posts.js";
 import { MediaItem } from "../../db/schema.js";
-import { parseMediaItems, remotePostLookup } from "../../utils/activitypub.js";
+import { parseMediaItems, remotePostLookup } from "../../utils/activitypub/index.js";
 import { publishTimelineEvent } from "../../services/publish-timeline.js";
 import { createAndPublishTimelineEntry } from "../../utils/timeline.js";
 

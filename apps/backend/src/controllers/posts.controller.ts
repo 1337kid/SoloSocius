@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { deliverActivityToFollowers } from "../utils/activitypub.js";
+import { deliverActivityToFollowers } from "../utils/activitypub/index.js";
 import {
   createUserPost,
   deletePostById,

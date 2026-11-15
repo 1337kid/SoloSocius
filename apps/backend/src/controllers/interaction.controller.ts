@@ -3,7 +3,7 @@ import {
   deliverActivityToFollowers,
   remoteActorLookup,
   remotePostLookup,
-} from "../utils/activitypub.js";
+} from "../utils/activitypub/index.js";
 import {
   createActivity,
   createInteractionActivity,

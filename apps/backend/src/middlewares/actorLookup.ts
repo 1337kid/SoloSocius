@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { remoteActorLookup } from "../utils/activitypub.js";
-import { webfingerLookup } from "../utils/activitypub.js";
+import { remoteActorLookup } from "../utils/activitypub/index.js";
+import { webfingerLookup } from "../utils/activitypub/index.js";
 import type { SearchUserBody } from "../validations/social.val.js";
 
 export const actorLookupMiddleware = async (

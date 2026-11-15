@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { splitSignatureHeader, verifySignature } from "../utils/signature.js";
-import { remoteFetch } from "../utils/activitypub.js";
+import { remoteFetch } from "../utils/activitypub/index.js";
 
 export const verifyIncomingSignature = async (
   request: FastifyRequest,
