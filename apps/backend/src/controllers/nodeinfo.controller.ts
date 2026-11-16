@@ -3,6 +3,7 @@ import { DOMAIN } from "../config/env.js";
 import { getActorOnThisInstance } from "../db/queries/actor.js";
 import { getLocalPostsCount } from "../db/queries/posts.js";
 import instanceConfig from "../config/instance.json" with { type: "json" };
+import { NODEINFO_SCHEMA } from "../activitypub/constants.js";
 
 export async function nodeinfoRoutes(
   request: FastifyRequest,
@@ -14,7 +15,7 @@ export async function nodeinfoRoutes(
     .send({
       links: [
         {
-          rel: "http://nodeinfo.diaspora.technology/spec/2.0",
+          rel: NODEINFO_SCHEMA,
           href: `https://${DOMAIN}/nodeinfo/2.0`,
         },
       ],
@@ -30,14 +31,13 @@ export async function getNodeInfo(
 
   return reply
     .status(200)
-    .type(
-      'application/json; profile="http://nodeinfo.diaspora.technology/spec/2.0#"',
-    )
+    .type(`application/json; profile="${NODEINFO_SCHEMA}#"`)
     .send({
       version: "2.0",
       software: {
         name: instanceConfig.software,
         version: instanceConfig.version,
+        homepage: instanceConfig.homepage,
       },
       protocols: ["activitypub"],
       services: {
@@ -56,6 +56,8 @@ export async function getNodeInfo(
       metadata: {
         nodeName: instanceConfig.name,
         nodeDescription: instanceConfig.description,
+        repositoryUrl: instanceConfig.repositoryUrl,
+        feedbackUrl: instanceConfig.feedbackUrl,
       },
     });
 }
