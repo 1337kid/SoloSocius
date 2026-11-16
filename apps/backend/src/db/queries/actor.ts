@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, countDistinct, eq, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { actors } from "../schema.js";
 import { ActorObject } from "../../types/index.js";
@@ -221,4 +221,13 @@ export const findRelayByActorUri = async (actorUri: string) => {
     .limit(1);
 
   return relay?.type === "relay";
+};
+
+export const getUniqueRemoteDomainCount = async () => {
+  const [result] = await db
+    .select({ value: countDistinct(actors.domain) })
+    .from(actors)
+    .where(eq(actors.isLocal, false));
+
+  return result?.value || 0;
 };
