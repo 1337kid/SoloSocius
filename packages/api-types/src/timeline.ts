@@ -18,8 +18,7 @@ export interface TimelineActor extends TimelineActorSnippet {
 }
 
 export interface TimelineReply {
-  idUri: string;
-  url: string | null;
+  id: string;
   content: string;
   actor: TimelineActorSnippet | null;
 }

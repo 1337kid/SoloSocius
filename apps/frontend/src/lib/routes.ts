@@ -10,6 +10,7 @@ export const routes = {
   settings: "/settings",
   settingsServer: "/settings/server",
   post: (id: string) => `/posts/${id}`,
+  user: (username: string, domain: string) => `/users/@${username}@${domain}`,
 } as const;
 
 export const authRoutes = [routes.login, routes.setup] as const;

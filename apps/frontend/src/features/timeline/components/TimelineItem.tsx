@@ -3,6 +3,7 @@
 import { formatDistanceToNow } from "date-fns";
 import purify from "dompurify";
 import { Repeat, Reply } from "lucide-react";
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Status } from "@/components/ui/status";
@@ -39,6 +40,7 @@ export function TimelineItem({
       avatarUrl={postAuthor.avatarUrl}
       html={purify.sanitize(entry.post.content)}
       href={routes.post(entry.post.id)}
+      profileHref={routes.user(postAuthor.username, postAuthor.domain)}
       media={<PostMediaGrid mediaItems={entry.post.mediaItems} />}
       boost={
         isBoost && booster ? (
@@ -68,12 +70,10 @@ export function TimelineItem({
       }
       context={
         parent ? (
-          <a
+          <Link
             data-slot="post-context"
-            href={parent.url || parent.idUri || entry.post.url || "#"}
-            target="_blank"
+            href={routes.post(parent.id.toString())}
             className="bg-accent p-2 rounded-md"
-            rel="noopener noreferrer"
           >
             <Avatar size="sm">
               {parentActor?.avatarUrl ? (
@@ -101,7 +101,7 @@ export function TimelineItem({
                 }}
               />
             </div>
-          </a>
+          </Link>
         ) : null
       }
       actions={

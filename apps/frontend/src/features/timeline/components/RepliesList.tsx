@@ -10,6 +10,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Status } from "@/components/ui/status"
+import { routes } from "@/lib/routes"
 
 import type { PostReply } from "../api"
 import { PostActions } from "./PostActions"
@@ -29,6 +30,8 @@ function ReplyItem({ reply }: { reply: PostReply }) {
       time={timeAgo}
       avatarUrl={reply.actor.avatarUrl}
       html={purify.sanitize(reply.content)}
+      href={routes.post(reply.id)}
+      profileHref={routes.user(reply.actor.username, reply.actor.domain)}
       media={<PostMediaGrid mediaItems={reply.mediaItems} />}
       actions={
         <PostActions

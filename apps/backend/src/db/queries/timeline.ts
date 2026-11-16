@@ -159,8 +159,7 @@ function timelineQuery() {
         },
 
         parentPost: {
-          idUri: parentPost.idUri,
-          url: parentPost.url || parentPost.idUri,
+          id: parentPost.id,
           content: parentPost.content,
         },
 

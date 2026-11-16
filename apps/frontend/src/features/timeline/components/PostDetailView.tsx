@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ColumnHeader } from "@/components/ui/shell";
 import { Status, StatusSkeleton } from "@/components/ui/status";
+import { routes } from "@/lib/routes";
 
 import { usePostDetail } from "../hooks/usePostDetail";
 import type { PostWithReplies } from "../api";
@@ -33,6 +34,7 @@ function PostDetailContent({ post }: { post: PostWithReplies }) {
         time={timeAgo}
         avatarUrl={post.actor.avatarUrl}
         html={purify.sanitize(post.content)}
+        profileHref={routes.user(post.actor.username, post.actor.domain)}
         media={<PostMediaGrid mediaItems={post.mediaItems} />}
         actions={
           <PostActions

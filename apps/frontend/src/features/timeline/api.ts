@@ -49,9 +49,7 @@ export const undoInteraction = async (
   return data;
 };
 
-export const deletePostApi = async (
-  id: string,
-): Promise<MessageResponse> => {
+export const deletePostApi = async (id: string): Promise<MessageResponse> => {
   const { data } = await api.delete<MessageResponse>(`/posts/${id}`);
   return data;
 };
