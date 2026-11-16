@@ -10,12 +10,13 @@ export const routes = {
   settings: "/settings",
   settingsServer: "/settings/server",
   post: (id: string) => `/posts/${id}`,
-  user: (username: string, domain: string) => `/users/@${username}@${domain}`,
+  user: (username: string, domain: string) =>
+    `/user/${encodeURIComponent(`@${username}@${domain}`)}`,
 } as const;
 
 export const authRoutes = [routes.login, routes.setup] as const;
 
-export const protectedRoutes = [routes.dash, routes.settings] as const;
+export const protectedRoutes = [routes.dash, routes.settings, "/user"] as const;
 
 export function matchesRoute(pathname: string, route: string): boolean {
   return pathname === route || pathname.startsWith(`${route}/`);

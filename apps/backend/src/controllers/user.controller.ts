@@ -4,7 +4,7 @@ import {
   updateLocalActorProfileData,
   deleteLocalActor,
   setLocalActorManuallyApprovesFollowers,
-  getActorByWebfinger,
+  getExternalActorProfile,
 } from "../db/queries/actor.js";
 import { getUserCredentials } from "../db/queries/users.js";
 import {
@@ -120,11 +120,11 @@ export const getExternalUserDetails = async (
 ) => {
   const { webfinger } = request.query;
 
-  const actor = await getActorByWebfinger(webfinger);
+  const profile = await getExternalActorProfile(webfinger);
 
-  if (!actor) {
+  if (!profile) {
     return reply.status(404).send({ error: "Actor not found." });
   }
 
-  return reply.status(200).send(actor);
+  return reply.status(200).send(profile);
 };

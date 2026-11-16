@@ -81,6 +81,17 @@ export const getAllAcceptedFollowingActorUri = async () => {
   return uris;
 };
 
+export const getLocalFollowState = async (
+  actorUri: string,
+): Promise<"none" | "requested" | "following"> => {
+  const row = await db.query.following.findFirst({
+    where: eq(following.followedActorUri, actorUri),
+    columns: { accepted: true },
+  });
+  if (!row) return "none";
+  return row.accepted ? "following" : "requested";
+};
+
 export const checkIfLocalActorIsFollowing = async (actorUri: string) => {
   return await db.query.following.findFirst({
     where: and(

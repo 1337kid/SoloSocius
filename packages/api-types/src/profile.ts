@@ -24,4 +24,21 @@ export interface ToggleManuallyApprovesFollowersResponse {
   manuallyApprovesFollowers: boolean;
 }
 
+export type FollowState = "none" | "requested" | "following";
+
+export interface ExternalProfile {
+  actorUri: string;
+  webfinger: string;
+  username: string;
+  domain: string;
+  displayName: string | null;
+  summary: string | null;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+  manuallyApprovesFollowers: boolean;
+  isLocal: boolean;
+  followState: FollowState;
+  postsCount: number;
+}
+
 export type DeleteAccountResponse = MessageResponse;

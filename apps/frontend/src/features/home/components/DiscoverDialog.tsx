@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -16,6 +18,8 @@ import { useState } from "react";
 import { TimelineActor } from "@/features/timeline/api";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { routes } from "@/lib/routes";
+
 import { useFollowUser } from "../hooks/useFollowUser";
 
 const handleRegex = /^@?([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -113,13 +117,18 @@ const DiscoverDialog = ({ open, onOpenChange }: DiscoverDialogProps = {}) => {
 
         {user && (
           <div data-slot="person">
-            <div data-slot="person-id">
+            <Link
+              href={routes.user(user.username, user.domain)}
+              data-slot="person-id"
+            >
               <Avatar size="lg">
                 <AvatarImage
                   src={user.avatarUrl ?? ""}
                   alt={user.displayName || user.username}
                 />
-                <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
+                <AvatarFallback>
+                  {(user.displayName || user.username).charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div>
                 <p data-slot="post-name">
@@ -130,7 +139,7 @@ const DiscoverDialog = ({ open, onOpenChange }: DiscoverDialogProps = {}) => {
                   {user.domain ? `@${user.domain}` : ""}
                 </p>
               </div>
-            </div>
+            </Link>
             {user?.isFollowing ? (
               <Badge variant="secondary">Following</Badge>
             ) : (

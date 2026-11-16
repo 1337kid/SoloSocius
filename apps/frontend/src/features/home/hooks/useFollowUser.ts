@@ -13,6 +13,7 @@ export const useFollowUser = () => {
         queryKey: profileQueryKeys.followingLists(),
       });
       queryClient.invalidateQueries({ queryKey: profileQueryKeys.public });
+      queryClient.invalidateQueries({ queryKey: profileQueryKeys.external });
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : "An error occurred");

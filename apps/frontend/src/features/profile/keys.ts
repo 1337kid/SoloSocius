@@ -1,5 +1,8 @@
 export const profileQueryKeys = {
   public: ["publicProfile"] as const,
+  external: ["externalProfile"] as const,
+  externalProfile: (webfinger: string) =>
+    ["externalProfile", webfinger] as const,
   followers: ["followers"] as const,
   followersLists: () => [...profileQueryKeys.followers, "list"] as const,
   followersList: (page: number) =>

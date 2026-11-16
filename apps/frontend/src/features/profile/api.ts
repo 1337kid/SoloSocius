@@ -2,6 +2,7 @@ import type {
   FollowersData,
   FollowRequestData,
   MessageResponse,
+  ExternalProfile,
   ProfileData,
   ToggleManuallyApprovesFollowersResponse,
   UpdateProfileRequest,
@@ -11,11 +12,21 @@ import type {
 import { api } from "@/lib/api/axios";
 
 export type {
+  ExternalProfile,
   FollowersData,
   FollowRequestData,
   ProfileData,
   UpdateProfileRequest as Profile,
 } from "@solosocius/api-types";
+
+export const getExternalProfile = async (
+  webfinger: string,
+): Promise<ExternalProfile> => {
+  const { data } = await api.get<ExternalProfile>("/profile/lookup", {
+    params: { webfinger },
+  });
+  return data;
+};
 
 export const getProfileData = async (): Promise<ProfileData> => {
   const { data } = await api.get<ProfileData>("/profile");

@@ -1,6 +1,22 @@
 export const TIMELINE_STREAMS = ["user", "public", "public:local"] as const;
 
-export type TimelineStream = (typeof TIMELINE_STREAMS)[number];
+export const ACCOUNT_STREAM_PREFIX = "account:" as const;
+
+export type TimelineStream =
+  | (typeof TIMELINE_STREAMS)[number]
+  | `${typeof ACCOUNT_STREAM_PREFIX}${string}`;
+
+export function accountTimelineStream(actorUri: string): TimelineStream {
+  return `${ACCOUNT_STREAM_PREFIX}${actorUri}`;
+}
+
+export function isTimelineStream(value: string): value is TimelineStream {
+  if ((TIMELINE_STREAMS as readonly string[]).includes(value)) return true;
+  return (
+    value.startsWith(ACCOUNT_STREAM_PREFIX) &&
+    value.length > ACCOUNT_STREAM_PREFIX.length
+  );
+}
 
 export type TimelineStreamEvent = "update" | "status.update" | "delete";
 

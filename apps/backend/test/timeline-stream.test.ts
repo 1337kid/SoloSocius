@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { accountTimelineStream } from "@solosocius/api-types";
 import {
   TimelineHub,
   broadcastTimelineEvent,
@@ -29,6 +30,15 @@ describe("timeline stream frames", () => {
       parseClientFrame('{"type":"unsubscribe","stream":"public:local"}'),
       { type: "unsubscribe", stream: "public:local" },
     );
+    assert.deepEqual(
+      parseClientFrame(
+        '{"type":"subscribe","stream":"account:https://remote.example/users/bob"}',
+      ),
+      {
+        type: "subscribe",
+        stream: "account:https://remote.example/users/bob",
+      },
+    );
   });
 
   it("rejects malformed frames", () => {
@@ -38,6 +48,10 @@ describe("timeline stream frames", () => {
     assert.deepEqual(parseClientFrame('{"type":"subscribe","stream":"home"}'), {
       error: "Unknown stream",
     });
+    assert.deepEqual(
+      parseClientFrame('{"type":"subscribe","stream":"account:"}'),
+      { error: "Unknown stream" },
+    );
     assert.deepEqual(parseClientFrame('{"type":"ping"}'), {
       error: "Unknown message type",
     });
@@ -136,6 +150,36 @@ describe("timeline hub", () => {
     assert.equal(closed.messages.length, 0);
     assert.equal(staying.messages.length, 1);
   });
+
+  it("requires auth for an account stream and fans status updates out to it", () => {
+    const hub = new TimelineHub();
+    const anon = fakeSocket();
+    const profile = fakeSocket();
+    const anonConn = hub.connect(anon, { authenticated: false });
+    const profileConn = hub.connect(profile, { authenticated: true });
+    const stream = accountTimelineStream("https://remote.example/users/bob");
+
+    assert.equal(
+      hub.handleFrame(anonConn, { type: "subscribe", stream }),
+      "Authentication required",
+    );
+    assert.equal(
+      hub.handleFrame(profileConn, { type: "subscribe", stream }),
+      null,
+    );
+
+    hub.publish("update", { id: "other" }, [
+      accountTimelineStream("https://remote.example/users/carol"),
+    ]);
+    hub.publish("status.update", { id: "post" }, ["public"], {
+      includeAccountSubscriptions: true,
+    });
+
+    assert.equal(profile.messages.length, 1);
+    const frame = JSON.parse(profile.messages[0]);
+    assert.equal(frame.event, "status.update");
+    assert.deepEqual(frame.stream, [stream]);
+  });
 });
 
 const item = {
@@ -161,7 +205,12 @@ describe("timeline stream selection", () => {
         localActorUri,
         followedActorUris: followed,
       }),
-      ["user", "public:local", "public"],
+      [
+        "user",
+        "public:local",
+        "public",
+        accountTimelineStream(localActorUri),
+      ],
     );
   });
 
@@ -172,18 +221,19 @@ describe("timeline stream selection", () => {
         localActorUri,
         followedActorUris: followed,
       }),
-      ["user", "public"],
+      ["user", "public", accountTimelineStream(followed[0])],
     );
   });
 
-  it("puts everyone else on the federated stream only", () => {
+  it("puts everyone else on the federated stream and their profile stream", () => {
+    const actorUri = "https://remote.example/users/carol";
     assert.deepEqual(
       streamsForActor({
-        actorUri: "https://remote.example/users/carol",
+        actorUri,
         localActorUri,
         followedActorUris: followed,
       }),
-      ["public"],
+      ["public", accountTimelineStream(actorUri)],
     );
   });
 });
@@ -224,7 +274,12 @@ describe("broadcastTimelineEvent", () => {
       {
         event: "update",
         payload: item,
-        streams: ["user", "public:local", "public"],
+        streams: [
+          "user",
+          "public:local",
+          "public",
+          accountTimelineStream("https://local.example/users/me"),
+        ],
       },
     ]);
   });
@@ -301,7 +356,11 @@ describe("broadcastTimelineEvent", () => {
           eventType: "boost",
           actorUri: "https://remote.example/users/bob",
         },
-        streams: ["user", "public"],
+        streams: [
+          "user",
+          "public",
+          accountTimelineStream("https://remote.example/users/bob"),
+        ],
       },
     ]);
   });

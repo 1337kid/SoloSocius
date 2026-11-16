@@ -16,6 +16,9 @@ export function useUnfollowRemoteUser() {
       queryClient.invalidateQueries({
         queryKey: profileQueryKeys.public,
       });
+      queryClient.invalidateQueries({
+        queryKey: profileQueryKeys.external,
+      });
       toast.success(data.message ?? "User unfollowed successfully.");
     },
     onError: (error) => {

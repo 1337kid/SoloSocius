@@ -19,6 +19,17 @@ export type {
   TimelineResponse,
 } from "@solosocius/api-types";
 
+export async function getUserTimeline(
+  webfinger: string,
+  page: number = 1,
+): Promise<TimelineResponse> {
+  const { data } = await api.get<TimelineResponse>(
+    `/timeline/${encodeURIComponent(webfinger)}`,
+    { params: { page } },
+  );
+  return data;
+}
+
 export async function getPublicTimeline(
   page: number = 1,
 ): Promise<TimelineResponse> {

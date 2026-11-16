@@ -82,6 +82,15 @@ export const getUserPosts = async (offset: number, limit: number) => {
     .offset(offset);
 };
 
+export const getActorPostsCount = async (actorUri: string) => {
+  const [totalResult] = await db
+    .select({ value: count() })
+    .from(posts)
+    .where(eq(posts.actorUri, actorUri));
+
+  return totalResult?.value || 0;
+};
+
 export const getLocalPostsCount = async () => {
   const [totalResult] = await db
     .select({ value: count() })

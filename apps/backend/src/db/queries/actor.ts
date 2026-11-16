@@ -9,7 +9,8 @@ import { CacheKeys, TTL } from "../../cache/keys.js";
 import { invalidateLocalActorCache } from "../../cache/invalidateLocalActor.js";
 import { getCachedFollowersCount } from "./followers.js";
 import { getCachedFollowingCount } from "./following.js";
-import { getCachedLocalPostsCount } from "./posts.js";
+import { getActorPostsCount, getCachedLocalPostsCount } from "./posts.js";
+import { getLocalFollowState } from "./following.js";
 
 export const setupAdminActor = async (username: string, publicKey: string) => {
   const endpoints = username === "system" ? systemUserEndpoints : userEndpoints;
@@ -240,6 +241,7 @@ export const getActorByWebfinger = async (webfinger: string) => {
     .select({
       actorUri: actors.actorUri,
       username: actors.username,
+      domain: actors.domain,
       displayName: actors.displayName,
       summary: actors.summary,
       avatarUrl: actors.avatarUrl,
@@ -251,4 +253,29 @@ export const getActorByWebfinger = async (webfinger: string) => {
     .from(actors)
     .where(and(eq(actors.username, username), eq(actors.domain, domain)));
   return actor;
+};
+
+export const getExternalActorProfile = async (webfinger: string) => {
+  const actor = await getActorByWebfinger(webfinger);
+  if (!actor) return undefined;
+
+  const [postsCount, followState] = await Promise.all([
+    getActorPostsCount(actor.actorUri),
+    getLocalFollowState(actor.actorUri),
+  ]);
+
+  return {
+    actorUri: actor.actorUri,
+    webfinger: `@${actor.username}@${actor.domain}`,
+    username: actor.username,
+    domain: actor.domain,
+    displayName: actor.displayName,
+    summary: actor.summary,
+    avatarUrl: actor.avatarUrl,
+    bannerUrl: actor.bannerUrl,
+    manuallyApprovesFollowers: actor.manuallyApprovesFollowers,
+    isLocal: actor.isLocal,
+    followState,
+    postsCount,
+  };
 };

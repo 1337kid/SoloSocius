@@ -1,12 +1,17 @@
 import {
+  ACCOUNT_STREAM_PREFIX,
   TIMELINE_STREAMS,
+  accountTimelineStream,
+  isTimelineStream,
   type TimelineClientFrame,
   type TimelineDeletePayload,
   type TimelineStream,
   type TimelineStreamEvent,
 } from "@solosocius/api-types";
 
-const AUTHENTICATED_STREAMS = new Set<TimelineStream>(["user", "public"]);
+function streamRequiresAuth(stream: TimelineStream) {
+  return stream !== "public:local";
+}
 
 export interface TimelineSocket {
   send(data: string): void;
@@ -40,10 +45,7 @@ export function parseClientFrame(
     return { error: "Unknown message type" };
   }
 
-  if (
-    typeof frame.stream !== "string" ||
-    !TIMELINE_STREAMS.includes(frame.stream as TimelineStream)
-  ) {
+  if (typeof frame.stream !== "string" || !isTimelineStream(frame.stream)) {
     return { error: "Unknown stream" };
   }
 
@@ -99,10 +101,7 @@ export class TimelineHub {
       return null;
     }
 
-    if (
-      AUTHENTICATED_STREAMS.has(frame.stream) &&
-      !connection.authenticated
-    ) {
+    if (streamRequiresAuth(frame.stream) && !connection.authenticated) {
       return "Authentication required";
     }
 
@@ -114,6 +113,7 @@ export class TimelineHub {
     event: TimelineStreamEvent,
     payload: unknown,
     streams: readonly TimelineStream[],
+    options?: { includeAccountSubscriptions?: boolean },
   ) {
     for (const connection of this.connections) {
       if (
@@ -126,6 +126,16 @@ export class TimelineHub {
       const matched = streams.filter((stream) =>
         connection.streams.has(stream),
       );
+      if (options?.includeAccountSubscriptions) {
+        for (const stream of connection.streams) {
+          if (
+            stream.startsWith(ACCOUNT_STREAM_PREFIX) &&
+            !matched.includes(stream)
+          ) {
+            matched.push(stream);
+          }
+        }
+      }
       if (matched.length === 0) continue;
 
       connection.socket.send(
@@ -150,7 +160,7 @@ export function streamsForActor({
   localActorUri: string;
   followedActorUris: readonly string[];
 }): TimelineStream[] {
-  const streams: TimelineStream[] = ["public"];
+  const streams: TimelineStream[] = ["public", accountTimelineStream(actorUri)];
   if (actorUri === localActorUri) {
     streams.unshift("user", "public:local");
     return streams;
@@ -187,6 +197,7 @@ export type TimelineBroadcastDeps = {
       event: TimelineStreamEvent,
       payload: unknown,
       streams: readonly TimelineStream[],
+      options?: { includeAccountSubscriptions?: boolean },
     ): void;
   };
   loadItem: (query: {
@@ -216,7 +227,14 @@ export async function broadcastTimelineEvent(
             localActorUri: deps.localActorUri,
             followedActorUris: await deps.followedActorUris(),
           });
-    deps.hub.publish("delete", payload, streams);
+    deps.hub.publish(
+      "delete",
+      payload,
+      streams,
+      input.eventType === "post"
+        ? { includeAccountSubscriptions: true }
+        : undefined,
+    );
     return;
   }
 
@@ -232,7 +250,9 @@ export async function broadcastTimelineEvent(
   if (!item) return;
 
   if (input.kind === "status.update") {
-    deps.hub.publish("status.update", item, EVERY_STREAM);
+    deps.hub.publish("status.update", item, EVERY_STREAM, {
+      includeAccountSubscriptions: true,
+    });
     return;
   }
 
