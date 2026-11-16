@@ -1,4 +1,8 @@
 import type { FastifySchema } from "fastify";
+import {
+  fetchExternalUserDetailsQuerySchema,
+  fetchExternalUserDetailsRouteSchema,
+} from "./webfinger.val.js";
 
 const pageProperty = {
   type: "integer",
@@ -34,4 +38,9 @@ export const optionalPageRouteSchema = {
       page: pageProperty,
     },
   },
+} satisfies FastifySchema;
+
+export const userTimelineRouteSchema = {
+  querystring: { ...defaultPageRouteSchema.querystring },
+  params: fetchExternalUserDetailsQuerySchema,
 } satisfies FastifySchema;

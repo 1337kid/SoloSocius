@@ -4,6 +4,7 @@ import { getProfileTimeline } from "../db/queries/timeline.js";
 import { getAllAcceptedFollowingActorUri } from "../db/queries/following.js";
 import type { DefaultPageQuery } from "../validations/pagination.val.js";
 import { serializeTimelineItems } from "../services/timeline-item.js";
+import { getActorByWebfinger } from "../db/queries/actor.js";
 
 const TIMELINE_LIMIT = 20;
 
@@ -82,4 +83,28 @@ export const getPublicTimeline = async (
     console.error("Failed assembling public timeline:", error);
     return reply.status(500).send({ error: "Internal Server Error" });
   }
+};
+
+export const getUserTimeline = async (
+  request: FastifyRequest<{
+    Querystring: DefaultPageQuery;
+    Params: { webfinger: string };
+  }>,
+  reply: FastifyReply,
+) => {
+  const { webfinger } = request.params;
+
+  const actor = await getActorByWebfinger(webfinger);
+
+  if (!actor) {
+    return reply.status(404).send({ error: "Actor not found." });
+  }
+
+  const { pageNumber, offsetValue } = pageWindow(request.query.page);
+  const feedItems = await getProfileTimeline(
+    [actor.actorUri],
+    TIMELINE_LIMIT,
+    offsetValue,
+  );
+  return reply.send(buildTimelinePage(pageNumber, feedItems));
 };

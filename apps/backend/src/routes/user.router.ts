@@ -16,7 +16,10 @@ import {
   handleApproveFollowRequest,
   handleRejectFollow,
 } from "../controllers/followers.controller.js";
-import { defaultPageRouteSchema } from "../validations/pagination.val.js";
+import {
+  defaultPageRouteSchema,
+  userTimelineRouteSchema,
+} from "../validations/pagination.val.js";
 import {
   actorUriRouteSchema,
   followRequestIdRouteSchema,
@@ -27,6 +30,7 @@ import {
   updateProfileRouteSchema,
 } from "../validations/user.val.js";
 import { fetchExternalUserDetailsRouteSchema } from "../validations/webfinger.val.js";
+import { getUserTimeline } from "../controllers/timeline.controller.js";
 
 export async function UserRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -77,10 +81,17 @@ export async function UserRoutes(fastify: FastifyInstance) {
     deleteAccount,
   );
 
-  // Fetch external user details
+  // Fetch external user data
   fastify.get(
     "/profile/lookup",
     { schema: fetchExternalUserDetailsRouteSchema },
     getExternalUserDetails,
+  );
+
+  // Fetch user timeline
+  fastify.get(
+    "/timeline/:webfinger",
+    { schema: userTimelineRouteSchema },
+    getUserTimeline,
   );
 }
