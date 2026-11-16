@@ -8,6 +8,7 @@ import {
   updateProfileData,
   deleteAccount,
   toggleManuallyApprovesFollowers,
+  getExternalUserDetails,
 } from "../controllers/user.controller.js";
 import { actorLookupMiddleware } from "../middlewares/actorLookup.js";
 import {
@@ -25,6 +26,7 @@ import {
   deleteAccountRouteSchema,
   updateProfileRouteSchema,
 } from "../validations/user.val.js";
+import { fetchExternalUserDetailsRouteSchema } from "../validations/webfinger.val.js";
 
 export async function UserRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -34,7 +36,11 @@ export async function UserRoutes(fastify: FastifyInstance) {
   );
 
   // Follows
-  fastify.post("/follow", { schema: actorUriRouteSchema }, handleFollowRemoteUser);
+  fastify.post(
+    "/follow",
+    { schema: actorUriRouteSchema },
+    handleFollowRemoteUser,
+  );
   fastify.delete(
     "/follow",
     { schema: actorUriRouteSchema },
@@ -60,6 +66,21 @@ export async function UserRoutes(fastify: FastifyInstance) {
   );
 
   // Profile
-  fastify.put("/profile", { schema: updateProfileRouteSchema }, updateProfileData);
-  fastify.delete("/account", { schema: deleteAccountRouteSchema }, deleteAccount);
+  fastify.put(
+    "/profile",
+    { schema: updateProfileRouteSchema },
+    updateProfileData,
+  );
+  fastify.delete(
+    "/account",
+    { schema: deleteAccountRouteSchema },
+    deleteAccount,
+  );
+
+  // Fetch external user details
+  fastify.get(
+    "/profile/lookup",
+    { schema: fetchExternalUserDetailsRouteSchema },
+    getExternalUserDetails,
+  );
 }

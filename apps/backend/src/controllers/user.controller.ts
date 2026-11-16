@@ -4,6 +4,7 @@ import {
   updateLocalActorProfileData,
   deleteLocalActor,
   setLocalActorManuallyApprovesFollowers,
+  getActorByWebfinger,
 } from "../db/queries/actor.js";
 import { getUserCredentials } from "../db/queries/users.js";
 import {
@@ -18,6 +19,7 @@ import type {
   DeleteAccountBody,
   UpdateProfileBody,
 } from "../validations/user.val.js";
+import { FetchExternalUserDetailsQuery } from "../validations/webfinger.val.js";
 
 export const getProfileData = async (
   request: FastifyRequest,
@@ -87,7 +89,7 @@ export const deleteAccount = async (
       ]);
       await Promise.allSettled(
         Array.from(uniqueInboxes).map((inboxUrl) =>
-          deliverActivity({ inboxUrl, activity }),
+          deliverActivity({ inboxUrl, activity, isSystemActor: false }),
         ),
       );
       console.log("Deleting local actor...");
@@ -110,4 +112,19 @@ export const toggleManuallyApprovesFollowers = async (
   return reply
     .status(200)
     .send({ manuallyApprovesFollowers: actor.manuallyApprovesFollowers });
+};
+
+export const getExternalUserDetails = async (
+  request: FastifyRequest<{ Querystring: FetchExternalUserDetailsQuery }>,
+  reply: FastifyReply,
+) => {
+  const { webfinger } = request.query;
+
+  const actor = await getActorByWebfinger(webfinger);
+
+  if (!actor) {
+    return reply.status(404).send({ error: "Actor not found." });
+  }
+
+  return reply.status(200).send(actor);
 };

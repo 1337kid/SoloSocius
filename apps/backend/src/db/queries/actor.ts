@@ -231,3 +231,24 @@ export const getUniqueRemoteDomainCount = async () => {
 
   return result?.value || 0;
 };
+
+export const getActorByWebfinger = async (webfinger: string) => {
+  const [, username, domain] = webfinger.match(/^@([^@]+)@([^@]+)$/) || [];
+  if (!username || !domain) return undefined;
+
+  const [actor] = await db
+    .select({
+      actorUri: actors.actorUri,
+      username: actors.username,
+      displayName: actors.displayName,
+      summary: actors.summary,
+      avatarUrl: actors.avatarUrl,
+      bannerUrl: actors.bannerUrl,
+      isLocal: actors.isLocal,
+      manuallyApprovesFollowers: actors.manuallyApprovesFollowers,
+      lastFetchedAt: actors.lastFetchedAt,
+    })
+    .from(actors)
+    .where(and(eq(actors.username, username), eq(actors.domain, domain)));
+  return actor;
+};
