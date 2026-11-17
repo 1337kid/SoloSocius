@@ -22,10 +22,6 @@ export const createTimelineEntry = async ({
   });
 };
 
-export const removeTimelineEntry = async (postUri: string) => {
-  await db.delete(timelineEvents).where(eq(timelineEvents.postUri, postUri));
-};
-
 export const removeTimelineBoostEntry = async (
   postUri: string,
   actorUri: string,

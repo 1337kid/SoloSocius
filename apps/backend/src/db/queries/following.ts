@@ -117,10 +117,6 @@ export const removeFollowingEntry = async (actorUri: string) => {
 
     if (!followingEntry) return undefined;
 
-    await tx
-      .delete(timelineEvents)
-      .where(eq(timelineEvents.actorUri, followingEntry.followedActorUri));
-
     return followingEntry;
   });
 
