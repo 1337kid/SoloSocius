@@ -1,10 +1,10 @@
 import { userEndpoints } from "./actor.js";
 import { DOMAIN } from "../config/env.js";
 
-export const webfingerResponse = (username: string) => {
+export const webfingerResponse = (username: string, actorUri: string) => {
   return {
     subject: `acct:${username}@${DOMAIN}`,
-    aliases: [userEndpoints.actorUri],
+    aliases: [actorUri],
     links: [
       {
         rel: "http://webfinger.net/rel/profile-page",
@@ -14,7 +14,7 @@ export const webfingerResponse = (username: string) => {
       {
         rel: "self",
         type: "application/activity+json",
-        href: userEndpoints.actorUri,
+        href: actorUri,
       },
     ],
   };

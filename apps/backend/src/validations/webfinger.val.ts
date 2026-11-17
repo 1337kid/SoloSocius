@@ -4,7 +4,12 @@ export const webFingerQuerySchema = {
   type: "object",
   required: ["resource"],
   properties: {
-    resource: { type: "string", minLength: 1, pattern: "^acct:" },
+    resource: {
+      type: "string",
+      minLength: 1,
+      pattern:
+        "^(acct:[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|https://.+)$",
+    },
   },
 } as const;
 
