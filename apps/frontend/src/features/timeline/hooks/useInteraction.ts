@@ -8,8 +8,6 @@ import {
 import { createPost } from "@/features/home/api";
 import { queryClient } from "@/lib/query/client";
 import { timelineQueryKeys } from "../keys";
-import { activityPubContent } from "@/lib/utils";
-
 export const useInteraction = () => {
   const interactWithPost = useMutation({
     mutationFn: ({
@@ -45,9 +43,8 @@ export const useInteraction = () => {
       reply: string;
       mediaItems?: import("@/features/home/api").UploadedAttachment[];
     }) => {
-      const content = activityPubContent(reply);
       return createPost({
-        content,
+        content: reply,
         inReplyTo,
         mediaItems: mediaItems?.map((m) => ({ url: m.url, mimeType: m.mimeType })),
       });

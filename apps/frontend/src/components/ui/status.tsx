@@ -15,7 +15,7 @@ function isInteractiveClick(event: React.MouseEvent) {
   if (!(event.target instanceof Element)) return true;
   if (
     event.target.closest(
-      "a, button, input, textarea, select, [role='menuitem']",
+      "a, button, input, textarea, select, [contenteditable='true'], [role='menuitem'], [role='dialog'], [data-slot='dialog-content'], [data-slot='dialog-overlay'], [data-slot='popover-content'], [data-slot='composer']",
     )
   ) {
     return true;

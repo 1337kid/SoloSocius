@@ -6,7 +6,6 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { Textarea } from "@/components/ui/textarea"
 import { useInteraction } from "@/features/timeline/hooks/useInteraction"
 
 import {
@@ -14,6 +13,7 @@ import {
   uploadAttachment,
   type UploadedAttachment,
 } from "../api"
+import { ComposerEditor, type ComposerEditorHandle } from "./ComposerEditor"
 import { useCreatePost } from "../hooks/useCreatePost"
 
 const MAX_IMAGES = 4
@@ -33,7 +33,7 @@ export function PostComposer({
   onSuccess,
 }: PostComposerProps) {
   const isReply = !!inReplyTo
-  const [content, setContent] = useState("")
+  const editorRef = useRef<ComposerEditorHandle>(null)
   const [attachments, setAttachments] = useState<UploadedAttachment[]>([])
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -75,7 +75,11 @@ export function PostComposer({
   }
 
   const handleSubmit = () => {
-    if (!content.trim() && attachments.length === 0) {
+    const current = editorRef.current?.getContent()
+    const text = current?.text.trim() ?? ""
+    const content = text ? (current?.html ?? "") : "<p></p>"
+
+    if (!text && attachments.length === 0) {
       toast.error("Write something or attach an image.")
       return
     }
@@ -85,15 +89,17 @@ export function PostComposer({
       mimeType: a.mimeType,
     }))
 
+    const reset = () => {
+      editorRef.current?.clear()
+      setAttachments([])
+      onSuccess?.()
+    }
+
     if (isReply) {
       replyToPost.mutate(
         { inReplyTo: inReplyTo!, reply: content, mediaItems: attachments },
         {
-          onSuccess: () => {
-            setContent("")
-            setAttachments([])
-            onSuccess?.()
-          },
+          onSuccess: reset,
           onError: (err) => toast.error(err.message),
         },
       )
@@ -103,9 +109,7 @@ export function PostComposer({
         {
           onSuccess: () => {
             toast.success("Post created!")
-            setContent("")
-            setAttachments([])
-            onSuccess?.()
+            reset()
           },
           onError: (err) => toast.error(err.message),
         },
@@ -115,16 +119,12 @@ export function PostComposer({
 
   return (
     <div data-slot="composer" data-variant={variant === "inline" ? "inline" : undefined}>
-      <Textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
+      <ComposerEditor
+        editorRef={editorRef}
         placeholder={
           placeholder ?? (isReply ? "Write your reply…" : "What's happening?")
         }
-        rows={isReply ? 3 : 4}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleSubmit()
-        }}
+        onSubmit={handleSubmit}
       />
       {attachments.length > 0 ? (
         <div data-slot="composer-attachments">

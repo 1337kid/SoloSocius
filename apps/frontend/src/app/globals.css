@@ -375,33 +375,111 @@
     border-bottom: 0;
   }
 
-  [data-slot="composer"] [data-slot="textarea"] {
+  [data-slot="composer-editor"] {
+    position: relative;
+    width: 100%;
     min-height: 4.75rem;
-    resize: none;
-    border-color: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     background: color-mix(in oklch, var(--muted) 70%, transparent);
+    padding: 0.5rem 0.75rem;
   }
 
-  [data-slot="composer"] [data-slot="textarea"]:focus-visible {
+  [data-slot="composer-editor"]:focus-within {
     border-color: var(--border);
     background: color-mix(in oklch, var(--background) 55%, transparent);
   }
 
+  [data-slot="composer-input"] {
+    min-height: 4.75rem;
+    outline: none;
+  }
+
+  [data-slot="composer-input"] :where(p) {
+    margin: 0;
+  }
+
+  [data-slot="composer-input"] :where(.composer-text-bold) {
+    font-weight: 700;
+  }
+
+  [data-slot="composer-input"] :where(.composer-text-italic) {
+    font-style: italic;
+  }
+
+  [data-slot="composer-input"] :where(.composer-text-underline) {
+    text-decoration: underline;
+  }
+
+  [data-slot="composer-input"] :where(.composer-text-strikethrough) {
+    text-decoration: line-through;
+  }
+
+  [data-slot="composer-input"] :where(.composer-text-underline-strikethrough) {
+    text-decoration: underline line-through;
+  }
+
+  [data-slot="composer-input"] :where(.composer-text-code) {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+  }
+
+  [data-slot="composer-input"] :where(.composer-link, a) {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+
+  [data-slot="composer-input"] :where(.composer-list-ul, ul) {
+    margin: 0.25rem 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  [data-slot="composer-input"] :where(.composer-list-ol, ol) {
+    margin: 0.25rem 0;
+    padding-left: 1.25rem;
+    list-style: decimal;
+  }
+
+  [data-slot="composer-editor"] > [aria-hidden="true"] {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    color: var(--muted-foreground);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  [data-slot="composer-toolbar"] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  [data-slot="composer-toolbar-sep"] {
+    width: 1px;
+    height: 1rem;
+    margin-inline: 0.25rem;
+    background: var(--border);
+  }
+
   [data-slot="composer-bar"] {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
   }
 
   [data-slot="composer"]:not([data-variant="inline"])
     [data-slot="composer-bar"]
-    [data-slot="button"]:last-child {
+    > [data-slot="button"]:last-child {
     flex: 1;
   }
 
   [data-slot="composer"][data-variant="inline"]
     [data-slot="composer-bar"]
-    [data-slot="button"]:last-child {
+    > [data-slot="button"]:last-child {
     margin-left: auto;
   }
 
@@ -582,6 +660,39 @@
 
   [data-slot="post-body"] :where(p) {
     margin: 0;
+  }
+
+  [data-slot="post-body"] :where(b, strong) {
+    font-weight: 700;
+  }
+
+  [data-slot="post-body"] :where(i, em) {
+    font-style: italic;
+  }
+
+  [data-slot="post-body"] :where(u) {
+    text-decoration: underline;
+  }
+
+  [data-slot="post-body"] :where(s) {
+    text-decoration: line-through;
+  }
+
+  [data-slot="post-body"] :where(ul) {
+    margin: 0.25rem 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  [data-slot="post-body"] :where(ol) {
+    margin: 0.25rem 0;
+    padding-left: 1.25rem;
+    list-style: decimal;
+  }
+
+  [data-slot="post-body"] :where(code) {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
   }
 
   [data-slot="post-body"] a {

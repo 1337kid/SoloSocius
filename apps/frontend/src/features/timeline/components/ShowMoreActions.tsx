@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Textarea } from "@/components/ui/textarea";
+import { ComposerEditor } from "@/features/home/components/ComposerEditor";
 import { useInteraction } from "../hooks/useInteraction";
 import {
   Ellipsis,
@@ -26,6 +26,15 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { toast } from "sonner";
+
+function htmlHasText(html: string) {
+  return (
+    html
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .trim().length > 0
+  );
+}
 
 export default function ShowMoreActions({
   id,
@@ -41,6 +50,7 @@ export default function ShowMoreActions({
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editedContent, setEditedContent] = useState(postContent);
+  const [hasText, setHasText] = useState(() => htmlHasText(postContent));
 
   const { updatePost, deletePost } = useInteraction();
 
@@ -112,6 +122,7 @@ export default function ShowMoreActions({
                 <DropdownMenuItem
                   onClick={() => {
                     setEditedContent(postContent);
+                    setHasText(htmlHasText(postContent));
                     setEditOpen(true);
                   }}
                 >
@@ -140,15 +151,20 @@ export default function ShowMoreActions({
               Make changes to your post below.
             </DialogDescription>
           </DialogHeader>
-          <Textarea
-            value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
-            rows={5}
-          />
+          {editOpen ? (
+            <ComposerEditor
+              initialHtml={postContent}
+              placeholder="Edit your post…"
+              onChange={({ html, text }) => {
+                setEditedContent(html);
+                setHasText(text.trim().length > 0);
+              }}
+            />
+          ) : null}
           <DialogFooter showCloseButton>
             <Button
               onClick={handleEdit}
-              disabled={updatePost.isPending || !editedContent.trim()}
+              disabled={updatePost.isPending || !hasText}
             >
               {updatePost.isPending ? "Saving…" : "Save changes"}
             </Button>
